@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 04-08-2017 a las 02:06:39
+-- Tiempo de generación: 01-12-2018 a las 22:25:31
 -- Versión del servidor: 5.7.18
 -- Versión de PHP: 5.6.30
 
@@ -33,6 +33,13 @@ CREATE TABLE `Alumno` (
   `correo` varchar(50) COLLATE utf8_bin NOT NULL,
   `contrasenia` varchar(255) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Volcado de datos para la tabla `Alumno`
+--
+
+INSERT INTO `Alumno` (`n_cuenta`, `nombres`, `apellidos`, `correo`, `contrasenia`) VALUES
+(1, 'asdfg', 'asdfg', 'a@a.a', '86f7e437faa5a7fce15d1ddcb9eaeaea377667b8');
 
 -- --------------------------------------------------------
 
@@ -77,8 +84,15 @@ CREATE TABLE `Contiene` (
 CREATE TABLE `Cursa` (
   `n_cuenta` int(11) UNSIGNED NOT NULL,
   `id_curso` int(10) NOT NULL,
-  `estado` tinyint(4) NOT NULL
+  `estado` varchar(1) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Volcado de datos para la tabla `Cursa`
+--
+
+INSERT INTO `Cursa` (`n_cuenta`, `id_curso`, `estado`) VALUES
+(1, 1, 'a');
 
 -- --------------------------------------------------------
 
@@ -88,8 +102,18 @@ CREATE TABLE `Cursa` (
 
 CREATE TABLE `Curso` (
   `id_curso` int(10) NOT NULL,
+  `clave` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(50) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Volcado de datos para la tabla `Curso`
+--
+
+INSERT INTO `Curso` (`id_curso`, `clave`, `nombre`) VALUES
+(1, 1234, 'Redes'),
+(2, 1212, '1212'),
+(3, 1111, 'Prueba');
 
 -- --------------------------------------------------------
 
@@ -209,6 +233,15 @@ CREATE TABLE `Imparte` (
   `id_curso` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+--
+-- Volcado de datos para la tabla `Imparte`
+--
+
+INSERT INTO `Imparte` (`n_trabajador`, `id_curso`) VALUES
+(1, 1),
+(1, 2),
+(1, 3);
+
 -- --------------------------------------------------------
 
 --
@@ -251,6 +284,13 @@ CREATE TABLE `Profesor` (
   `correo` varchar(50) COLLATE utf8_bin NOT NULL,
   `contrasenia` varchar(255) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Volcado de datos para la tabla `Profesor`
+--
+
+INSERT INTO `Profesor` (`n_trabajador`, `nombres`, `apellidos`, `correo`, `contrasenia`) VALUES
+(1, 'yolo', 'qwerty', 'p@p.p', '516b9783fca517eecbd1d064da2d165310b19759');
 
 -- --------------------------------------------------------
 
@@ -296,6 +336,17 @@ CREATE TABLE `Respuesta` (
 CREATE TABLE `Tema` (
   `id_tema` int(10) NOT NULL,
   `nombre` varchar(50) COLLATE utf8_bin NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `TemaFuente`
+--
+
+CREATE TABLE `TemaFuente` (
+  `id_tema` int(10) NOT NULL,
+  `id_fuente` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -490,6 +541,14 @@ ALTER TABLE `Tema`
   ADD PRIMARY KEY (`id_tema`);
 
 --
+-- Indices de la tabla `TemaFuente`
+--
+ALTER TABLE `TemaFuente`
+  ADD PRIMARY KEY (`id_tema`,`id_fuente`),
+  ADD KEY `id_tema` (`id_tema`),
+  ADD KEY `id_fuente` (`id_fuente`);
+
+--
 -- Indices de la tabla `Tipo`
 --
 ALTER TABLE `Tipo`
@@ -511,12 +570,12 @@ ALTER TABLE `VieneDe`
 -- AUTO_INCREMENT de la tabla `Alumno`
 --
 ALTER TABLE `Alumno`
-  MODIFY `n_cuenta` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `n_cuenta` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT de la tabla `Curso`
 --
 ALTER TABLE `Curso`
-  MODIFY `id_curso` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_curso` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT de la tabla `Examen`
 --
@@ -536,7 +595,7 @@ ALTER TABLE `Pregunta`
 -- AUTO_INCREMENT de la tabla `Profesor`
 --
 ALTER TABLE `Profesor`
-  MODIFY `n_trabajador` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `n_trabajador` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT de la tabla `Referencia`
 --
@@ -658,6 +717,13 @@ ALTER TABLE `Presenta`
 ALTER TABLE `ReferenciaFuente`
   ADD CONSTRAINT `referenciafuente_ibfk_1` FOREIGN KEY (`id_referencia`) REFERENCES `Referencia` (`id_referencia`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `referenciafuente_ibfk_2` FOREIGN KEY (`id_fuente`) REFERENCES `Fuente` (`id_fuente`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `TemaFuente`
+--
+ALTER TABLE `TemaFuente`
+  ADD CONSTRAINT `temafuente_ibfk_1` FOREIGN KEY (`id_fuente`) REFERENCES `Fuente` (`id_fuente`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `temafuente_ibfk_2` FOREIGN KEY (`id_tema`) REFERENCES `Tema` (`id_tema`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `VieneDe`
