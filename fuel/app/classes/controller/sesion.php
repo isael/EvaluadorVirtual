@@ -342,14 +342,33 @@ class Controller_Sesion extends Controller_Template
 					$curso = new Model_Curso();
 					$curso->nombre = $nombre;
 					$curso->clave = $clave;
-					$curso->save();
+					$exito = false;
+					try{
+						$curso->save();
+						$exito = true;
+					}catch(Database_Exception $e){
+						$pos = strpos($e->getMessage(), "Duplicate entry");	//Es el error que marca cuando hay duplicados
+						if ($pos !== false) {
+							$mensaje="Ya existe un curso con esa clave '$clave'";
+						} else {
+							$mensaje="Hubo un error al crear el curso";
+						}
+					}
 
-					$imparte = new Model_Imparte();
-					$imparte->n_trabajador = $id;
-					$imparte->id_curso = $curso->id_curso;
-					$imparte->save();
+					if($exito){
+						try{
+							$imparte = new Model_Imparte();
+							$imparte->n_trabajador = $id;
+							$imparte->id_curso = $curso->id_curso;
+							$imparte->save();
 
-					$mensaje="Curso agregado con éxito.";
+							$mensaje="Curso agregado con éxito.";
+
+						}catch(Database_Exception $e){
+							$mensaje="Hubo un error al crear el curso";
+						}						
+					}
+
 				}else{
 					$mensaje="Acción no permitida";
 				}
@@ -383,9 +402,17 @@ class Controller_Sesion extends Controller_Template
 					$cursa->n_cuenta = $id;
 					$cursa->id_curso = $curso->id_curso;
 					$cursa->estado = 'e'; //Esperando
-					$cursa->save();
-
-					$mensaje="Curso solicitado con éxito. Espera confirmación del profesor.";
+					try{
+						$cursa->save();
+						$mensaje="Curso solicitado con éxito. Espera confirmación del profesor.";
+					}catch(Database_Exception $e){
+						$pos = strpos($e->getMessage(), "Duplicate entry");	//Es el error que marca cuando hay duplicados
+						if ($pos !== false) {
+							$mensaje="Ya existe una solicitud previa al curso '$clave'";
+						} else {
+							$mensaje="Hubo un error al solicitar el curso";
+						}
+					}
 				}else{
 					$mensaje="Acción no permitida";
 				}
