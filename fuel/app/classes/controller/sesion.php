@@ -339,17 +339,26 @@ class Controller_Sesion extends Controller_Template
 				$tipo_usuario = substr($id,0,1);
 				$id = substr($id,1);
 				if ($tipo_usuario=="p"){
-					$curso = new Model_Curso();
-					$curso->nombre = $nombre;
-					$curso->clave = $clave;
-					$curso->save();
+					try{
+						$curso = new Model_Curso();
+						$curso->nombre = $nombre;
+						$curso->clave = $clave;
+						$curso->save();
 
-					$imparte = new Model_Imparte();
-					$imparte->n_trabajador = $id;
-					$imparte->id_curso = $curso->id_curso;
-					$imparte->save();
+						$imparte = new Model_Imparte();
+						$imparte->n_trabajador = $id;
+						$imparte->id_curso = $curso->id_curso;
+						$imparte->save();
 
-					$mensaje="Curso agregado con éxito.";
+						$mensaje="Curso agregado con éxito.";
+
+					}catch(Database_Exception $e){
+						$pos = strpos($e->getMessage(), "Duplicate entry");
+						$mensaje="Ocurrio un error al agregar el curso.";
+						if($pos !== false){
+							$mensaje="Ya existe una curso con clave similar.";
+						}
+					}
 				}else{
 					$mensaje="Acción no permitida";
 				}
@@ -361,7 +370,7 @@ class Controller_Sesion extends Controller_Template
 	}
 
 	/**
-	 * Controlador que sirve para crear en la base un nuevo curso
+	 * Controlador que sirve para crear en la base un nuevo curso relacionado al alumno
 	 *
 	 * @access  public
 	 * @return  Response
@@ -378,14 +387,25 @@ class Controller_Sesion extends Controller_Template
 				$id = substr($id,1);
 				if ($tipo_usuario=="a"){
 					$curso = Model_Curso::find_one_by('clave',$clave);
-
-					$cursa = new Model_Cursa();
-					$cursa->n_cuenta = $id;
-					$cursa->id_curso = $curso->id_curso;
-					$cursa->estado = 'e'; //Esperando
-					$cursa->save();
-
-					$mensaje="Curso solicitado con éxito. Espera confirmación del profesor.";
+					if(is_object($curso)){ //Revisa si el $curso no es vacío, es decir si existe.
+						$cursa = new Model_Cursa();
+						$cursa->n_cuenta = $id;
+						$cursa->id_curso = $curso->id_curso;
+						$cursa->estado = 'e'; //Esperando
+						try{
+							$cursa->save();
+							$mensaje="Curso solicitado con éxito. Espera confirmación del profesor.";
+						}catch(Database_Exception $e){
+							$pos = strpos($e->getMessage(), "Duplicate entry");
+							$mensaje="Ocurrio un error al realizar tu solicitud.";
+							if($pos !== false){
+								$mensaje="Ya existe una solicitud previa del curso";
+							}
+						}
+					}else{
+						$mensaje = "El curso que solicitaste no existe";
+					}
+					
 				}else{
 					$mensaje="Acción no permitida";
 				}

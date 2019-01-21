@@ -10,7 +10,13 @@
 				    		<?php echo Html::anchor('sesion/profesor','<i class="fa fa-chevron-circle-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg')); ?>	
 				    	</div>
 				    	<div class="col-xs-8 materia">
-				    		<?php echo $curso->nombre;; ?>		
+				    		<?php 
+				    		if(isset($curso)){
+				    			echo $curso->nombre;; 
+				    		}else{
+				    			Response::redirect('sesion/index');
+				    		}
+				    		?>	
 				    	</div>
 			    </div>
 			    <!-- /Barra -->
