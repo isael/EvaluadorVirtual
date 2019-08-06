@@ -3,8 +3,11 @@
         <div class="row">
             <div class="col-lg-12 text-center">
                 <h3>
-                    <?php if(isset($mensaje))
-                        echo $mensaje;
+                    <?php if(isset($mensaje)){
+                            echo $mensaje;?>
+                            <hr>
+                            <?php
+                        }
                     ?>
                 </h3>
                 <h3>Iniciar Sesión</h3>

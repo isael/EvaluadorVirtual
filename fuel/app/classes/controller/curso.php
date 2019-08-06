@@ -103,7 +103,9 @@ class Controller_Curso extends Controller_Template
 
 			$id_curso = SESSION::get('id_curso');
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
-			
+			if($curso == null){
+				Response::redirect('sesion/index');
+			}
 			$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
 			    return $query->join('Cursa')
 			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
