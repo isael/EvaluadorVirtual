@@ -54,7 +54,7 @@ class Controller_Principal extends Controller_Template
 	 */
 	public function action_inicio()
 	{
-		Response::redirect('sesion/inicio');		
+		Response::redirect('sesion/inicio');	
 	}
 
 	/**
@@ -65,8 +65,16 @@ class Controller_Principal extends Controller_Template
 	 */
 	public function action_cerrar()
 	{
-		$data = array('mensaje' => "Tu sesión ha sido cerrada. ¡Vuelve Pronto!", 'cerrar'=>True);
-		$this->template->content = View::forge('principal/mensaje', $data);
+		$id=SESSION::get('id_sesion');
+   		if(isset($id)){
+			SESSION::delete('id_sesion');
+			$mensaje = "Tu sesión ha sido cerrada. ¡Vuelve Pronto!";
+			$data = array('mensaje' => $mensaje );
+			$this->template->color = " azul";
+			$this->template->content = View::forge('principal/index', $data);
+		}else{
+			Response::redirect('/');
+		}
 	}
 
 	/**

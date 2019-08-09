@@ -63,13 +63,7 @@ class Controller_Sesion extends Controller_Template
 	 */
 	public function action_cerrar()
 	{
-		SESSION::delete('id_sesion');
-		//Response::redirect('principal/cerrar');
-		$this->template->nav_bar = View::forge('nav_bar');
-		$this->template->footer = View::forge('footer');
-		$mensaje = "Sesión cerrada con éxito";
-		$data = array('mensaje' => $mensaje );
-		$this->template->content = View::forge('sesion/inicio', $data);
+		Response::redirect('principal/cerrar');
 	}
 
 	/**
