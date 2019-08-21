@@ -126,4 +126,31 @@ class Controller_Curso_Examen extends Controller_Template
 		
 
 	}
+	/**
+	 * Controlador que muestra la pantalla de creacion de temas para
+	 * la creacion del examen correspondiente.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_crear_bibliografia()
+	{	
+		// $id_curso = SESSION::get('id_curso');
+		// if (isset($id_curso)) {
+		// 	$id_examen = trim(Input::get('id_examen'));
+		// 	if (isset($id_examen) && $id_examen!="") {
+		// 		$volver = "curso/examen/temas?id_examen=".$id_examen;
+		// 		$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+		// 		$data = array('curso'=>$curso, 'volver'=>$volver);;
+		// 		$this->template->content = View::forge('curso/temas/crear', $data);
+		// 	}else{
+		// 		Response::redirect('curso/index');
+		// 	}
+		// }else{
+			Response::redirect('sesion/index');
+		// }
+		
+
+	}
+
 }
