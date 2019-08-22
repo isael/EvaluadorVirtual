@@ -3,6 +3,20 @@
         <div class="row">
             <div class="col-lg-12 text-center">
 			    <!-- Contenido -->
+
+			    <!-- SESSION -->
+			    <?php
+					$pestania = SESSION::get('pestania');
+					$data = SESSION::get('data');
+					if(isset($pestania)){
+						SESSION::delete('pestania');
+					}
+					if(isset($data)){
+						SESSION::delete('data');
+					}
+			    ?>
+			    <!-- /SESSION -->
+
 			    <!-- Barra -->
 			    <div class="row">
 			    	<div class="col-xs-2">
@@ -20,11 +34,12 @@
 			    <!-- /Barra -->
 
 			    <!-- Pestanias -->
+			    <?php if(!isset($pestania)){$pestania = '';} ?>
 			    <div id="pestanias" class="row">
 			    	<ul class="nav nav-tabs pestania">
-		    			<li id="edicion" class="col-xs-4 active"><a href="javascript:cambiarPestania(pestanias, edicion);">Edición</a></li>					
-		    			<li id="bibliografia" class="col-xs-4"><a href="javascript:cambiarPestania(pestanias, bibliografia);">Bibliografía</a></li>						
-		    			<li id="preguntas" class="col-xs-4"><a href="javascript:cambiarPestania(pestanias, preguntas);">Preguntas</a></li>
+						<li id="edicion" class="col-xs-4<?php echo $pestania == 'edicion' || $pestania == '' ? " active": ""; ?>"><a href="javascript:cambiarPestania(pestanias, edicion);">Edición</a></li>
+						<li id="bibliografia" class="col-xs-4<?php echo $pestania == 'bibliografia' ? " active": ""; ?>"><a href="javascript:cambiarPestania(pestanias, bibliografia);">Bibliografía</a></li>
+						<li id="preguntas" class="col-xs-4<?php echo $pestania == 'preguntas' ? " active": ""; ?>"><a href="javascript:cambiarPestania(pestanias, preguntas);">Preguntas</a></li>
 					</ul>
 				</div>
 			    <!-- Pestanias -->
@@ -32,7 +47,7 @@
 			    <!-- Area de trabajo -->
 			    <div id="area_pestanias">
 			    	<!-- Edicion -->
-			    	<div id="area_edicion" class="area">
+					<div id="area_edicion" class="area<?php echo $pestania == 'edicion' || $pestania == '' ? " expuesto": " oculto"; ?>">
 			    		<!-- Lista Examenes -->
 			    		<?php
 			    			$cual_boton = "examen";
@@ -61,7 +76,7 @@
 																echo ", ".$tema->nombre;
 															}
 														}
-													}													
+													}
 												}else{
 													echo 'Sin fijar';
 												}
@@ -134,42 +149,42 @@
 			    	<!-- /Edicion -->
 
 			    	<!-- Bibliografia -->
-			    	<div id="area_bibliografia" class="area oculto">
+					<div id="area_bibliografia" class="area<?php echo $pestania == 'bibliografia' ? " expuesto": " oculto"; ?>">
 			    		<!-- Lista Bibliografias -->
 			    		<?php
 			    			if(isset($bibliografia)){//TODO_ISAEL Cambiar por lista de bibliografia
 			    				echo '<div class="row">';
-					    		foreach ($examenes as $examen) {
-					    			
-									echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-										echo '<a href="examen/editar?id_examen='.$examen->id_examen.'">';
-										echo '<div class="row">';
-											echo '<div class="col-xs-6">';
-												echo $examen->nombre;
-												echo '<br>Inicio: '.$examen->fecha_inicio;
-												echo '<br>Final: '.$examen->fecha_fin;
-											echo '</div>';
-											echo '<div class="col-xs-6">';
-												echo 'Temas: ';
-												if(isset($temas)){
-													$es_primero = True;
-													foreach ($temas as $tema) {
-														if($tema->id_examen==$examen->id_examen){
-															if($es_primero){
-																echo $tema->nombre;
-																$es_primero=False;
-															}else{
-																echo ", ".$tema->nombre;
-															}
-														}
-													}													
-												}else{
-													echo 'Sin fijar';
-												}
-											echo '</div>';
-										echo '</div>';
-										echo '</a>';
-									echo '</div>';
+								foreach ($bibliografia as $fuente) {
+									echo $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero;
+									// echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
+									// 	echo '<a href="examen/editar?id_examen='.$examen->id_examen.'">';
+									// 	echo '<div class="row">';
+									// 		echo '<div class="col-xs-6">';
+									// 			echo $examen->nombre;
+									// 			echo '<br>Inicio: '.$examen->fecha_inicio;
+									// 			echo '<br>Final: '.$examen->fecha_fin;
+									// 		echo '</div>';
+									// 		echo '<div class="col-xs-6">';
+									// 			echo 'Temas: ';
+									// 			if(isset($temas)){
+									// 				$es_primero = True;
+									// 				foreach ($temas as $tema) {
+									// 					if($tema->id_examen==$examen->id_examen){
+									// 						if($es_primero){
+									// 							echo $tema->nombre;
+									// 							$es_primero=False;
+									// 						}else{
+									// 							echo ", ".$tema->nombre;
+									// 						}
+									// 					}
+									// 				}
+									// 			}else{
+									// 				echo 'Sin fijar';
+									// 			}
+									// 		echo '</div>';
+									// 	echo '</div>';
+									// 	echo '</a>';
+									// echo '</div>';
 					    		}
 					    		echo '</div>';
 			    			}else{
@@ -232,7 +247,7 @@
 			    	<!-- /Bibliografia -->
 
 			    	<!-- Preguntas -->
-			    	<div id="area_preguntas" class="area oculto">
+					<div id="area_preguntas" class="area<?php echo $pestania == 'preguntas' ? " expuesto": " oculto"; ?>">
 			    		<!-- Lista Bibliografias -->
 			    		<?php
 			    			$cual_boton = "preguntas";
@@ -261,7 +276,7 @@
 																echo ", ".$tema->nombre;
 															}
 														}
-													}													
+													}
 												}else{
 													echo 'Sin fijar';
 												}
