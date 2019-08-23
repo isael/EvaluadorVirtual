@@ -152,9 +152,9 @@
 					<div id="area_bibliografia" class="area<?php echo $pestania == 'bibliografia' ? " expuesto": " oculto"; ?>">
 			    		<!-- Lista Bibliografias -->
 			    		<?php
-			    			if(isset($bibliografia)){//TODO_ISAEL Cambiar por lista de bibliografia
+			    			if(isset($bibliografias)){//TODO_ISAEL Cambiar por lista de bibliografia
 			    				echo '<div class="row">';
-								foreach ($bibliografia as $fuente) {
+								foreach ($bibliografias as $fuente) {
 									echo $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero;
 									// echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
 									// 	echo '<a href="examen/editar?id_examen='.$examen->id_examen.'">';
@@ -196,10 +196,10 @@
 			    		<br>
 			    		<!-- Seccion agregar bibliografia -->
 			    		<div class="row">
-					    	<button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearExamen','agregarExamen','+ Agregar nueva bibliografía','- Cancelar nueva bibliografía')">+ Agregar nueva bibliografía</button>
+					    	<button id="mostrarCrearBibliografia" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearBibliografia','agregarBibliografia','+ Agregar nueva bibliografía','- Cancelar nueva bibliografía')">+ Agregar nueva bibliografía</button>
 					    </div>
 					    <br>
-					    <div id="agregarExamen" class="row" style="display: none;">
+					    <div id="agregarBibliografia" class="row" style="display: none;">
 						    <?php echo Form::open('curso/examen/crear_bibliografia');?>
 						    <div class="form-group">
 						    	<div class="col-xs-12 col-sm-12">
@@ -298,7 +298,7 @@
 			    		?>
 			    		<!-- /Lista Bibliografias -->
 			    		<br>
-			    		<!-- Seccion agregar bibliografia -->
+			    		<!-- Seccion agregar pregunta -->
 			    		<?php 
 			    			switch($cual_boton){
 								case "bibliografia":
@@ -312,20 +312,95 @@
 								default:
 								?>
 						    		<div class="row">
-								    	<button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearExamen','agregarExamen','+ Crear nuevo examen','- Cancelar creación de examen')">+ Crear nuevo examen</button>
+								    	<button id="mostrarCrearPregunta" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPregunta','agregarPregunta','+ Agrega nueva pregunta','- Cancelar nueva pregunta')">+ Agrega nueva pregunta</button>
 								    </div>
 								    <br>
-								    <div id="agregarExamen" class="row" style="display: none;">
-									    <?php echo Form::open('curso/crear_examen');?>
+								    <div id="agregarPregunta" class="row" style="display: none;">
+									    <?php echo Form::open('curso/examen/crear_pregunta');?>
 									    <div class="form-group">
-									    	<div class="col-xs-12 col-sm-3">
-									    		<?php echo Form::label('Nombre del examen', 'nombre_examen');?>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Nombre', 'nombre_bibliografia');?>
 									    	</div>
-									    	<div class="col-xs-12 col-sm-7">
-									    		<?php echo Form::input('nombre_examen','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre del examen'));?>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::input('nombre_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de la fuente'));?>
 									    	</div>
-										    <div class="col-xs-12 col-sm-2">
-										    	<?php echo Form::button('boton_agregar_curso', '+ Agregar', array('class' => 'btn btn-primary btn-block'));?>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Autor(es)', 'autor_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::input('autor_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de los autores'));?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Edición', 'edicion_bibliografia');?>
+									    	</div>						    	
+									    	<div class="col-xs-4 col-sm-4">
+									    		<?php echo Form::label('#', 'numero_edicion_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-8 col-sm-8">
+									    		<?php echo Form::label('Año', 'anio_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-4 col-sm-4">
+									    		<?php echo Form::input('numero_edicion_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Número'));?>
+									    	</div>
+									    	<div class="col-xs-8 col-sm-8">
+									    		<?php echo Form::input('anio_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Año'));?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Enlace en línea (si existe)', 'link_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::input('link_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Enlace o link a la fuente'));?>
+									    	</div>
+									    	<br>
+										    <div class="col-xs-12 col-sm-12">
+										    	<?php echo Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block'));?>
+										    </div>
+									    </div>
+									    <?php echo Form::close();?>
+								    </div>
+								    <br>								    
+								    <div class="row">
+								    	<button id="mostrarCrearPreguntaCompartida" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPreguntaCompartida','agregarPreguntaCompartida','+ Agrega preguntas compartidas','- Cancelar preguntas compartidas')">+ Agrega preguntas compartidas</button>
+								    </div>
+								    <div id="agregarPreguntaCompartida" class="row" style="display: none;">
+									    <?php echo Form::open('curso/examen/crear_pregunta');?>
+									    <div class="form-group">
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Nombre', 'nombre_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::input('nombre_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de la fuente'));?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Autor(es)', 'autor_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::input('autor_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de los autores'));?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Edición', 'edicion_bibliografia');?>
+									    	</div>						    	
+									    	<div class="col-xs-4 col-sm-4">
+									    		<?php echo Form::label('#', 'numero_edicion_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-8 col-sm-8">
+									    		<?php echo Form::label('Año', 'anio_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-4 col-sm-4">
+									    		<?php echo Form::input('numero_edicion_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Número'));?>
+									    	</div>
+									    	<div class="col-xs-8 col-sm-8">
+									    		<?php echo Form::input('anio_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Año'));?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Enlace en línea (si existe)', 'link_bibliografia');?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::input('link_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Enlace o link a la fuente'));?>
+									    	</div>
+									    	<br>
+										    <div class="col-xs-12 col-sm-12">
+										    	<?php echo Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block'));?>
 										    </div>
 									    </div>
 									    <?php echo Form::close();?>
@@ -334,7 +409,7 @@
 						    	<?php 
 						    }
 						    ?>
-			    		<!-- /Seccion agregar bibliografia -->
+			    		<!-- /Seccion agregar pregunta -->
 			    	</div>
 			    	<!-- /Preguntas -->
 			    </div>
