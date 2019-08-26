@@ -319,37 +319,82 @@
 									    <?php echo Form::open('curso/examen/crear_pregunta');?>
 									    <div class="form-group">
 									    	<div class="col-xs-12 col-sm-12">
-									    		<?php echo Form::label('Nombre', 'nombre_bibliografia');?>
+									    		<?php echo Form::label('Tema', 'pregunta_tema');?>
 									    	</div>
 									    	<div class="col-xs-12 col-sm-12">
-									    		<?php echo Form::input('nombre_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de la fuente'));?>
+									    		<?php echo Form::input('pregunta_tema','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Selecciona o crea un tema'));?>
 									    	</div>
 									    	<div class="col-xs-12 col-sm-12">
-									    		<?php echo Form::label('Autor(es)', 'autor_bibliografia');?>
+									    		<?php echo Form::label('Bibliografía', 'pregunta_bibliografia');?>
 									    	</div>
 									    	<div class="col-xs-12 col-sm-12">
-									    		<?php echo Form::input('autor_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de los autores'));?>
-									    	</div>
-									    	<div class="col-xs-12 col-sm-12">
-									    		<?php echo Form::label('Edición', 'edicion_bibliografia');?>
-									    	</div>						    	
+									    		<select class="form-control" id="form_pregunta_bibliografia" name="pregunta_bibliografia">
+												    <option value="None" disabled selected>Selecciona una fuente</option>
+												    <optgroup label="Nombre del libro">
+												    	<option value="hurr">Durr</option>
+												    </optgroup>
+												    <optgroup label="Nombre del libro 2">
+												    	<option value="foo">Bar</option>
+												    </optgroup>
+												    <option disabled><hr></option>
+												    <option><a href="#">+ Agregar nueva Bibliografía</a></option>
+												</select>
+									    		<?php echo Form::select('pregunta_bibliografia','',array('none' => 'None',
+    												'class'=>'form-control','type' => array('opcion1'=>'opcion1', 'opcion2'=>'opcion2'), 'placeholder'=>'Selecciona una fuente'),array('class'=>'form-control'));?>
+									    	</div>				    	
 									    	<div class="col-xs-4 col-sm-4">
-									    		<?php echo Form::label('#', 'numero_edicion_bibliografia');?>
+									    		<?php echo Form::label('Página', 'pregunta_bibliografia_pagina');?>
 									    	</div>
 									    	<div class="col-xs-8 col-sm-8">
-									    		<?php echo Form::label('Año', 'anio_bibliografia');?>
+									    		<?php echo Form::label('Capítulo', 'pregunta_bibliografia_capitulo');?>
 									    	</div>
 									    	<div class="col-xs-4 col-sm-4">
-									    		<?php echo Form::input('numero_edicion_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Número'));?>
+									    		<?php echo Form::input('pregunta_bibliografia_pagina','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Página'));?>
 									    	</div>
 									    	<div class="col-xs-8 col-sm-8">
-									    		<?php echo Form::input('anio_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Año'));?>
+									    		<?php echo Form::input('pregunta_bibliografia_capitulo','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Capítulo'));?>
+									    	</div>				    	
+									    	<div class="col-xs-4 col-sm-4">
+									    		<?php echo Form::label('Dificultad', 'pregunta_bibliografia_pagina');?>
+									    	</div>
+									    	<div class="col-xs-8 col-sm-8">
+									    		<?php echo Form::label('Tiempo', 'pregunta_bibliografia_capitulo');?>
+									    	</div>
+									    	<div class="col-xs-4 col-sm-4">
+									    		<?php echo Form::input('pregunta_bibliografia_dificultad','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'...'));?>
+									    	</div>
+									    	<div class="col-xs-8 col-sm-8">
+									    		<?php echo Form::input('pregunta_bibliografia_tiempo','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'segs'));?>
 									    	</div>
 									    	<div class="col-xs-12 col-sm-12">
-									    		<?php echo Form::label('Enlace en línea (si existe)', 'link_bibliografia');?>
+									    		<?php echo Form::label('Pregunta', 'pregunta_texto');?>
 									    	</div>
 									    	<div class="col-xs-12 col-sm-12">
-									    		<?php echo Form::input('link_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Enlace o link a la fuente'));?>
+									    		<?php echo Form::input('pregunta_texto','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen'));?>
+									    	</div>
+
+
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Respuestas y porcentaje', '');?>
+									    	</div>
+									    	<div class="col-xs-1 col-sm-1">
+									    		<?php echo Form::label('R.1', 'pregunta_respuesta_1');?>
+									    	</div>
+									    	<div class="col-xs-8 col-sm-8">
+									    		<?php echo Form::input('pregunta_respuesta_1','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen'));?>
+									    	</div>
+									    	<div class="col-xs-2 col-sm-2">
+									    		<?php echo Form::input('pregunta_respuesta_porcentaje','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'0'));?>
+									    	</div>
+									    	<div class="col-xs-1 col-sm-1">
+									    		<?php echo Form::label('%', 'pregunta_respuesta_porcentaje');?>
+									    	</div>
+
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::label('Justificación', 'pregunta_justificacion');?>
+									    	</div>
+									    	<div class="col-xs-12 col-sm-12">
+									    		<?php echo Form::input('pregunta_justificacion','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación'));?>
 									    	</div>
 									    	<br>
 										    <div class="col-xs-12 col-sm-12">
