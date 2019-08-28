@@ -351,9 +351,16 @@
     											</ul>
     											
 											</div> -->
-											<hr>
-											<?php echo Special_Selector::createSpecialSelector();?>
-											<hr>
+											<?php 
+												$boton_agregar_bibliografia = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
+												$lista_de_fuentes = [];
+												if(isset($bibliografias)){
+													foreach ($bibliografias as $fuente) {
+														array_push($lista_de_fuentes, array($fuente->id_fuente, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
+													}
+												}
+												echo Special_Selector::createSpecialSelector("pregunta_bibliografia", "results_fuente", $lista_de_fuentes,"Selecciona una fuente" , $boton_agregar_bibliografia);
+											?>
 											<div class="col-xs-12 col-sm-12 table">
 												<div class="col-xs-4 col-sm-4 table-row">
 													<div class="col-xs-12 col-sm-12">
@@ -379,7 +386,11 @@
 														<?php echo Form::label('Dificultad', 'pregunta_bibliografia_pagina');?>
 													</div>
 													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('pregunta_bibliografia_dificultad','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'...'));?>
+														<?php echo Form::input('pregunta_dificultad','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'...'));?>
+														<?php 
+															$dificultades = array(array(1,1),array(2,2),array(3,3));
+															echo Special_Selector::createSpecialSelector("pregunta_dificultad", "results_dificultad", $dificultades,"...");
+														?>
 													</div>
 												</div>
 												<div class="col-xs-8 col-sm-8 table-row">

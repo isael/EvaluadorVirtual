@@ -25,20 +25,30 @@ class Special_Selector
 	public static function createSpecialSelector($responseTextId, $resultsId, $results, $placeholder, $extraButton = null){
 		$result = '';
 		$extraButtonElement = '';
+		$options = '';
+
 		if(!is_null($extraButton)){
-			$extraButtonElement = '<li><a href="'.$extraButton->href.'">+ '.$extraButton->value.'</a></li>';
+			$extraButtonElement = '<li><br></li>';
+			$extraButtonElement = $extraButtonElement.'<li><a href="'.$extraButton["href"].'">'.$extraButton["value"].'</a></li>';
 		}
+
+		if (isset($results)) {
+			$length = sizeof($results);
+			for ($i=0; $i < $length; $i++) {
+				$id = $results[$i][0];
+				$text = $results[$i][1];
+				$options = $options.'<li><a href="javascript:updateResponse('.$id.','.$resultsId.','.$responseTextId.',\''.$text.'\')">'.$text.'</a></li>';
+			}
+		}
+
 		$result = 	'<div class="col-xs-12 col-sm-12">
 						<ul class="col-xs-12 selector">
 								<li class="response">
-									<input class="form-control" type="text" placeholder="'.$placeholder.'" name="pregunta_texto" value="" id="'.$responseTextId.'" onfocus="javascript:handleFocus('.$resultsId.',true)" onfocusout="javascript:handleFocus('.$resultsId.',false)">
-									<ul id="'.$resultsId.'">
-										<li><a href="javascript:updateResponse('.$resultsId.','.$responseTextId.',\'Web Development\')">Web Development</a></li>
-										<li><a href="javascript:updateResponse('.$resultsId.','.$responseTextId.',\'Logo Design\')">Logo Design</a></li>
-										<li><a href="javascript:updateResponse('.$resultsId.','.$responseTextId.',\'Identity & Branding\')">Identity & Branding &raquo;</a></li>
-										<li><a href="javascript:updateResponse('.$resultsId.','.$responseTextId.',\'Wordpress\')">Wordpress</a></li>
-										<li><br></li>
-										'.$extraButtonElement.'
+									<input type="hidden" name="'.$responseTextId.'_option_selected" id="'.$responseTextId.'_option_selected" value="">
+									<input class="form-control" type="text" placeholder="'.$placeholder.'" name="'.$responseTextId.'" value="" id="'.$responseTextId.'" onfocus="javascript:handleFocus('.$resultsId.',true)" onfocusout="javascript:handleFocus('.$resultsId.',false)">
+									<ul id="'.$resultsId.'">'.
+										$options
+										.$extraButtonElement.'
 						            </ul>
 						        </li>
 						        <li class="button">

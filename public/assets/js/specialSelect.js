@@ -22,8 +22,10 @@ function handleFocus(results, focusIn){
     },150);
 }
 
-function updateResponse(results, textElement, text){
+function updateResponse(idSelected, results, textElement, text){
     element = document.getElementById(textElement.id);
     element.value = text;
-    toogleSelector(results);
+    hiddenElement = document.getElementById(textElement.id+"_option_selected");
+    hiddenElement.value = idSelected;
+    toogleSelector(textElement, results);
 }
