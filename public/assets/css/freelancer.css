@@ -662,3 +662,9 @@ i.fav_icon {
 .examen:focus{
   background-color: #00777a;
 }
+.table{
+  display: table;
+}
+.table-row{
+  display: table-row;
+}

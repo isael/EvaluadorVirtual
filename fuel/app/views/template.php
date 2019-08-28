@@ -22,6 +22,9 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
     <!-- Theme CSS -->
     <?php echo Asset::css('freelancer.css'); ?>
 
+    <!-- Extra-Styles -->
+    <?php echo Asset::css('specialSelect.css'); ?>
+
     <!-- Custom Fonts -->
     <?php echo Asset::css('font-awesome.min.css'); ?>
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
@@ -69,6 +72,9 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 <!-- Theme JavaScript -->
     <?php echo Asset::js('freelancer.js'); ?>
+
+<!-- Extra-functionality -->
+    <?php echo Asset::js('specialSelect.js'); ?>
 
 </body>
 
