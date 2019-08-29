@@ -328,39 +328,32 @@
 											</div>
 											<div class="col-xs-12 col-sm-12">
 												<?php echo Form::input('pregunta_tema','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Selecciona o crea un tema'));?>
+												<?php
+													$boton_agregar_bibliografia = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
+													$lista_de_fuentes = [];
+													if(isset($bibliografias)){
+														foreach ($bibliografias as $fuente) {
+															array_push($lista_de_fuentes, array($fuente->id_fuente, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
+														}
+													}
+													echo Special_Selector::createSpecialSelector("pregunta_tema", "results_tema", $lista_de_fuentes,"Selecciona o crea un tema" , $boton_agregar_bibliografia);
+												?>
 											</div>
 											<div class="col-xs-12 col-sm-12">
 												<?php echo Form::label('Bibliografía', 'pregunta_bibliografia');?>
 											</div>
-											<!-- <div class="col-xs-12 col-sm-12">
-    											<ul class="col-xs-12 selector">
-    													<li class="response">
-    														<input class="form-control" type="text" placeholder="Selecciona una fuente" name="pregunta_texto" value="" id="responseText" onfocus="javascript:handleFocus(resultsFuente,true)" onfocusout="javascript:handleFocus(resultsFuente,false)">
-												            <ul id="resultsFuente">
-												                <li><a href="javascript:updateResponse(resultsFuente,responseText,'Web Development')">Web Development</a></li>
-												                <li><a href="javascript:updateResponse(resultsFuente,responseText,'Logo Design')">Logo Design</a></li>
-												                <li><a href="javascript:updateResponse(resultsFuente,responseText,'Identity & Branding')">Identity & Branding &raquo;</a></li>
-												                <li><a href="javascript:updateResponse(resultsFuente,responseText,'Wordpress')">Wordpress</a></li>
-												                <li><br></li>
-												                <li><a href="#">+ Agregar nueva bibliografía</a></li>
-												            </ul>
-												        </li>
-												        <li class="button">
-	    													<a href="javascript:toogleSelector(responseText, resultsFuente)">v</a>
-	    												</li>
-    											</ul>
-    											
-											</div> -->
-											<?php 
-												$boton_agregar_bibliografia = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
-												$lista_de_fuentes = [];
-												if(isset($bibliografias)){
-													foreach ($bibliografias as $fuente) {
-														array_push($lista_de_fuentes, array($fuente->id_fuente, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
+											<div class="col-xs-12 col-sm-12">
+												<?php
+													$boton_agregar_bibliografia = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
+													$lista_de_fuentes = [];
+													if(isset($bibliografias)){
+														foreach ($bibliografias as $fuente) {
+															array_push($lista_de_fuentes, array($fuente->id_fuente, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
+														}
 													}
-												}
-												echo Special_Selector::createSpecialSelector("pregunta_bibliografia", "results_fuente", $lista_de_fuentes,"Selecciona una fuente" , $boton_agregar_bibliografia);
-											?>
+													echo Special_Selector::createSpecialSelector("pregunta_bibliografia", "results_fuente", $lista_de_fuentes,"Selecciona una fuente" , $boton_agregar_bibliografia);
+												?>
+											</div>
 											<div class="col-xs-12 col-sm-12 table">
 												<div class="col-xs-4 col-sm-4 table-row">
 													<div class="col-xs-12 col-sm-12">
@@ -381,19 +374,18 @@
 											</div>
 
 											<div class="col-xs-12 col-sm-12 table">
-												<div class="col-xs-4 col-sm-4 table-row">
-													<div class="col-xs-12 col-sm-12">
+												<div class="col-xs-6 col-sm-6 table-row">
+													<div>
 														<?php echo Form::label('Dificultad', 'pregunta_bibliografia_pagina');?>
 													</div>
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('pregunta_dificultad','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'...'));?>
+													<div>
 														<?php 
 															$dificultades = array(array(1,1),array(2,2),array(3,3));
 															echo Special_Selector::createSpecialSelector("pregunta_dificultad", "results_dificultad", $dificultades,"...");
 														?>
 													</div>
 												</div>
-												<div class="col-xs-8 col-sm-8 table-row">
+												<div class="col-xs-6 col-sm-6 table-row">
 													<div class="col-xs-12 col-sm-12">
 														<?php echo Form::label('Tiempo', 'pregunta_bibliografia_capitulo');?>
 													</div>

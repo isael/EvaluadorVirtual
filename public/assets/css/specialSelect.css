@@ -17,10 +17,10 @@
 }
 
 .selector li.response{  
-    width: 95%
+    width: calc(100% - 30px);
 }
 .selector li.button{  
-    width: 5%
+    width: 30px;
 }
  
 .selector li a {
@@ -68,7 +68,7 @@ being the ones which make the drop-down to stay hidden */
     opacity:0;
     position: absolute;
     z-index: 99999;
-    width:105%;
+    width: calc(100% + 30px);
     background:#f8f8f8;
     box-shadow:1px 1px 3px #ccc;
 /* css3 transitions for smooth hover effect */
