@@ -326,17 +326,16 @@
 											<div class="col-xs-12 col-sm-12">
 												<?php echo Form::label('Tema', 'pregunta_tema');?>
 											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::input('pregunta_tema','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Selecciona o crea un tema'));?>
+											<div class="col-xs-12 col-sm-12 table">
 												<?php
-													$boton_agregar_bibliografia = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
-													$lista_de_fuentes = [];
-													if(isset($bibliografias)){
-														foreach ($bibliografias as $fuente) {
-															array_push($lista_de_fuentes, array($fuente->id_fuente, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
+													$boton_agregar_tema = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
+													$lista_de_temas = [];
+													if(isset($temas)){
+														foreach ($temas as $tema) {
+															array_push($lista_de_temas, array($tema->id_tema, $tema->nombre));
 														}
 													}
-													echo Special_Selector::createSpecialSelector("pregunta_tema", "results_tema", $lista_de_fuentes,"Selecciona o crea un tema" , $boton_agregar_bibliografia);
+													echo Special_Selector::createSpecialSelector("pregunta_tema", "results_tema", $lista_de_temas,"Selecciona o crea un tema" , $boton_agregar_tema);
 												?>
 											</div>
 											<div class="col-xs-12 col-sm-12">
