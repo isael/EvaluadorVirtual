@@ -375,7 +375,7 @@
 											<div class="col-xs-12 col-sm-12 table">
 												<div class="col-xs-6 col-sm-6 table-row">
 													<div>
-														<?php echo Form::label('Dificultad', 'pregunta_bibliografia_pagina');?>
+														<?php echo Form::label('Dificultad', 'pregunta_dificultad');?>
 													</div>
 													<div>
 														<?php 
@@ -386,12 +386,25 @@
 												</div>
 												<div class="col-xs-6 col-sm-6 table-row">
 													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::label('Tiempo', 'pregunta_bibliografia_capitulo');?>
+														<?php echo Form::label('Tiempo', 'pregunta_tiempo');?>
 													</div>
 													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('pregunta_bibliografia_tiempo','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'segs'));?>
+														<?php echo Form::input('pregunta_tiempo','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'segs'));?>
 													</div>
 												</div>
+											</div>
+
+											<div class="col-xs-12 col-sm-12">
+												<?php
+													$tipo = '1' // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
+													echo Form::input("pregunta_tipo",$tipo, array('type' => 'hidden')); 
+												?>
+											</div>
+											<div class="col-xs-12 col-sm-12">
+												<?php
+													$tiene_subpregunta = '0' // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
+													echo Form::input("pregunta_tiene_subpregunta",$tiene_subpregunta, array('type' => 'hidden'));
+												?>
 											</div>
 
 											<div class="col-xs-12 col-sm-12">
@@ -406,6 +419,7 @@
 											</div>
 											<?php 
 												$numero_de_preguntas = 4; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
+												echo Form::input("pregunta_cantidad_respuestas",$numero_de_preguntas, array('type' => 'hidden'));
 												for ($i=1; $i <= $numero_de_preguntas ; $i++) {
 													?>
 														<div class="col-xs-12 col-sm-12 table">
@@ -555,10 +569,10 @@
 								<div class="modal-footer">
 									<div class="row text-center">
 										<div class="col-xs-6">
-											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
+											<button id="cancelarBibliografia" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
 										</div>
-										<div class="col-xs-6" data-dismiss="modal">
-											<?php echo Html::anchor('javascript:cambiarPestania(pestanias, bibliografia);','Ir a bibliografías', array('class' => 'btn btn-primary btn-block')); ?>
+										<div class="col-xs-6">
+											<?php echo Html::anchor('javascript:cambiarPestania(pestanias, bibliografia);cancelarBibliografia.click();','Ir a bibliografías', array('class' => 'btn btn-primary btn-block')); ?>
 										</div>
 									</div>
 								</div>
