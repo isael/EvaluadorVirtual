@@ -328,7 +328,7 @@
 											</div>
 											<div class="col-xs-12 col-sm-12 table">
 												<?php
-													$boton_agregar_tema = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
+													$boton_agregar_tema = array("href" => "", "value" => "+ Agregar nuevo tema", "data-toggle" => "modal", "data-target" => "#modalAgregarTema");
 													$lista_de_temas = [];
 													if(isset($temas)){
 														foreach ($temas as $tema) {
@@ -343,7 +343,7 @@
 											</div>
 											<div class="col-xs-12 col-sm-12">
 												<?php
-													$boton_agregar_bibliografia = array("href" => "javascript:void();", "value" => "+ Agregar nueva bibliografía");
+													$boton_agregar_bibliografia = array("href" => "", "value" => "+ Agregar nueva bibliografía", "data-toggle" => "modal", "data-target" => "#modalAgregarBibliografia");
 													$lista_de_fuentes = [];
 													if(isset($bibliografias)){
 														foreach ($bibliografias as $fuente) {
@@ -404,20 +404,28 @@
 											<div class="col-xs-12 col-sm-12">
 												<?php echo Form::label('Respuestas y porcentaje', '');?>
 											</div>
-											<div class="col-xs-12 col-sm-12 table">
-												<div class="col-xs-1 col-sm-1 table-row">
-													<?php echo Form::label('R.1', 'pregunta_respuesta_1');?>
-												</div>
-												<div class="col-xs-8 col-sm-8 table-row">
-													<?php echo Form::input('pregunta_respuesta_1','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen'));?>
-												</div>
-												<div class="col-xs-2 col-sm-2 table-row">
-													<?php echo Form::input('pregunta_respuesta_porcentaje','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'0'));?>
-												</div>
-												<div class="col-xs-1 col-sm-1 table-row">
-													<?php echo Form::label('%', 'pregunta_respuesta_porcentaje');?>
-												</div>
-											</div>
+											<?php 
+												$numero_de_preguntas = 4; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
+												for ($i=1; $i <= $numero_de_preguntas ; $i++) {
+													?>
+														<div class="col-xs-12 col-sm-12 table">
+															<div class="col-xs-1 col-sm-1 table-row">
+																<?php echo Form::label('R.'.$i, 'pregunta_respuesta_'.$i);?>
+															</div>
+															<div class="col-xs-8 col-sm-8 table-row">
+																<?php echo Form::input('pregunta_respuesta_'.$i,'',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen'));?>
+															</div>
+															<div class="col-xs-2 col-sm-2 table-row">
+																<?php echo Form::input('pregunta_respuesta_porcentaje_'.$i,'',array('class'=>'form-control','type' => 'text', 'placeholder'=>'0'));?>
+															</div>
+															<div class="col-xs-1 col-sm-1 table-row">
+																<?php echo Form::label('%', 'pregunta_respuesta_porcentaje_'.$i);?>
+															</div>
+														</div>
+													<?php
+												}
+											?>
+											
 
 											<div class="col-xs-12 col-sm-12">
 												<?php echo Form::label('Justificación', 'pregunta_justificacion');?>
@@ -493,7 +501,73 @@
 					</div>
 					<!-- /Preguntas -->
 				</div>
-				<!-- Area de trabajo -->
+				<!-- /Area de trabajo -->
+
+				<!-- Modales -->
+				<div class="modal fade" id="modalAgregarTema" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">Agregar nuevo tema</h4>
+							</div>
+
+							<div class="form-group">
+								<div class="modal-body">
+									<div class="input-group">
+										<?php echo Form::label('Escribe el nombre del nuevo tema. Este se agregará hasta que se haya guardado la pregunta correctamente.', 'modal_tema_input');?>
+										<input id="modal_tema_input" type="text" class="form-control" placeholder="Cuida la ortografía al escribir el tema">
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div class="row text-center">
+										<div class="col-xs-6">
+											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
+										</div>
+										<div class="col-xs-6">
+											<?php echo Html::anchor('javascript:agregarNuevoElementoEnLista(modal_tema_input,results_tema,pregunta_tema,cancelarTema);','Guardar Cambios', array('class' => 'btn btn-primary btn-block')); ?>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal fade" id="modalAgregarBibliografia" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">Agregar nueva bibliografía</h4>
+							</div>
+
+							<div class="form-group">
+								<div class="modal-body">
+									<div class="input-group">
+										<?php echo Form::label('Será redirigido a la pestaña de creación de biografía y se perderán los datos de esta pantalla. ¿Está seguro de querer continuar?', 'modal_tema_input');?>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div class="row text-center">
+										<div class="col-xs-6">
+											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
+										</div>
+										<div class="col-xs-6" data-dismiss="modal">
+											<?php echo Html::anchor('javascript:cambiarPestania(pestanias, bibliografia);','Ir a bibliografías', array('class' => 'btn btn-primary btn-block')); ?>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- /Modales -->
 				
 				<!-- /Contenido -->
 			</div>

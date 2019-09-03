@@ -29,7 +29,12 @@ class Special_Selector
 
 		if(!is_null($extraButton)){
 			$extraButtonElement = '<li><br></li>';
-			$extraButtonElement = $extraButtonElement.'<li><a href="'.$extraButton["href"].'">'.$extraButton["value"].'</a></li>';
+			$extraButtonElement = $extraButtonElement.'<li><a'; 
+			foreach ($extraButton as $key => $value) {
+				if($key !== "value")
+					$extraButtonElement = $extraButtonElement.' '.$key.'="'.$value.'"';
+			}
+			$extraButtonElement = $extraButtonElement.'>'.$extraButton["value"].'</a></li>';
 		}
 
 		if (isset($results)) {

@@ -10,7 +10,7 @@ function toogleSelector(response, listResults){
 }
 
 function handleFocus(results, focusIn){
-    resultados = document.getElementById(results.id);
+    const resultados = document.getElementById(results.id);
     setTimeout(function(){
         if(focusIn){
             resultados.style.visibility="visible";
@@ -23,9 +23,29 @@ function handleFocus(results, focusIn){
 }
 
 function updateResponse(idSelected, results, textElement, text){
-    element = document.getElementById(textElement.id);
+    let element = document.getElementById(textElement.id);
     element.value = text;
     hiddenElement = document.getElementById(textElement.id+"_option_selected");
     hiddenElement.value = idSelected;
     toogleSelector(textElement, results);
+}
+
+function agregarNuevoElementoEnLista(modalInputId,resultsId,responseTextId,cancelButtonId){
+    let cancelButton = document.getElementById(cancelButtonId.id);
+    let responseText = document.getElementById(responseTextId.id);
+    let text = document.getElementById(modalInputId.id).value;
+    debugger;
+    if(typeof text === 'string' && text !== ''){
+        let element = document.getElementById(resultsId.id);
+        let li = document.createElement("li");
+        let anchor = document.createElement("a");
+        anchor.setAttribute('href',"javascript:updateResponse('"+text+"',"+resultsId.id+","+responseTextId.id+",'"+text+"')");
+        anchor.innerHTML = text;
+        li.appendChild(anchor);
+        element.insertBefore(li,element.firstChild);
+        cancelButton.click();
+        responseText.focus();
+    }else{
+        //TODO javascript error message
+    }
 }
