@@ -396,13 +396,13 @@
 
 											<div class="col-xs-12 col-sm-12">
 												<?php
-													$tipo = '1' // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
+													$tipo = '1'; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
 													echo Form::input("pregunta_tipo",$tipo, array('type' => 'hidden')); 
 												?>
 											</div>
 											<div class="col-xs-12 col-sm-12">
 												<?php
-													$tiene_subpregunta = '0' // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
+													$tiene_subpregunta = '0'; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
 													echo Form::input("pregunta_tiene_subpregunta",$tiene_subpregunta, array('type' => 'hidden'));
 												?>
 											</div>

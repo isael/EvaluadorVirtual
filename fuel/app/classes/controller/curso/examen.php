@@ -254,7 +254,7 @@ class Controller_Curso_Examen extends Controller_Template
 		$tema=null;
 		if(isset($pregunta_tema) && $pregunta_tema!==""){
 			if(is_numeric($pregunta_tema)){				
-				$tema = Model_Tema::find_one_by( 'nombre', $pregunta_tema));
+				$tema = Model_Tema::find_one_by( 'nombre', $pregunta_tema);
 			}
 		}else{
 			$error=True;
@@ -263,8 +263,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 		$fuente=null;
 		if(isset($pregunta_bibliografia) && $pregunta_bibliografia!=="" && is_numeric($pregunta_bibliografia)){
-				$fuente = Model_Fuente::find_one_by( 'id_fuente', $pregunta_bibliografia));
-			}
+				$fuente = Model_Fuente::find_one_by( 'id_fuente', $pregunta_bibliografia);
 		}else{
 			$error=True;
 			$mensaje=$mensaje."El campo de Bibliografía no fue correctamente seleccionado.<br>";
@@ -328,7 +327,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$porcentaje = 0;
 				if(isset($respuesta) && $respuesta !== ''){
 					array_push($conjunto_respuestas, $respuesta);
-					if(isset($porcentaje_texto)  && $porcentaje_texto !== '')){
+					if(isset($porcentaje_texto)  && $porcentaje_texto !== ''){
 						if(is_numeric($porcentaje_texto)){
 							$porcentaje = intval($porcentaje_texto);
 							$porcentaje = $porcentaje >= 0 ? ( $porcentaje <= 100 ? $porcentaje : 100 ) : 0 ;
@@ -366,7 +365,7 @@ class Controller_Curso_Examen extends Controller_Template
 		                 ->where('ReferenciaFuente.id_fuente', '=', $fuente->id_fuente)
 		                 ->and_where('Referencia.pagina', $pregunta_bibliografia_pagina)
 		                 ->and_where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
-		                 ->order_by('Fuente.id_examen');
+		                 ->order_by('Fuente.id_fuente');
 			});
 
 			$id_referencia="";
@@ -388,8 +387,8 @@ class Controller_Curso_Examen extends Controller_Template
 
 			$id_pregunta = null;
 			$fundamentado_en = null;
-			if(isset($pregunta_id)){
-				$fundamentado_en = Model_FundamentadoEn::find_one_by(array('id_referencia' => $id_referencia, 'id_pregunta' => $pregunta_id ));
+			if(isset($pregunta_id)  && $pregunta_id!==""){
+				$fundamentado_en = Model_FundamentadoEn::find(array('id_referencia' => $id_referencia, 'id_pregunta' => $pregunta_id ));
 				if(isset($fundamentado_en)){
 					$id_pregunta = $pregunta_id;
 				}
@@ -408,12 +407,12 @@ class Controller_Curso_Examen extends Controller_Template
 				$de_tipo->id_pregunta = $id_pregunta;
 				$de_tipo->save();
 			}
-			if(!isset($fundamentado_en))
-				$fundamentado_en = new Model_FundamentadoEn();
-				$fundamentado_en->id_pregunta = $id_pregunta;
-				$fundamentado_en->id_referencia = $id_referencia;
-				$fundamentado_en->save();
-			}
+			// if(!isset($fundamentado_en)){
+			// 	$fundamentado_en = new Model_FundamentadoEn();
+			// 	$fundamentado_en->id_pregunta = $id_pregunta;
+			// 	$fundamentado_en->id_referencia = $id_referencia;
+			// 	$fundamentado_en->save();
+			// }
 
 
 			if($tema==null){					
@@ -422,7 +421,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$tema->save();
 			}
 
-			$tema_fuente = Model_TemaFuente::find_one_by(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
+			$tema_fuente = Model_TemaFuente::find(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
 			if(!isset($tema_fuente)){
 				$tema_fuente = new Model_TemaFuente();
 				$tema_fuente->id_fuente = $fuente->id_fuente;
@@ -430,7 +429,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$tema_fuente->save();
 			}
 
-			$curso_tema = Model_CursoTema::find_one_by(array('id_curso' => $id_curso ,'id_tema' => $tema->id_tema));
+			$curso_tema = Model_CursoTema::find(array('id_curso' => $id_curso ,'id_tema' => $tema->id_tema));
 			if(!isset($curso_tema)){
 				$curso_tema = new Model_CursoTema();
 				$curso_tema->id_curso = $id_curso;
@@ -442,12 +441,11 @@ class Controller_Curso_Examen extends Controller_Template
 			$mensaje = "La nueva pregunta ha sido agregada con éxito.";
 		}
 
-		$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 		if($error){
-			$data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
+			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
 			SESSION::set('mensaje',$mensaje);
 			SESSION::set('pestania','preguntas');
-			SESSION::set('data',$data);
+			// SESSION::set('data',$data);
 			Response::redirect('curso/examenes');
 		}else{
 			SESSION::set('mensaje',$mensaje);
