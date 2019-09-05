@@ -407,12 +407,12 @@ class Controller_Curso_Examen extends Controller_Template
 				$de_tipo->id_pregunta = $id_pregunta;
 				$de_tipo->save();
 			}
-			// if(!isset($fundamentado_en)){
-			// 	$fundamentado_en = new Model_FundamentadoEn();
-			// 	$fundamentado_en->id_pregunta = $id_pregunta;
-			// 	$fundamentado_en->id_referencia = $id_referencia;
-			// 	$fundamentado_en->save();
-			// }
+			if(!isset($fundamentado_en)){
+				$fundamentado_en = new Model_FundamentadoEn();
+				$fundamentado_en->id_pregunta = $id_pregunta;
+				$fundamentado_en->id_referencia = $id_referencia;
+				$fundamentado_en->save();
+			}
 
 
 			if($tema==null){					
