@@ -251,6 +251,8 @@ class Controller_Curso extends Controller_Template
 				$temas = null;
 			}
 
+			$preguntas = Model_Pregunta::find_all();
+
 			$bibliografias = Model_Fuente::find(function ($query) use ($id_curso){
 			    return $query->join('Edicion')
 			                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
@@ -260,7 +262,7 @@ class Controller_Curso extends Controller_Template
 			                 ->order_by('Fuente.nombre');
 			});
 
-			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias);
+			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas);
 			
 			$this->template->content = View::forge('curso/examenes', $data);
 		}else{
