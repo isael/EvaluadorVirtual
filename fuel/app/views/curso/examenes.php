@@ -259,6 +259,7 @@
 							if(isset($preguntas)){//TODO_ISAEL Cambiar por lista de preguntas
 								echo '<div class="row">';
 								foreach ($preguntas as $pregunta) {
+									echo "<h5>".$pregunta->nombre."</h5>";
 									echo $pregunta->texto."</br>";
 									// echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
 									// 	echo '<a href="examen/editar?id_examen='.$examen->id_examen.'">';
@@ -373,7 +374,7 @@
 											</div>
 
 											<div class="col-xs-12 col-sm-12 table">
-												<div class="col-xs-6 col-sm-6 table-row">
+												<div class="col-xs-4 col-sm-4 table-row">
 													<div>
 														<?php echo Form::label('Dificultad', 'pregunta_dificultad');?>
 													</div>
@@ -384,7 +385,7 @@
 														?>
 													</div>
 												</div>
-												<div class="col-xs-6 col-sm-6 table-row">
+												<div class="col-xs-4 col-sm-4 table-row">
 													<div class="col-xs-12 col-sm-12">
 														<?php echo Form::label('Tiempo', 'pregunta_tiempo');?>
 													</div>
@@ -392,21 +393,25 @@
 														<?php echo Form::input('pregunta_tiempo','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'segs'));?>
 													</div>
 												</div>
+												<div class="col-xs-4 col-sm-4 table-row">
+													<div class="col-xs-12 col-sm-12">
+														<?php echo Form::label('Tipo', 'pregunta_tipo');?>
+													</div>
+													<div class="col-xs-12 col-sm-12">
+														<?php
+															$lista_de_tipos = [];
+															if(isset($tipos)){
+																foreach ($tipos as $tipo) {
+																	array_push($lista_de_tipos, array($tipo->id_tipo, $tipo->nombre));
+																}
+															}
+															$boton_extra=null;
+															$onclick="setNumeroRespuestas";
+															echo Special_Selector::createSpecialSelector("pregunta_tipo", "results_tipo", $lista_de_tipos,"Selecciona un tipo",$boton_extra, $onclick);
+														?>
+													</div>
+												</div>
 											</div>
-
-											<div class="col-xs-12 col-sm-12">
-												<?php
-													$tipo = '1'; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
-													echo Form::input("pregunta_tipo",$tipo, array('type' => 'hidden')); 
-												?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php
-													$tiene_subpregunta = '0'; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
-													echo Form::input("pregunta_tiene_subpregunta",$tiene_subpregunta, array('type' => 'hidden'));
-												?>
-											</div>
-
 											<div class="col-xs-12 col-sm-12">
 												<?php echo Form::label('Pregunta', 'pregunta_texto');?>
 											</div>
@@ -417,9 +422,12 @@
 											<div class="col-xs-12 col-sm-12">
 												<?php echo Form::label('Respuestas y porcentaje', '');?>
 											</div>
+											<div id="respuestas">
+												<!-- Aquí van las respuestas -->
+											</div>
 											<?php 
 												$numero_de_preguntas = 4; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
-												echo Form::input("pregunta_cantidad_respuestas",$numero_de_preguntas, array('type' => 'hidden'));
+												echo Form::input("pregunta_cantidad_respuestas",$numero_de_preguntas, array('type' => 'hidden', 'onchange' => 'javascript:actualizaRespuestas()'));
 												for ($i=1; $i <= $numero_de_preguntas ; $i++) {
 													?>
 														<div class="col-xs-12 col-sm-12 table">

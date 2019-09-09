@@ -235,23 +235,36 @@ class Controller_Curso extends Controller_Template
 			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
 			                 ->where('Evalua.id_curso', $id_curso)
 			                 ->order_by('Evalua.id_examen');
-			});			
-			if(isset($examenes)){
-				$id_examenes = array();
-				foreach ($examenes as $examen) {
-					$id_examenes[] = $examen->id_examen;
-				}
-				$temas = Model_Tema::find(function ($query) use ($id_examenes){
-			    return $query->join('BasadoEn')
-			                 ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			                 ->where('BasadoEn.id_examen', 'IN', $id_examenes)
-			                 ->order_by('BasadoEn.id_examen');
-				});
-			}else{
-				$temas = null;
-			}
+			});
+			// if(isset($examenes)){
+			// 	$id_examenes = array();
+			// 	foreach ($examenes as $examen) {
+			// 		$id_examenes[] = $examen->id_examen;
+			// 	}
+			// 	$temas = Model_Tema::find(function ($query) use ($id_examenes){
+			//     return $query->join('BasadoEn')
+			//                  ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
+			//                  ->where('BasadoEn.id_examen', 'IN', $id_examenes)
+			//                  ->order_by('BasadoEn.id_examen');
+			// 	});
+			// }else{
+			// 	$temas = null;
+			// }
+
+			$temas = Model_Tema::find_all();
+
+			$tipos = Model_Tipo::find_all();
 
 			$preguntas = Model_Pregunta::find_all();
+
+			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso){
+			    return $query->join('Genera')
+			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->join('Tema')
+			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
+			                 ->order_by('Tema.nombre')
+			                 ->order_by('Pregunta.id_pregunta');
+			});
 
 			$bibliografias = Model_Fuente::find(function ($query) use ($id_curso){
 			    return $query->join('Edicion')
@@ -262,7 +275,7 @@ class Controller_Curso extends Controller_Template
 			                 ->order_by('Fuente.nombre');
 			});
 
-			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas);
+			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas, 'tipos' => $tipos);
 			
 			$this->template->content = View::forge('curso/examenes', $data);
 		}else{

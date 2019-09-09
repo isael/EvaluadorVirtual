@@ -239,8 +239,7 @@ class Controller_Curso_Examen extends Controller_Template
 		$error = False;
 
 		$pregunta_id = trim(Input::post('pregunta_id'));
-		$pregunta_tipo = trim(Input::post('pregunta_tipo'));
-		$pregunta_tiene_subpregunta = trim(Input::post('pregunta_tiene_subpregunta'));
+		$pregunta_tipo = trim(Input::post('pregunta_tipo_option_selected'));
 		$pregunta_tema = trim(Input::post('pregunta_tema_option_selected'));
 		$pregunta_bibliografia=trim(Input::post('pregunta_bibliografia_option_selected'));
 		$pregunta_bibliografia_pagina=trim(Input::post('pregunta_bibliografia_pagina'));
@@ -393,15 +392,16 @@ class Controller_Curso_Examen extends Controller_Template
 					$id_pregunta = $pregunta_id;
 				}
 			}else{
+				$tipo = Model_Tipo::find_one_by('id_tipo',$pregunta_tipo);//Pendiente
+
 				$pregunta = new Model_Pregunta();
 				$pregunta->texto = $pregunta_texto;
 				$pregunta->dificultad = $pregunta_dificultad;
 				$pregunta->justificacion = $pregunta_justificacion;
-				$pregunta->tiene_subpregunta = $pregunta_tiene_subpregunta; //Pendiente
+				$pregunta->tiene_subpregunta = $tipo->tiene_subpregunta; //Pendiente
 				$pregunta->save();
 				$id_pregunta = $pregunta->id_pregunta;
 
-				$tipo = Model_Tipo::find_one_by('id_tipo',$pregunta_tipo);//Pendiente
 				$de_tipo = new Model_DeTipo();
 				$de_tipo->id_tipo = $tipo->id_tipo;
 				$de_tipo->id_pregunta = $id_pregunta;
@@ -419,6 +419,14 @@ class Controller_Curso_Examen extends Controller_Template
 				$tema = new Model_Tema();
 				$tema->nombre = $pregunta_tema;
 				$tema->save();
+			}
+
+			$genera = Model_Genera::find(array('id_pregunta'=> $id_pregunta, 'id_tema' => $tema->id_tema);
+			if(!isset($genera)){
+				$genera = new Model_Genera();
+				$genera->id_pregunta = $id_pregunta;
+				$genera->id_tema = $tema->id_tema;
+				$genera->save();
 			}
 
 			$tema_fuente = Model_TemaFuente::find(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
