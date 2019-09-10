@@ -5,7 +5,7 @@ class Model_Pregunta extends \Model_Crud{
 		'id_pregunta',
 		'texto',
 		'dificultad',
-		'tiene_subpregunta',
+		'tiene_subpreguntas',
 		'justificacion',
 	);
 	

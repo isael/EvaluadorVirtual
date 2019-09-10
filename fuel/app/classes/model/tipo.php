@@ -5,8 +5,8 @@ class Model_Tipo extends \Model_Crud{
 		'id_tipo',
 		'nombre',
 		'tiene_subpreguntas',
-		'min_preguntas',
-		'max_preguntas',
+		'min_respuestas',
+		'max_respuestas',
 	);
 	
 	protected static $_table_name = 'Tipo';

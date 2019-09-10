@@ -227,7 +227,7 @@ class Controller_Curso_Examen extends Controller_Template
 	/**
 	 * Controlador que muestra la pantalla de creacion de fuentes bibliográficas para
 	 * la creacion del examen correspondiente.
-	 *
+	 *f
 	 * @access  public
 	 * @return  Response
 	 */
@@ -240,7 +240,8 @@ class Controller_Curso_Examen extends Controller_Template
 
 		$pregunta_id = trim(Input::post('pregunta_id'));
 		$pregunta_tipo = trim(Input::post('pregunta_tipo_option_selected'));
-		$pregunta_tema = trim(Input::post('pregunta_tema_option_selected'));
+		$pregunta_tema_id = trim(Input::post('pregunta_tema_option_selected'));
+		$pregunta_tema = trim(Input::post('pregunta_tema'));
 		$pregunta_bibliografia=trim(Input::post('pregunta_bibliografia_option_selected'));
 		$pregunta_bibliografia_pagina=trim(Input::post('pregunta_bibliografia_pagina'));
 		$pregunta_bibliografia_capitulo=trim(Input::post('pregunta_bibliografia_capitulo'));
@@ -251,9 +252,9 @@ class Controller_Curso_Examen extends Controller_Template
 		$pregunta_cantidad=trim(Input::post('pregunta_cantidad_respuestas'));
 
 		$tema=null;
-		if(isset($pregunta_tema) && $pregunta_tema!==""){
-			if(is_numeric($pregunta_tema)){				
-				$tema = Model_Tema::find_one_by( 'nombre', $pregunta_tema);
+		if(isset($pregunta_tema_id) && $pregunta_tema_id!==""){
+			if(is_numeric($pregunta_tema_id)){
+				$tema = Model_Tema::find_one_by( 'id_tema', $pregunta_tema_id);
 			}
 		}else{
 			$error=True;
@@ -303,11 +304,6 @@ class Controller_Curso_Examen extends Controller_Template
 		if($pregunta_tipo==null||$pregunta_tipo===""){
 			$error=True;
 			$mensaje=$mensaje."El campo de Tipo está vacío.<br>";
-		}
-
-		if($pregunta_tiene_subpregunta==null||$pregunta_tiene_subpregunta===""){
-			$error=True;
-			$mensaje=$mensaje."El campo de Tiene subpregunta está vacío.<br>";
 		}
 
 		if($pregunta_texto==null||$pregunta_texto===""){
@@ -398,7 +394,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$pregunta->texto = $pregunta_texto;
 				$pregunta->dificultad = $pregunta_dificultad;
 				$pregunta->justificacion = $pregunta_justificacion;
-				$pregunta->tiene_subpregunta = $tipo->tiene_subpregunta; //Pendiente
+				$pregunta->tiene_subpreguntas = $tipo->tiene_subpreguntas; //Pendiente
 				$pregunta->save();
 				$id_pregunta = $pregunta->id_pregunta;
 
@@ -421,7 +417,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$tema->save();
 			}
 
-			$genera = Model_Genera::find(array('id_pregunta'=> $id_pregunta, 'id_tema' => $tema->id_tema);
+			$genera = Model_Genera::find(array('id_pregunta'=> $id_pregunta, 'id_tema' => $tema->id_tema));
 			if(!isset($genera)){
 				$genera = new Model_Genera();
 				$genera->id_pregunta = $id_pregunta;

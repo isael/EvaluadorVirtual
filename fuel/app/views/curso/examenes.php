@@ -400,14 +400,15 @@
 													<div class="col-xs-12 col-sm-12">
 														<?php
 															$lista_de_tipos = [];
+															$lista_de_tipos_min_max_resp = [];
 															if(isset($tipos)){
 																foreach ($tipos as $tipo) {
 																	array_push($lista_de_tipos, array($tipo->id_tipo, $tipo->nombre));
+																	array_push($lista_de_tipos_min_max_resp, array($tipo->id_tipo, $tipo->min_respuestas, $tipo->max_respuestas));
 																}
 															}
 															$boton_extra=null;
-															$onclick="setNumeroRespuestas";
-															echo Special_Selector::createSpecialSelector("pregunta_tipo", "results_tipo", $lista_de_tipos,"Selecciona un tipo",$boton_extra, $onclick);
+															echo Special_Selector::createSpecialSelector("pregunta_tipo", "results_tipo", $lista_de_tipos,"Selecciona un tipo",$boton_extra);
 														?>
 													</div>
 												</div>
@@ -424,28 +425,10 @@
 											</div>
 											<div id="respuestas">
 												<!-- Aquí van las respuestas -->
+												*-* Selecciona un tipo de pregunta primero *-*
 											</div>
-											<?php 
-												$numero_de_preguntas = 4; // Este valor podría cambiar de acuerdo a las necesidades futuras de la aplicación e incluso podría ser opcional. Se dejará pendiente para una futura versión.
-												echo Form::input("pregunta_cantidad_respuestas",$numero_de_preguntas, array('type' => 'hidden', 'onchange' => 'javascript:actualizaRespuestas()'));
-												for ($i=1; $i <= $numero_de_preguntas ; $i++) {
-													?>
-														<div class="col-xs-12 col-sm-12 table">
-															<div class="col-xs-1 col-sm-1 table-row">
-																<?php echo Form::label('R.'.$i, 'pregunta_respuesta_'.$i);?>
-															</div>
-															<div class="col-xs-8 col-sm-8 table-row">
-																<?php echo Form::input('pregunta_respuesta_'.$i,'',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen'));?>
-															</div>
-															<div class="col-xs-2 col-sm-2 table-row">
-																<?php echo Form::input('pregunta_respuesta_porcentaje_'.$i,'',array('class'=>'form-control','type' => 'text', 'placeholder'=>'0'));?>
-															</div>
-															<div class="col-xs-1 col-sm-1 table-row">
-																<?php echo Form::label('%', 'pregunta_respuesta_porcentaje_'.$i);?>
-															</div>
-														</div>
-													<?php
-												}
+											<?php
+												echo Form::input("pregunta_cantidad_respuestas",'', array('type' => 'hidden'));
 											?>
 											
 
@@ -596,3 +579,22 @@
 		</div>
 	</div>
 </section>
+
+<script type="text/javascript">
+	let types =
+	<?php
+		echo "{";
+		$length = sizeof($lista_de_tipos_min_max_resp);
+		for ($i = 0; $i < $length; $i++) {
+			$type =$lista_de_tipos_min_max_resp[$i];
+			echo "'".$type[0]."'";
+			echo " : ";
+			echo "[";
+			echo "'".$type[1]."',";
+			echo "'".$type[2]."'";
+			echo "]";
+			echo ",";
+		}
+		echo "}";
+	 ?>;
+</script>

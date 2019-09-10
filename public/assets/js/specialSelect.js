@@ -27,19 +27,21 @@ function updateResponse(idSelected, results, textElement, text){
     element.value = text;
     hiddenElement = document.getElementById(textElement.id+"_option_selected");
     hiddenElement.value = idSelected;
+    if(textElement.id === 'pregunta_tipo'){
+        setNumeroRespuestas(idSelected);
+    }
     toogleSelector(textElement, results);
 }
 
-function agregarNuevoElementoEnLista(modalInputId,resultsId,responseTextId,cancelButtonId){
+function agregarNuevoElementoEnLista(modalInputId, resultsId, responseTextId, cancelButtonId){
     let cancelButton = document.getElementById(cancelButtonId.id);
     let responseText = document.getElementById(responseTextId.id);
     let text = document.getElementById(modalInputId.id).value;
-    debugger;
     if(typeof text === 'string' && text !== ''){
         let element = document.getElementById(resultsId.id);
         let li = document.createElement("li");
         let anchor = document.createElement("a");
-        anchor.setAttribute('href',"javascript:updateResponse('"+text+"',"+resultsId.id+","+responseTextId.id+",'"+text+"')");
+        anchor.setAttribute('href', "javascript:updateResponse('"+text+"',"+resultsId.id+","+responseTextId.id+",'"+text+"')");
         anchor.innerHTML = text;
         li.appendChild(anchor);
         element.insertBefore(li,element.firstChild);
@@ -50,27 +52,19 @@ function agregarNuevoElementoEnLista(modalInputId,resultsId,responseTextId,cance
     }
 }
 
-function setNumeroRespuestas(numero){
-    let elemento = document.getElementById('pregunta_cantidad_respuestas');
-    elemento.value = numero;
+function setNumeroRespuestas(idTipo){
+    let minmax = types[idTipo];
+    let numero = minmax[0];
+    console.log("set Numero respuesta", numero);
+    actualizaRespuestas(numero);
 }
 
-// <div class="col-xs-12 col-sm-12 table">
-//     <div class="col-xs-1 col-sm-1 table-row">
-//         <label for="form_pregunta_respuesta_1">R.1</label>                                                          </div>
-//     <div class="col-xs-8 col-sm-8 table-row">
-//         <input class="form-control" type="text" placeholder="Texto, URLVideo o URLImágen" name="pregunta_respuesta_1" value="" id="form_pregunta_respuesta_1">                                                          </div>
-//     <div class="col-xs-2 col-sm-2 table-row">
-//         <input class="form-control" type="text" placeholder="0" name="pregunta_respuesta_porcentaje_1" value="" id="form_pregunta_respuesta_porcentaje_1">                                                          </div>
-//     <div class="col-xs-1 col-sm-1 table-row">
-//         <label for="form_pregunta_respuesta_porcentaje_1">%</label>                                                         </div>
-// </div>
-
-function actualizaRespuestas(){
-    let elemento = document.getElementById('pregunta_cantidad_respuestas');
+function actualizaRespuestas(cantidad){
+    console.log("Actualizar Respuesta");
     let elementoRespuestas = document.getElementById('respuestas');
+    let elementoCantidadRespuestas = document.getElementById('form_pregunta_cantidad_respuestas');
+    elementoCantidadRespuestas.value=cantidad;
     elementoRespuestas.innerHTML = "";
-    let cantidad = elemento.value;
     for (let i = 1; i <= cantidad; i++) {
         let nuevaRespuesta = document.createElement('div');
         nuevaRespuesta.className = "col-xs-12 col-sm-12 table";
@@ -109,10 +103,12 @@ function actualizaRespuestas(){
 
         let divLabelPorcentaje = document.createElement('div');
         divLabelPorcentaje.className = "col-xs-1 col-sm-1 table-row";
-        let labelR = document.createElement('label');
-        labelR.innerHTML = "%";
-        labelR.htmlFor = "form_pregunta_respuesta_porcentaje_"+i;
-        divLabelPorcentaje.appendChild(labelR);
+        let labelP = document.createElement('label');
+        labelP.innerHTML = "%";
+        labelP.htmlFor = "form_pregunta_respuesta_porcentaje_"+i;
+        divLabelPorcentaje.appendChild(labelP);
         nuevaRespuesta.appendChild(divLabelPorcentaje);
+
+        elementoRespuestas.appendChild(nuevaRespuesta);
     }
 }
