@@ -8,11 +8,15 @@
 				<?php
 					$pestania = SESSION::get('pestania');
 					$data = SESSION::get('data');
+					$modalPregunta = SESSION::get('modalPregunta');
 					if(isset($pestania)){
 						SESSION::delete('pestania');
 					}
 					if(isset($data)){
 						SESSION::delete('data');
+					}
+					if(isset($modalPregunta)){
+						SESSION::delete('modalPregunta');
 					}
 				?>
 				<!-- /SESSION -->
@@ -121,7 +125,9 @@
 								default:
 								?>
 									<div class="row">
-										<button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearExamen','agregarExamen','+ Crear nuevo examen','- Cancelar creación de examen')">+ Crear nuevo examen</button>
+										<!-- <button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearExamen','agregarExamen','+ Crear nuevo examen','- Cancelar creación de examen')">+ Crear nuevo examen</button> -->
+										
+										<button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" data-toggle="modal" data-target="#modalCrearExamen">+ Crear nuevo examen</button>
 									</div>
 									<br>
 									<div id="agregarExamen" class="row" style="display: none;">
@@ -253,58 +259,8 @@
 
 					<!-- Preguntas -->
 					<div id="area_preguntas" class="area<?php echo $pestania == 'preguntas' ? " expuesto": " oculto"; ?>">
-						<!-- Lista Bibliografias -->
-						<?php
-							$cual_boton = "preguntas";
-							if(isset($preguntas)){//TODO_ISAEL Cambiar por lista de preguntas
-								echo '<div class="row">';
-								foreach ($preguntas as $pregunta) {
-									echo "<h5>".$pregunta->nombre."</h5>";
-									echo $pregunta->texto."</br>";
-									// echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-									// 	echo '<a href="examen/editar?id_examen='.$examen->id_examen.'">';
-									// 	echo '<div class="row">';
-									// 		echo '<div class="col-xs-6">';
-									// 			echo $examen->nombre;
-									// 			echo '<br>Inicio: '.$examen->fecha_inicio;
-									// 			echo '<br>Final: '.$examen->fecha_fin;
-									// 		echo '</div>';
-									// 		echo '<div class="col-xs-6">';
-									// 			echo 'Temas: ';
-									// 			if(isset($temas)){
-									// 				$es_primero = True;
-									// 				foreach ($temas as $tema) {
-									// 					if($tema->id_examen==$examen->id_examen){
-									// 						if($es_primero){
-									// 							echo $tema->nombre;
-									// 							$es_primero=False;
-									// 						}else{
-									// 							echo ", ".$tema->nombre;
-									// 						}
-									// 					}
-									// 				}
-									// 			}else{
-									// 				echo 'Sin fijar';
-									// 			}
-									// 		echo '</div>';
-									// 	echo '</div>';
-									// 	echo '</a>';
-									// echo '</div>';
-								}
-								echo '</div>';
-							}else{
-								//Verificar si hay preguntas
-								if(isset($bibliografias)){									
-									echo "Las preguntas se separan por temas";
-								}else{
-									$cual_boton = "bibliografia";
-									echo "Para crear preguntas debe existir bibliografía";
-								}
-							}
-						?>
-						<!-- /Lista Bibliografias -->
-						<br>
 						<!-- Seccion agregar pregunta -->
+						<br>
 						<?php 
 							switch($cual_boton){
 								case "bibliografia":
@@ -322,130 +278,18 @@
 									</div>
 									<br>
 									<div id="agregarPregunta" class="row" style="display: none;">
-										<?php echo Form::open('curso/examen/crear_pregunta');?>
-										<div class="form-group">
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Tema', 'pregunta_tema');?>
-											</div>
-											<div class="col-xs-12 col-sm-12 table">
-												<?php
-													$boton_agregar_tema = array("href" => "", "value" => "+ Agregar nuevo tema", "data-toggle" => "modal", "data-target" => "#modalAgregarTema");
-													$lista_de_temas = [];
-													if(isset($temas)){
-														foreach ($temas as $tema) {
-															array_push($lista_de_temas, array($tema->id_tema, $tema->nombre));
-														}
-													}
-													echo Special_Selector::createSpecialSelector("pregunta_tema", "results_tema", $lista_de_temas,"Selecciona o crea un tema" , $boton_agregar_tema);
-												?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Bibliografía', 'pregunta_bibliografia');?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php
-													$boton_agregar_bibliografia = array("href" => "", "value" => "+ Agregar nueva bibliografía", "data-toggle" => "modal", "data-target" => "#modalAgregarBibliografia");
-													$lista_de_fuentes = [];
-													if(isset($bibliografias)){
-														foreach ($bibliografias as $fuente) {
-															array_push($lista_de_fuentes, array($fuente->id_fuente, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
-														}
-													}
-													echo Special_Selector::createSpecialSelector("pregunta_bibliografia", "results_fuente", $lista_de_fuentes,"Selecciona una fuente" , $boton_agregar_bibliografia);
-												?>
-											</div>
-											<div class="col-xs-12 col-sm-12 table">
-												<div class="col-xs-4 col-sm-4 table-row">
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::label('Página', 'pregunta_bibliografia_pagina');?>
-													</div>
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('pregunta_bibliografia_pagina','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Página'));?>
-													</div>
-												</div>
-												<div class="col-xs-8 col-sm-8 table-row">
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::label('Capítulo', 'pregunta_bibliografia_capitulo');?>
-													</div>
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('pregunta_bibliografia_capitulo','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Capítulo'));?>
-													</div>
-												</div>
-											</div>
-
-											<div class="col-xs-12 col-sm-12 table">
-												<div class="col-xs-4 col-sm-4 table-row">
-													<div>
-														<?php echo Form::label('Dificultad', 'pregunta_dificultad');?>
-													</div>
-													<div>
-														<?php 
-															$dificultades = array(array(1,1),array(2,2),array(3,3));
-															echo Special_Selector::createSpecialSelector("pregunta_dificultad", "results_dificultad", $dificultades,"...");
-														?>
-													</div>
-												</div>
-												<div class="col-xs-4 col-sm-4 table-row">
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::label('Tiempo', 'pregunta_tiempo');?>
-													</div>
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('pregunta_tiempo','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'segs'));?>
-													</div>
-												</div>
-												<div class="col-xs-4 col-sm-4 table-row">
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::label('Tipo', 'pregunta_tipo');?>
-													</div>
-													<div class="col-xs-12 col-sm-12">
-														<?php
-															$lista_de_tipos = [];
-															$lista_de_tipos_min_max_resp = [];
-															if(isset($tipos)){
-																foreach ($tipos as $tipo) {
-																	array_push($lista_de_tipos, array($tipo->id_tipo, $tipo->nombre));
-																	array_push($lista_de_tipos_min_max_resp, array($tipo->id_tipo, $tipo->min_respuestas, $tipo->max_respuestas));
-																}
-															}
-															$boton_extra=null;
-															echo Special_Selector::createSpecialSelector("pregunta_tipo", "results_tipo", $lista_de_tipos,"Selecciona un tipo",$boton_extra);
-														?>
-													</div>
-												</div>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Pregunta', 'pregunta_texto');?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::input('pregunta_texto','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen'));?>
-											</div>
-
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Respuestas y porcentaje', '');?>
-											</div>
-											<div id="respuestas">
-												<!-- Aquí van las respuestas -->
-												*-* Selecciona un tipo de pregunta primero *-*
-											</div>
-											<?php
-												echo Form::input("pregunta_cantidad_respuestas",'', array('type' => 'hidden'));
-											?>
-											
-
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Justificación', 'pregunta_justificacion');?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::input('pregunta_justificacion','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación'));?>
-											</div>
-											<br>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block'));?>
-											</div>
-										</div>
-										<?php echo Form::close();?>
+										<?php
+											$lista_de_tipos_min_max_resp = [];
+											if(isset($tipos)){
+												foreach ($tipos as $tipo) {
+													array_push($lista_de_tipos_min_max_resp, array($tipo->id_tipo, $tipo->min_respuestas, $tipo->max_respuestas));
+												}
+											}
+										?>
+										<?php
+											echo Modals::getModalPregunta($temas, $bibliografias, $tipos);
+										?>
 									</div>
-									<br>
 									<div class="row">
 										<button id="mostrarCrearPreguntaCompartida" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPreguntaCompartida','agregarPreguntaCompartida','+ Agrega preguntas compartidas','- Cancelar preguntas compartidas')">+ Agrega preguntas compartidas</button>
 									</div>
@@ -503,12 +347,97 @@
 							}
 							?>
 						<!-- /Seccion agregar pregunta -->
+						<br>
+						<!-- Lista Preguntas -->
+						<?php
+							$cual_boton = "preguntas";
+							if(isset($preguntas)){
+								echo '<div class="row">';
+								$tema_actual = "";
+								foreach ($preguntas as $pregunta) {
+									if($tema_actual !== $pregunta->nombre){
+										if($tema_actual !== "")
+											echo "</div>";
+										$tema_actual = $pregunta->nombre;
+										echo '<div class="col-xs-12 table">';
+										echo "<h4>".$tema_actual."</h4>";
+									}
+									echo '<div class="col-xs-12 col-md-6 col-lg-4">';
+										echo '<div class="col-xs-9">';
+											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta->id_pregunta,'<b>Nivel '.$pregunta->dificultad.':</b> <i><span>'.$pregunta->texto.'</span></i>', array('class' => ''));
+											echo "<br>";
+										echo '</div>';
+										echo '<div class="col-xs-3">';
+											echo '<button id="compartir" class="btn btn-primary btn-block" onclick="">Compartir</button>';
+										echo '</div>';
+										echo "</br>";
+									echo '</div>';
+								}
+								if($tema_actual !== "")
+									echo "</div>";
+								echo '</div>';
+							}else{
+								//Verificar si hay preguntas
+								if(isset($bibliografias)){									
+									echo "Las preguntas se separan por temas";
+								}else{
+									$cual_boton = "bibliografia";
+									echo "Para crear preguntas debe existir bibliografía";
+								}
+							}
+						?>
+						<!-- /Lista Preguntas -->
 					</div>
 					<!-- /Preguntas -->
 				</div>
 				<!-- /Area de trabajo -->
 
 				<!-- Modales -->
+				<div id="botonModal">
+
+				</div>
+				<?php
+					if(isset($modalPregunta)){
+				?>
+				<div class="modal fade" id="modalPregunta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<?php echo Modals::getModalPregunta($temas, $bibliografias, $tipos, True); ?>
+				</div>
+				<?php 
+					}
+				?>	
+
+				<div class="modal fade" id="modalCrearExamen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<!-- <div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">Agregar nuevo tema</h4>
+							</div>
+
+							<div class="form-group">
+								<div class="modal-body">
+									<div class="input-group">
+										<?php echo Form::label('Escribe el nombre del nuevo tema. Este se agregará hasta que se haya guardado la pregunta correctamente.', 'modal_tema_input');?>
+										<input id="modal_tema_input" type="text" class="form-control" placeholder="Cuida la ortografía al escribir el tema">
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div class="row text-center">
+										<div class="col-xs-6">
+											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
+										</div>
+										<div class="col-xs-6">
+											<?php echo Html::anchor('javascript:agregarNuevoElementoEnLista(modal_tema_input,results_tema,pregunta_tema,cancelarTema);','Guardar Cambios', array('class' => 'btn btn-primary btn-block')); ?>
+										</div>
+									</div>
+								</div>
+							</div> -->
+						</div>
+					</div>
+				</div>
+
 				<div class="modal fade" id="modalAgregarTema" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
@@ -597,4 +526,21 @@
 		}
 		echo "}";
 	 ?>;
+	 <?php
+	 if(isset($modalPregunta)){
+	 	?>
+	 		let botonModalPregunta = document.createElement('button');
+	 		botonModalPregunta.setAttribute('data-toggle','modal');
+	 		botonModalPregunta.setAttribute('data-target','#modalPregunta');
+	 		botonModalPregunta.style.visibility = "hidden";
+	 		let padre = document.getElementById('botonModal');
+	 		padre.appendChild(botonModalPregunta);
+	 		setTimeout(function(){
+	 			botonModalPregunta.click();
+	 			padre.removeChild(botonModalPregunta);
+	 		},100);
+	 		
+	 	<?php
+	 }
+	 ?>
 </script>

@@ -459,4 +459,30 @@ class Controller_Curso_Examen extends Controller_Template
 
 	}
 
+	/**
+	 * Controlador que muestra la pantalla de creacion de fuentes bibliográficas para
+	 * la creacion del examen correspondiente.
+	 *f
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_mostrar_pregunta($id_pregunta)
+	{
+		$id_curso = SESSION::get('id_curso');
+		$mensaje = "";
+		$error = False;
+		if($error){
+			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
+			SESSION::set('mensaje',$mensaje);
+			SESSION::set('pestania','preguntas');
+			// SESSION::set('data',$data);
+			Response::redirect('curso/examenes');
+		}else{
+			SESSION::set('modalPregunta',True);
+			SESSION::set('pestania','preguntas');
+			Response::redirect('curso/examenes');
+		}
+
+	}
+
 }

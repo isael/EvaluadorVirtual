@@ -6,6 +6,7 @@ require COREPATH.'bootstrap.php';
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
 	'Special_Selector' => APPPATH.'classes/helper/specialselector.php',
+	'Modals' => APPPATH.'classes/helper/modals.php',
 ));
 
 // Register the autoloader
