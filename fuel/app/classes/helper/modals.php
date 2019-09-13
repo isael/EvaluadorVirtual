@@ -22,7 +22,15 @@
 class Modals
 {
 
-	public static function getModalPregunta($temas, $bibliografias, $tipos, $is_modal = false){
+	public static function getModalPregunta($temas, $bibliografias, $tipos, $is_modal = false, $id_pregunta = null){
+		$pregunta_texto="";
+		$pregunta_justificacion="";
+		if(isset($id_pregunta)){
+			$pregunta = Model_Pregunta::find_one_by('id_pregunta', $id_pregunta);
+			$pregunta_texto=$pregunta->texto;
+			$pregunta_justificacion=$pregunta->justificacion;
+		}
+
 		$result = '';
 		$boton_agregar_tema = array("href" => "", "value" => "+ Agregar nuevo tema", "data-toggle" => "modal", "data-target" => "#modalAgregarTema");
 		$lista_de_temas = [];
@@ -65,7 +73,8 @@ class Modals
 						<span aria-hidden="true">&times;</span>
 					</button>
 					<h4 class="modal-title" id="myModalLabel">Modificar Pregunta</h4>
-					</div>';
+					</div>
+					<div class="modal-body">';
 		}else{
 			$result = $result.Form::open('curso/examen/crear_pregunta');			
 		}
@@ -133,7 +142,7 @@ class Modals
 									Form::label('Pregunta', 'pregunta_texto'.$sufijo_modal).'
 								</div>
 								<div class="col-xs-12 col-sm-12">'.
-									Form::input('pregunta_texto'.$sufijo_modal,'',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen')).'
+									Form::input('pregunta_texto'.$sufijo_modal,$pregunta_texto,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen')).'
 								</div>
 
 								<div class="col-xs-12 col-sm-12">'.
@@ -148,11 +157,26 @@ class Modals
 									Form::label('Justificación', 'pregunta_justificacion'.$sufijo_modal).'
 								</div>
 								<div class="col-xs-12 col-sm-12">'.
-									Form::input('pregunta_justificacion'.$sufijo_modal,'',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación')).'
+									Form::input('pregunta_justificacion'.$sufijo_modal,$pregunta_justificacion,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación')).'
 								</div>
 							</div>';
 		if($is_modal){
 			$result = $result.'
+					</div>
+					<div class="modal-footer">
+                          <div class="row text-center">
+							<div class="col-xs-12">
+								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Duplicar pregunta</button>
+							</div>
+							<br>
+							<div class="col-xs-6">
+								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
+							</div>
+							<div class="col-xs-6">'.
+								Html::anchor('sesion/cerrar','Guardar',array('type' => 'button', 'class' => 'btn btn-danger btn-block')).'
+							</div>
+                          </div>
+                      </div>
 				</div>
 			</div>';
 		}else{

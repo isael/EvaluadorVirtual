@@ -478,7 +478,7 @@ class Controller_Curso_Examen extends Controller_Template
 			// SESSION::set('data',$data);
 			Response::redirect('curso/examenes');
 		}else{
-			SESSION::set('modalPregunta',True);
+			SESSION::set('id_pregunta',$id_pregunta);
 			SESSION::set('pestania','preguntas');
 			Response::redirect('curso/examenes');
 		}

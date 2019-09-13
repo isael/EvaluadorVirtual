@@ -8,18 +8,29 @@
 				<?php
 					$pestania = SESSION::get('pestania');
 					$data = SESSION::get('data');
-					$modalPregunta = SESSION::get('modalPregunta');
+					$idPregunta = SESSION::get('id_pregunta');
 					if(isset($pestania)){
 						SESSION::delete('pestania');
 					}
 					if(isset($data)){
 						SESSION::delete('data');
 					}
-					if(isset($modalPregunta)){
-						SESSION::delete('modalPregunta');
+					if(isset($idPregunta)){
+						SESSION::delete('id_pregunta');
 					}
 				?>
 				<!-- /SESSION -->
+
+				<!-- EXTRA -->				
+				<?php
+					$lista_de_tipos_min_max_resp = [];
+					if(isset($tipos)){
+						foreach ($tipos as $tipo) {
+							array_push($lista_de_tipos_min_max_resp, array($tipo->id_tipo, $tipo->min_respuestas, $tipo->max_respuestas));
+						}
+					}
+				?>
+				<!-- /EXTRA -->
 
 				<!-- Barra -->
 				<div class="row">
@@ -279,14 +290,6 @@
 									<br>
 									<div id="agregarPregunta" class="row" style="display: none;">
 										<?php
-											$lista_de_tipos_min_max_resp = [];
-											if(isset($tipos)){
-												foreach ($tipos as $tipo) {
-													array_push($lista_de_tipos_min_max_resp, array($tipo->id_tipo, $tipo->min_respuestas, $tipo->max_respuestas));
-												}
-											}
-										?>
-										<?php
 											echo Modals::getModalPregunta($temas, $bibliografias, $tipos);
 										?>
 									</div>
@@ -397,10 +400,10 @@
 
 				</div>
 				<?php
-					if(isset($modalPregunta)){
+					if(isset($idPregunta)){
 				?>
 				<div class="modal fade" id="modalPregunta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<?php echo Modals::getModalPregunta($temas, $bibliografias, $tipos, True); ?>
+					<?php echo Modals::getModalPregunta($temas, $bibliografias, $tipos, True, $idPregunta); ?>
 				</div>
 				<?php 
 					}
@@ -527,7 +530,7 @@
 		echo "}";
 	 ?>;
 	 <?php
-	 if(isset($modalPregunta)){
+	 if(isset($idPregunta)){
 	 	?>
 	 		let botonModalPregunta = document.createElement('button');
 	 		botonModalPregunta.setAttribute('data-toggle','modal');
