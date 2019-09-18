@@ -22,7 +22,7 @@
 class Special_Selector
 {
 
-	public static function createSpecialSelector($responseTextId, $resultsId, $results, $placeholder, $extraButton = null, $attributes = null){
+	public static function createSpecialSelector($responseTextId, $resultsId, $results, $placeholder, $extraButton = null, $attributes = null, $defaultOptionValue = ""){
 		$result = '';
 		$extraButtonElement = '';
 		$options = '';
@@ -56,8 +56,8 @@ class Special_Selector
 		$result = 	'<div class="col-xs-12 col-sm-12">
 						<ul class="col-xs-12 selector">
 								<li class="response">
-									<input type="hidden" name="'.$responseTextId.'_option_selected" id="'.$responseTextId.'_option_selected" value="">
-									<input class="form-control" type="text" placeholder="'.$placeholder.'" name="'.$responseTextId.'" value="" id="'.$responseTextId.'" onfocus="javascript:handleFocus('.$resultsId.',true)" onfocusout="javascript:handleFocus('.$resultsId.',false)"'.$atributos.'>
+									<input type="hidden" name="'.$responseTextId.'_option_selected" id="'.$responseTextId.'_option_selected" value="'.$defaultOptionValue.'">
+									<input class="form-control" type="text" placeholder="'.$placeholder.'" name="'.$responseTextId.'" id="'.$responseTextId.'" onfocus="javascript:handleFocus('.$resultsId.',true)" onfocusout="javascript:handleFocus('.$resultsId.',false)"'.$atributos.'>
 									<ul id="'.$resultsId.'">'.
 										$options
 										.$extraButtonElement.'

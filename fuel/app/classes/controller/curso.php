@@ -251,17 +251,22 @@ class Controller_Curso extends Controller_Template
 			// 	$temas = null;
 			// }
 
-			$temas = Model_Tema::find_all();
+			$temas = Model_Tema::find(function ($query) use ($id_curso){
+				return $query->join('CursoTema')
+			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+			                 ->where('CursoTema.id_curso', '=', $id_curso);
+			});
 
 			$tipos = Model_Tipo::find_all();
-
-			$preguntas = Model_Pregunta::find_all();
 
 			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso){
 			    return $query->join('Genera')
 			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 			                 ->join('Tema')
 			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
+			                 ->join('CursoTema')
+			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+			                 ->where('CursoTema.id_curso', '=', $id_curso)
 			                 ->order_by('Tema.nombre')
 			                 ->order_by('Pregunta.id_pregunta');
 			});

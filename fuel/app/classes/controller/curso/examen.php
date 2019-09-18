@@ -395,6 +395,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$pregunta->dificultad = $pregunta_dificultad;
 				$pregunta->justificacion = $pregunta_justificacion;
 				$pregunta->tiene_subpreguntas = $tipo->tiene_subpreguntas; //Pendiente
+				$pregunta->tiempo = $pregunta_tiempo;
 				$pregunta->save();
 				$id_pregunta = $pregunta->id_pregunta;
 
@@ -408,6 +409,23 @@ class Controller_Curso_Examen extends Controller_Template
 				$fundamentado_en->id_pregunta = $id_pregunta;
 				$fundamentado_en->id_referencia = $id_referencia;
 				$fundamentado_en->save();
+			}
+
+			if(isset($pregunta_cantidad)){
+				$cantidad = intval($pregunta_cantidad);
+				for ($i=0; $i < $cantidad; $i++) {
+					$texto_actual = $conjunto_respuestas[$i];
+					$porcentaje_actual = $conjunto_porcentajes[$i];
+					$resp = new Model_Respuesta();
+					$resp->contenido = $texto_actual;
+					$resp->porcentaje = $porcentaje_actual;
+					$resp->save();
+
+					$contiene = new Model_Contiene();
+					$contiene->id_pregunta = $id_pregunta;
+					$contiene->id_respuesta = $resp->id_respuesta;
+					$contiene->save();
+				}
 			}
 
 
