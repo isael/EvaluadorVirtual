@@ -36,6 +36,7 @@ class Modals
 		$pregunta_tipo="";
 		$pregunta_tipo_id="";
 		$respuestas="";
+		$cantidad_respuestas = "";
 
 		if(isset($id_pregunta)){
 			$pregunta = Model_Pregunta::find_one_by('id_pregunta', $id_pregunta);
@@ -85,8 +86,10 @@ class Modals
 		                 ->where('Contiene.id_pregunta', '=', $id_pregunta);
 		    });
 			$i = 1;
+			$cantidad_respuestas_entero = 0;
 			foreach ((array) $_respuestas as $respuesta) {
-				$respuestas = $respuestas.'<div class="col-xs-12 col-sm-12 table">
+				$respuestas = $respuestas.'<div class="col-xs-12 col-sm-12 table">'.
+									Form::input('pregunta_id_respuesta_'.$i.'_modal',$respuesta->id_respuesta, array('type' => 'hidden')).'
 									<div class="col-xs-1 col-sm-1 table-row">'.
 										Form::label('R.'.$i, 'pregunta_respuesta_'.$i.'_modal').'
 									</div>
@@ -102,8 +105,14 @@ class Modals
 								</div>
 								<br>';
 				$i++;
+				$cantidad_respuestas_entero++;
+			}
+			if($cantidad_respuestas_entero){
+				$cantidad_respuestas = strval($cantidad_respuestas_entero);
 			}
 			
+		}else{
+			$id_pregunta = '';
 		}
 
 		$result = '';
@@ -152,9 +161,8 @@ class Modals
 					<h4 class="modal-title" id="myModalLabel">Modificar Pregunta</h4>
 					</div>
 					<div class="modal-body">';
-		}else{
-			$result = $result.Form::open('curso/examen/crear_pregunta');			
 		}
+		$result = $result.Form::open('curso/examen/crear_pregunta');
 
 		$result = $result.'
 							<div class="form-group">
@@ -230,10 +238,11 @@ class Modals
 									$respuestas.'
 									*-* Selecciona un tipo de pregunta primero *-*
 								</div>'.
-									Form::input("pregunta_cantidad_respuestas",'', array('type' => 'hidden')).'
+									Form::input('pregunta_cantidad_respuestas'.$sufijo_modal,$cantidad_respuestas, array('type' => 'hidden')).'
 								<div class="col-xs-12 col-sm-12">'.
 									Form::label('Justificación', 'pregunta_justificacion'.$sufijo_modal).'
-								</div>
+								</div>'.
+									Form::input("pregunta_id",$id_pregunta, array('type' => 'hidden')).'
 								<div class="col-xs-12 col-sm-12">'.
 									Form::input('pregunta_justificacion'.$sufijo_modal,$pregunta_justificacion,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación')).'
 								</div>
@@ -251,7 +260,7 @@ class Modals
 								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 							</div>
 							<div class="col-xs-6">'.
-								Html::anchor('sesion/cerrar','Guardar',array('type' => 'button', 'class' => 'btn btn-danger btn-block')).'
+								Form::submit('Guardar','Guardar',array('class' => 'btn btn-danger btn-block')).'
 							</div>
                           </div>
                       </div>
@@ -263,8 +272,8 @@ class Modals
 									Form::button('boton_agregar_pregunta', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
 								</div>
 								<br>';
-			$result = $result.Form::close();
 		}
+		$result = $result.Form::close();
 		return $result;
 	}
 }

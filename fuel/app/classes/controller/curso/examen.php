@@ -237,22 +237,28 @@ class Controller_Curso_Examen extends Controller_Template
 		$data = null;
 		$mensaje="";
 		$error = False;
-
+		$modal = "";
+		$modificar_pregunta = False;
 		$pregunta_id = trim(Input::post('pregunta_id'));
-		$pregunta_tipo = trim(Input::post('pregunta_tipo_option_selected'));
-		$pregunta_tema_id = trim(Input::post('pregunta_tema_option_selected'));
-		$pregunta_tema = trim(Input::post('pregunta_tema'));
-		$pregunta_bibliografia=trim(Input::post('pregunta_bibliografia_option_selected'));
-		$pregunta_bibliografia_pagina=trim(Input::post('pregunta_bibliografia_pagina'));
-		$pregunta_bibliografia_capitulo=trim(Input::post('pregunta_bibliografia_capitulo'));
-		$pregunta_dificultad=trim(Input::post('pregunta_dificultad'));
-		$pregunta_tiempo=trim(Input::post('pregunta_tiempo'));
-		$pregunta_texto=trim(Input::post('pregunta_texto'));
-		$pregunta_justificacion=trim(Input::post('pregunta_justificacion'));
-		$pregunta_cantidad=trim(Input::post('pregunta_cantidad_respuestas'));
+		if(isset($pregunta_id)  && $pregunta_id!==""){
+			$modal = "_modal";
+			$modificar_pregunta = True;
+		}
+
+		$pregunta_tipo = trim(Input::post('pregunta_tipo'.$modal.'_option_selected'));
+		$pregunta_tema_id = trim(Input::post('pregunta_tema'.$modal.'_option_selected'));
+		$pregunta_tema = trim(Input::post('pregunta_tema'.$modal));
+		$pregunta_bibliografia=trim(Input::post('pregunta_bibliografia'.$modal.'_option_selected'));
+		$pregunta_bibliografia_pagina=trim(Input::post('pregunta_bibliografia_pagina'.$modal));
+		$pregunta_bibliografia_capitulo=trim(Input::post('pregunta_bibliografia_capitulo'.$modal));
+		$pregunta_dificultad=trim(Input::post('pregunta_dificultad'.$modal));
+		$pregunta_tiempo=trim(Input::post('pregunta_tiempo'.$modal));
+		$pregunta_texto=trim(Input::post('pregunta_texto'.$modal));
+		$pregunta_justificacion=trim(Input::post('pregunta_justificacion'.$modal));
+		$pregunta_cantidad=trim(Input::post('pregunta_cantidad_respuestas'.$modal));
 
 		$tema=null;
-		if(isset($pregunta_tema_id) && $pregunta_tema_id!==""){
+		if(isset($pregunta_tema_id) && $pregunta_tema_id!=="" && isset($pregunta_tema) && $pregunta_tema!==""){
 			if(is_numeric($pregunta_tema_id)){
 				$tema = Model_Tema::find_one_by( 'id_tema', $pregunta_tema_id);
 			}
@@ -312,15 +318,21 @@ class Controller_Curso_Examen extends Controller_Template
 		}
 
 		$conjunto_respuestas = array();
+		$conjunto_id_respuestas = array();
 		$conjunto_porcentajes = array();
+		$cantidad_respuestas = 0;
 		if(isset($pregunta_cantidad)){
-			$cantidad = intval($pregunta_cantidad);
+			$cantidad_respuestas = intval($pregunta_cantidad);
 			$maximo_porcentaje = 0;
-			for ($i=1; $i <= $cantidad; $i++) {
-				$respuesta = trim(Input::post('pregunta_respuesta_'.$i));
-				$porcentaje_texto = trim(Input::post('pregunta_respuesta_porcentaje_'.$i));
+			for ($i=1; $i <= $cantidad_respuestas; $i++) {
+				$respuesta = trim(Input::post('pregunta_respuesta_'.$i.$modal));
+				$id_respuesta = trim(Input::post('pregunta_id_respuesta_'.$i.$modal));
+				$porcentaje_texto = trim(Input::post('pregunta_respuesta_porcentaje_'.$i.$modal));
 				$porcentaje = 0;
 				if(isset($respuesta) && $respuesta !== ''){
+					if(isset($id_respuesta)){
+						array_push($conjunto_id_respuestas, $id_respuesta);
+					}
 					array_push($conjunto_respuestas, $respuesta);
 					if(isset($porcentaje_texto)  && $porcentaje_texto !== ''){
 						if(is_numeric($porcentaje_texto)){
@@ -336,14 +348,17 @@ class Controller_Curso_Examen extends Controller_Template
 					array_push($conjunto_porcentajes, $porcentaje);
 				}else{
 					$error = True;
-					$mensaje = "Hay respuestas y/o porcentajes sin llenar.<br>";
-					$i=$cantidad+1; //Detiene el for
+					$mensaje = $mensaje."Hay respuestas y/o porcentajes sin llenar.<br>";
+					$i=$cantidad_respuestas+1; //Detiene el for
 				}
 			}
 			if($maximo_porcentaje!=100){
 				$error = True;
-				$mensaje = "Debe haber al menos una respuesta con porcentaje del 100%.<br>";
+				$mensaje = $mensaje."Debe haber al menos una respuesta con porcentaje del 100%.<br>";
 			}
+		}else{
+			$error = True;
+			$mensaje = $mensaje."Ha sido borrado un dato importante desde el HTML. Favor de no hacerlo.<br>";
 		}
 
 		if($pregunta_justificacion==null||$pregunta_justificacion===""){
@@ -352,21 +367,144 @@ class Controller_Curso_Examen extends Controller_Template
 		}
 	
 		if(!$error){
-			$referencias = Model_Referencia::find(function ($query) use ($fuente, $pregunta_bibliografia_capitulo, $pregunta_bibliografia_pagina){
-		    	return $query->join('ReferenciaFuente')
-		                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-		                 ->join('Fuente')
-		                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
-		                 ->where('ReferenciaFuente.id_fuente', '=', $fuente->id_fuente)
-		                 ->and_where('Referencia.pagina', $pregunta_bibliografia_pagina)
-		                 ->and_where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
-		                 ->order_by('Fuente.id_fuente');
-			});
+			/* Bibliografías */
 
-			$id_referencia="";
-			if(isset($referencias)){
-				$referencia_completa = reset($referencias);
-				$id_referencia=$referencia_completa->id_referencia;
+			$id_pregunta = null;
+			$id_referencia=null;
+			$fundamentado_en = null;
+
+			if($modificar_pregunta){
+				$id_pregunta=$pregunta_id;
+				$fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
+				if(isset($fundamentado_en_lista)){
+					$fundamentado_en = reset($fundamentado_en_lista);
+					$id_referencia = $fundamentado_en->id_referencia;
+
+					$new_referencia = Model_Referencia::find_one_by('id_referencia',$id_referencia);
+					if(isset($new_referencia)){
+						$update_referencia = False;
+						$pagina_iguales = ($new_referencia->pagina === $pregunta_bibliografia_pagina);
+						if(!$pagina_iguales){
+							$new_referencia->pagina = $pregunta_bibliografia_pagina;
+							$update_referencia = True;
+						}
+						$capitulo_iguales = ($new_referencia->capitulo === $pregunta_bibliografia_capitulo);
+						if(!$capitulo_iguales){
+							$new_referencia->capitulo = $pregunta_bibliografia_capitulo;
+							$update_referencia = True;
+						}
+						if($update_referencia){
+							$new_referencia->save();
+						}
+					}
+
+					$new_referencia_fuente_lista = Model_ReferenciaFuente::find('all',array('where' => array(array('id_referencia', $id_referencia))));
+					if(isset($new_referencia_fuente_lista)){
+						$new_referencia_fuente = reset($new_referencia_fuente_lista);
+						$update_referencia_fuente = False;
+						$fuente_iguales = ($new_referencia_fuente->id_fuente === $pregunta_bibliografia);
+						if(!$fuente_iguales){
+							$new_referencia_fuente->id_fuente = $pregunta_bibliografia;
+							$update_referencia_fuente = True;
+						}
+						if($update_referencia_fuente){
+							$new_referencia_fuente->save();
+						}
+					}
+
+					$new_pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
+					if(isset($new_pregunta)){
+						$update_pregunta = False;
+						$texto_iguales = ($new_pregunta->texto === $pregunta_texto);
+						if(!$texto_iguales){
+							$new_pregunta->texto = $pregunta_texto;
+							$update_pregunta = True;
+						}
+						$dificultad_iguales = ($new_pregunta->dificultad === $pregunta_dificultad);
+						if(!$dificultad_iguales){
+							$new_pregunta->dificultad = $pregunta_dificultad;
+							$update_pregunta = True;
+						}
+						$justificacion_iguales = ($new_pregunta->justificacion === $pregunta_justificacion);
+						if(!$justificacion_iguales){
+							$new_pregunta->justificacion = $pregunta_justificacion;
+							$update_pregunta = True;
+						}
+						$tiempo_iguales = ($new_pregunta->tiempo === $pregunta_tiempo);
+						if(!$tiempo_iguales){
+							$new_pregunta->tiempo = $pregunta_tiempo;
+							$update_pregunta = True;
+						}
+						if($update_pregunta){
+							$new_pregunta->save();
+						}
+					}
+
+					$cantidad_respuestas = sizeof($conjunto_id_respuestas);
+					for ($i=0; $i < $cantidad_respuestas; $i++) {
+						$id_respuesta_actual = $conjunto_id_respuestas[$i];
+						$texto_actual = $conjunto_respuestas[$i];
+						$porcentaje_actual = $conjunto_porcentajes[$i];
+						$resp = Model_Respuesta::find_one_by('id_respuesta',$id_respuesta_actual);
+						if(isset($resp)){
+							$update_respuesta = False;
+							$contenido_iguales = ($resp->contenido === $texto_actual);
+							if(!$contenido_iguales){
+								$resp->contenido = $texto_actual;
+								$update_respuesta = True;
+							}
+							$porcentaje_iguales = ($resp->porcentaje === $porcentaje_actual);
+							if(!$porcentaje_iguales){
+								$resp->porcentaje = $porcentaje_actual;
+								$update_respuesta = True;
+							}
+							if($update_respuesta){
+								$resp->save();
+							}
+						}
+					}
+
+					$genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+					if(isset($genera_lista)){
+						$genera = reset($genera_lista);
+						$update_tema = False;
+						$id_tema_antiguo = $genera->id_tema;
+						$id_tema_actual = $tema->id_tema;
+
+						$tema_fuente_lista = Model_TemaFuente::find(array('id_tema' => $id_tema_antiguo, 'id_fuente' => $fuente->id_fuente ));
+						$tema_fuente = reset($tema_fuente_lista);
+						$curso_tema_lista = Model_CursoTema::find(array('id_curso' => $id_curso ,'id_tema' => $id_tema_antiguo));
+						$curso_tema = reset($curso_tema_lista);
+
+						$id_tema_iguales = ($id_tema_antiguo === $id_tema_actual);
+						if(!$id_tema_iguales){
+							$genera->delete();
+							$new_genera = new Model_Genera();
+							$genera->id_pregunta = $id_pregunta;
+							$genera->id_tema = $id_tema_actual;
+							$genera->save();
+						}
+						// if(!$id_tema_iguales){
+						// 	$genera->id_tema = $id_tema_actual;
+						// 	$tema_fuente->id_tema = $id_tema_actual;
+						// 	$curso_tema->id_tema = $id_tema_actual;
+						// 	$update_tema = True;
+						// 	//cuenta cuantas preguntas tiene el $id_tema_antiguo
+						// 	//Si no es ninguna, borra el tema por completo
+						// 	$genera_lista = Model_Genera::find(array('id_tema'=> $id_tema_antiguo));
+						// 	if(!isset($genera_lista)){
+						// 		$tema = Model_Tema::find_one_by('id_tema',$id_tema_antiguo);
+						// 		$tema->delete();
+						// 	}
+						// }
+						// if($update_tema){
+						// 	$genera->save();
+						// 	$tema_fuente->save();
+						// 	$curso_tema->save();
+						// }
+					}
+
+				}
 			}else{
 				$referencia = new Model_Referencia();
 				$referencia->capitulo = $pregunta_bibliografia_capitulo;
@@ -378,16 +516,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$referencia_fuente->id_referencia = $referencia->id_referencia;
 				$referencia_fuente->id_fuente = $fuente->id_fuente;
 				$referencia_fuente->save();
-			}
 
-			$id_pregunta = null;
-			$fundamentado_en = null;
-			if(isset($pregunta_id)  && $pregunta_id!==""){
-				$fundamentado_en = Model_FundamentadoEn::find(array('id_referencia' => $id_referencia, 'id_pregunta' => $pregunta_id ));
-				if(isset($fundamentado_en)){
-					$id_pregunta = $pregunta_id;
-				}
-			}else{
 				$tipo = Model_Tipo::find_one_by('id_tipo',$pregunta_tipo);//Pendiente
 
 				$pregunta = new Model_Pregunta();
@@ -403,17 +532,13 @@ class Controller_Curso_Examen extends Controller_Template
 				$de_tipo->id_tipo = $tipo->id_tipo;
 				$de_tipo->id_pregunta = $id_pregunta;
 				$de_tipo->save();
-			}
-			if(!isset($fundamentado_en)){
+
 				$fundamentado_en = new Model_FundamentadoEn();
 				$fundamentado_en->id_pregunta = $id_pregunta;
 				$fundamentado_en->id_referencia = $id_referencia;
 				$fundamentado_en->save();
-			}
 
-			if(isset($pregunta_cantidad)){
-				$cantidad = intval($pregunta_cantidad);
-				for ($i=0; $i < $cantidad; $i++) {
+				for ($i=0; $i < $cantidad_respuestas; $i++) {
 					$texto_actual = $conjunto_respuestas[$i];
 					$porcentaje_actual = $conjunto_porcentajes[$i];
 					$resp = new Model_Respuesta();
@@ -426,41 +551,36 @@ class Controller_Curso_Examen extends Controller_Template
 					$contiene->id_respuesta = $resp->id_respuesta;
 					$contiene->save();
 				}
-			}
 
+				if(!isset($tema)){
+					$tema = new Model_Tema();
+					$tema->nombre = $pregunta_tema;
+					$tema->save();
+				}
 
-			if($tema==null){					
-				$tema = new Model_Tema();
-				$tema->nombre = $pregunta_tema;
-				$tema->save();
-			}
-
-			$genera = Model_Genera::find(array('id_pregunta'=> $id_pregunta, 'id_tema' => $tema->id_tema));
-			if(!isset($genera)){
 				$genera = new Model_Genera();
 				$genera->id_pregunta = $id_pregunta;
 				$genera->id_tema = $tema->id_tema;
 				$genera->save();
+
+				$tema_fuente = Model_TemaFuente::find(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
+				if(!isset($tema_fuente)){
+					$tema_fuente = new Model_TemaFuente();
+					$tema_fuente->id_fuente = $fuente->id_fuente;
+					$tema_fuente->id_tema = $tema->id_tema;
+					$tema_fuente->save();
+				}
+
+				$curso_tema = Model_CursoTema::find(array('id_curso' => $id_curso ,'id_tema' => $tema->id_tema));
+				if(!isset($curso_tema)){
+					$curso_tema = new Model_CursoTema();
+					$curso_tema->id_curso = $id_curso;
+					$curso_tema->id_tema = $tema->id_tema;
+					$curso_tema->save();
+				}
 			}
 
-			$tema_fuente = Model_TemaFuente::find(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
-			if(!isset($tema_fuente)){
-				$tema_fuente = new Model_TemaFuente();
-				$tema_fuente->id_fuente = $fuente->id_fuente;
-				$tema_fuente->id_tema = $tema->id_tema;
-				$tema_fuente->save();
-			}
-
-			$curso_tema = Model_CursoTema::find(array('id_curso' => $id_curso ,'id_tema' => $tema->id_tema));
-			if(!isset($curso_tema)){
-				$curso_tema = new Model_CursoTema();
-				$curso_tema->id_curso = $id_curso;
-				$curso_tema->id_tema = $tema->id_tema;
-				$curso_tema->save();
-			}
-
-
-			$mensaje = "La nueva pregunta ha sido agregada con éxito.";
+			$mensaje = $mensaje."La nueva pregunta ha sido agregada con éxito.";
 		}
 
 		if($error){

@@ -4,6 +4,7 @@ class Model_CursoTema extends \Orm\Model{
 	protected static $_properties = array(
 		'id_curso',
 		'id_tema',
+		'contador',
 	);
 	
 	protected static $_table_name = 'CursoTema';
