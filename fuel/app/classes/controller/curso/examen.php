@@ -471,11 +471,6 @@ class Controller_Curso_Examen extends Controller_Template
 						$id_tema_antiguo = $genera->id_tema;
 						$id_tema_actual = $tema->id_tema;
 
-						$tema_fuente_lista = Model_TemaFuente::find(array('id_tema' => $id_tema_antiguo, 'id_fuente' => $fuente->id_fuente ));
-						$tema_fuente = reset($tema_fuente_lista);
-						$curso_tema_lista = Model_CursoTema::find(array('id_curso' => $id_curso ,'id_tema' => $id_tema_antiguo));
-						$curso_tema = reset($curso_tema_lista);
-
 						$id_tema_iguales = ($id_tema_antiguo === $id_tema_actual);
 						if(!$id_tema_iguales){
 							$genera->delete();
@@ -484,24 +479,52 @@ class Controller_Curso_Examen extends Controller_Template
 							$genera->id_tema = $id_tema_actual;
 							$genera->save();
 						}
-						// if(!$id_tema_iguales){
-						// 	$genera->id_tema = $id_tema_actual;
-						// 	$tema_fuente->id_tema = $id_tema_actual;
-						// 	$curso_tema->id_tema = $id_tema_actual;
-						// 	$update_tema = True;
-						// 	//cuenta cuantas preguntas tiene el $id_tema_antiguo
-						// 	//Si no es ninguna, borra el tema por completo
-						// 	$genera_lista = Model_Genera::find(array('id_tema'=> $id_tema_antiguo));
-						// 	if(!isset($genera_lista)){
-						// 		$tema = Model_Tema::find_one_by('id_tema',$id_tema_antiguo);
-						// 		$tema->delete();
-						// 	}
-						// }
-						// if($update_tema){
-						// 	$genera->save();
-						// 	$tema_fuente->save();
-						// 	$curso_tema->save();
-						// }
+
+						$id_fuente = $fuente->id_fuente;
+
+						$tema_fuente = Model_TemaFuente::find(array($id_tema_antiguo, $id_fuente));
+						$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+						$cantidad_tema_fuente = intval($cantidad_tema_fuente_string);
+						if($cantidad_tema_fuente > 1){
+							$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente -1;
+							$tema_fuente->save();
+						}else{
+							$tema_fuente->delete();
+						}
+						$tema_fuente_nuevo = Model_TemaFuente::find(array($id_tema_actual, $id_fuente));
+						if(isset($tema_fuente_nuevo)){
+							$cantidad = intval($tema_fuente_nuevo->cantidad_preguntas);
+							$tema_fuente_nuevo->cantidad_preguntas = $cantidad + 1;
+							$tema_fuente_nuevo->save();
+						}else{
+							$tema_fuente_nuevo = new Model_TemaFuente();
+							$tema_fuente_nuevo->id_fuente = $id_fuente;
+							$tema_fuente_nuevo->id_tema = $id_tema_actual;
+							$tema_fuente_nuevo->cantidad_preguntas = 1;
+							$tema_fuente_nuevo->save();
+						}
+
+						$curso_tema = Model_CursoTema::find(array($id_curso, $id_tema_antiguo));
+						$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+						$cantidad_curso_tema = intval($cantidad_curso_tema_string);
+						if($cantidad_curso_tema > 1){
+							$curso_tema->cantidad_preguntas =  $cantidad_curso_tema -1;
+							$curso_tema->save();
+						}else{
+							$curso_tema->delete();
+						}
+						$curso_tema_nuevo = Model_CursoTema::find(array($id_curso, $id_tema_actual));
+						if(isset($curso_tema_nuevo)){
+							$cantidad = intval($curso_tema_nuevo->cantidad_preguntas);
+							$curso_tema_nuevo->cantidad_preguntas = $cantidad + 1;
+							$curso_tema_nuevo->save();
+						}else{
+							$curso_tema_nuevo = new Model_CursoTema();
+							$curso_tema_nuevo->id_curso = $id_curso;
+							$curso_tema_nuevo->id_tema = $id_tema_actual;
+							$curso_tema_nuevo->cantidad_preguntas = 1;
+							$curso_tema_nuevo->save();
+						}
 					}
 
 				}
@@ -563,12 +586,17 @@ class Controller_Curso_Examen extends Controller_Template
 				$genera->id_tema = $tema->id_tema;
 				$genera->save();
 
-				$tema_fuente = Model_TemaFuente::find(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
-				if(!isset($tema_fuente)){
+				$tema_fuente_lista = Model_TemaFuente::find(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
+				if(!isset($tema_fuente_lista)){
 					$tema_fuente = new Model_TemaFuente();
 					$tema_fuente->id_fuente = $fuente->id_fuente;
 					$tema_fuente->id_tema = $tema->id_tema;
+					$tema_fuente->cantidad_preguntas = 1;
 					$tema_fuente->save();
+				}else{
+					$tema_fuente = reset($tema_fuente_lista);
+					$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+					$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
 				}
 
 				$curso_tema = Model_CursoTema::find(array('id_curso' => $id_curso ,'id_tema' => $tema->id_tema));
@@ -576,7 +604,12 @@ class Controller_Curso_Examen extends Controller_Template
 					$curso_tema = new Model_CursoTema();
 					$curso_tema->id_curso = $id_curso;
 					$curso_tema->id_tema = $tema->id_tema;
+					$curso_tema->cantidad_preguntas = 1;
 					$curso_tema->save();
+				}else{
+					$curso_tema = reset($curso_tema_lista);
+					$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+					$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
 				}
 			}
 
