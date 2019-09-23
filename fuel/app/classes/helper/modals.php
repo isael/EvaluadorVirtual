@@ -253,14 +253,15 @@ class Modals
 					<div class="modal-footer">
                           <div class="row text-center">
 							<div class="col-xs-12">
-								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Duplicar pregunta</button>
+								<button type="button" class="btn btn-primary btn-block" onclick="javascript:duplicaPregunta()">Duplicar pregunta</button>'.
+								Form::input('pregunta_duplicada','', array('type' => 'hidden')).'
 							</div>
 							<br>
 							<div class="col-xs-6">
 								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 							</div>
 							<div class="col-xs-6">'.
-								Form::submit('Guardar','Guardar',array('class' => 'btn btn-danger btn-block')).'
+								Form::submit('guardar_pregunta','Guardar',array('class' => 'btn btn-danger btn-block')).'
 							</div>
                           </div>
                       </div>

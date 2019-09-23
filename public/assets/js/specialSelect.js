@@ -112,3 +112,10 @@ function actualizaRespuestas(cantidad){
         elementoRespuestas.appendChild(nuevaRespuesta);
     }
 }
+
+function duplicaPregunta(){
+    let submit = document.getElementById("form_guardar_pregunta");
+    let elementoDuplicado = document.getElementById("form_pregunta_duplicada");
+    elementoDuplicado.value = "duplicada";
+    submit.click();
+}

@@ -244,7 +244,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$modal = "_modal";
 			$modificar_pregunta = True;
 		}
-
+		$pregunta_duplicada = trim(Input::post('pregunta_duplicada'));
 		$pregunta_tipo = trim(Input::post('pregunta_tipo'.$modal.'_option_selected'));
 		$pregunta_tema_id = trim(Input::post('pregunta_tema'.$modal.'_option_selected'));
 		$pregunta_tema = trim(Input::post('pregunta_tema'.$modal));
@@ -256,6 +256,10 @@ class Controller_Curso_Examen extends Controller_Template
 		$pregunta_texto=trim(Input::post('pregunta_texto'.$modal));
 		$pregunta_justificacion=trim(Input::post('pregunta_justificacion'.$modal));
 		$pregunta_cantidad=trim(Input::post('pregunta_cantidad_respuestas'.$modal));
+
+		if (isset($pregunta_duplicada) && $pregunta_duplicada === "duplicada") {
+			$modificar_pregunta = False;
+		}
 
 		$tema=null;
 		if(isset($pregunta_tema_id) && $pregunta_tema_id!=="" && isset($pregunta_tema) && $pregunta_tema!==""){
@@ -281,6 +285,9 @@ class Controller_Curso_Examen extends Controller_Template
 		}elseif(!preg_match("/^[0-9]+$/",$pregunta_bibliografia_pagina)){
 			$error=True;
 			$mensaje=$mensaje."El campo de Página contiene más que números.<br>";
+		}elseif (intval($pregunta_bibliografia_pagina) > 8**5 -1) {
+			$error=True;
+			$mensaje=$mensaje."El valor de la Página es muy alto. Revisa la página de la fuente.<br>";
 		}
 
 		if($pregunta_bibliografia_capitulo==null||$pregunta_bibliografia_capitulo===""){
@@ -289,6 +296,9 @@ class Controller_Curso_Examen extends Controller_Template
 		}elseif(!preg_match("/^[0-9]+$/",$pregunta_bibliografia_capitulo)){
 			$error=True;
 			$mensaje=$mensaje."El campo de Capítulo contiene más que números.<br>";
+		}elseif (intval($pregunta_bibliografia_capitulo) > 8**3-1) {
+			$error=True;
+			$mensaje=$mensaje."El valor del Capítulo es muy alto. Revisa el capítulo de la fuente.<br>";
 		}
 
 		if($pregunta_dificultad==null||$pregunta_dificultad===""){
@@ -305,6 +315,9 @@ class Controller_Curso_Examen extends Controller_Template
 		}elseif(!preg_match("/^[0-9]+$/",$pregunta_tiempo)){
 			$error=True;
 			$mensaje=$mensaje."El campo de Tiempo contiene más que números.<br>";
+		}elseif (intval($pregunta_tiempo) > 600) {
+			$error=True;
+			$mensaje=$mensaje."El tiempo no debe exceder los 10 minutos.<br>";
 		}
 
 		if($pregunta_tipo==null||$pregunta_tipo===""){
@@ -404,7 +417,10 @@ class Controller_Curso_Examen extends Controller_Template
 						$update_referencia_fuente = False;
 						$fuente_iguales = ($new_referencia_fuente->id_fuente === $pregunta_bibliografia);
 						if(!$fuente_iguales){
+							$new_referencia_fuente->delete();
+							$new_referencia_fuente = new Model_ReferenciaFuente();							
 							$new_referencia_fuente->id_fuente = $pregunta_bibliografia;
+							$new_referencia_fuente->id_referencia = $id_referencia;
 							$update_referencia_fuente = True;
 						}
 						if($update_referencia_fuente){
@@ -483,47 +499,51 @@ class Controller_Curso_Examen extends Controller_Template
 						$id_fuente = $fuente->id_fuente;
 
 						$tema_fuente = Model_TemaFuente::find(array($id_tema_antiguo, $id_fuente));
-						$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
-						$cantidad_tema_fuente = intval($cantidad_tema_fuente_string);
-						if($cantidad_tema_fuente > 1){
-							$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente -1;
-							$tema_fuente->save();
-						}else{
-							$tema_fuente->delete();
-						}
-						$tema_fuente_nuevo = Model_TemaFuente::find(array($id_tema_actual, $id_fuente));
-						if(isset($tema_fuente_nuevo)){
-							$cantidad = intval($tema_fuente_nuevo->cantidad_preguntas);
-							$tema_fuente_nuevo->cantidad_preguntas = $cantidad + 1;
-							$tema_fuente_nuevo->save();
-						}else{
-							$tema_fuente_nuevo = new Model_TemaFuente();
-							$tema_fuente_nuevo->id_fuente = $id_fuente;
-							$tema_fuente_nuevo->id_tema = $id_tema_actual;
-							$tema_fuente_nuevo->cantidad_preguntas = 1;
-							$tema_fuente_nuevo->save();
+						if(isset($tema_fuente)){
+							$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+							$cantidad_tema_fuente = intval($cantidad_tema_fuente_string);
+							if($cantidad_tema_fuente > 1){
+								$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente -1;
+								$tema_fuente->save();
+							}else{
+								$tema_fuente->delete();
+							}
+							$tema_fuente_nuevo = Model_TemaFuente::find(array($id_tema_actual, $id_fuente));
+							if(isset($tema_fuente_nuevo)){
+								$cantidad = intval($tema_fuente_nuevo->cantidad_preguntas);
+								$tema_fuente_nuevo->cantidad_preguntas = $cantidad + 1;
+								$tema_fuente_nuevo->save();
+							}else{
+								$tema_fuente_nuevo = new Model_TemaFuente();
+								$tema_fuente_nuevo->id_fuente = $id_fuente;
+								$tema_fuente_nuevo->id_tema = $id_tema_actual;
+								$tema_fuente_nuevo->cantidad_preguntas = 1;
+								$tema_fuente_nuevo->save();
+							}
 						}
 
 						$curso_tema = Model_CursoTema::find(array($id_curso, $id_tema_antiguo));
-						$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
-						$cantidad_curso_tema = intval($cantidad_curso_tema_string);
-						if($cantidad_curso_tema > 1){
-							$curso_tema->cantidad_preguntas =  $cantidad_curso_tema -1;
-							$curso_tema->save();
-						}else{
-							$curso_tema->delete();
-						}
-						$curso_tema_nuevo = Model_CursoTema::find(array($id_curso, $id_tema_actual));
-						if(isset($curso_tema_nuevo)){
-							$cantidad = intval($curso_tema_nuevo->cantidad_preguntas);
-							$curso_tema_nuevo->cantidad_preguntas = $cantidad + 1;
-							$curso_tema_nuevo->save();
-						}else{
-							$curso_tema_nuevo = new Model_CursoTema();
-							$curso_tema_nuevo->id_curso = $id_curso;
-							$curso_tema_nuevo->id_tema = $id_tema_actual;
-							$curso_tema_nuevo->cantidad_preguntas = 1;
-							$curso_tema_nuevo->save();
+						if(isset($curso_tema)){
+							$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+							$cantidad_curso_tema = intval($cantidad_curso_tema_string);
+							if($cantidad_curso_tema > 1){
+								$curso_tema->cantidad_preguntas =  $cantidad_curso_tema -1;
+								$curso_tema->save();
+							}else{
+								$curso_tema->delete();
+							}
+							$curso_tema_nuevo = Model_CursoTema::find(array($id_curso, $id_tema_actual));
+							if(isset($curso_tema_nuevo)){
+								$cantidad = intval($curso_tema_nuevo->cantidad_preguntas);
+								$curso_tema_nuevo->cantidad_preguntas = $cantidad + 1;
+								$curso_tema_nuevo->save();
+							}else{
+								$curso_tema_nuevo = new Model_CursoTema();
+								$curso_tema_nuevo->id_curso = $id_curso;
+								$curso_tema_nuevo->id_tema = $id_tema_actual;
+								$curso_tema_nuevo->cantidad_preguntas = 1;
+								$curso_tema_nuevo->save();
+							}
 						}
 					}
 
@@ -586,20 +606,20 @@ class Controller_Curso_Examen extends Controller_Template
 				$genera->id_tema = $tema->id_tema;
 				$genera->save();
 
-				$tema_fuente_lista = Model_TemaFuente::find(array('id_tema' => $tema->id_tema, 'id_fuente' => $fuente->id_fuente ));
-				if(!isset($tema_fuente_lista)){
+				$tema_fuente = Model_TemaFuente::find(array($tema->id_tema, $fuente->id_fuente));
+				if(!isset($tema_fuente)){
 					$tema_fuente = new Model_TemaFuente();
 					$tema_fuente->id_fuente = $fuente->id_fuente;
 					$tema_fuente->id_tema = $tema->id_tema;
 					$tema_fuente->cantidad_preguntas = 1;
 					$tema_fuente->save();
 				}else{
-					$tema_fuente = reset($tema_fuente_lista);
 					$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
 					$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
+					$tema_fuente->save();
 				}
 
-				$curso_tema = Model_CursoTema::find(array('id_curso' => $id_curso ,'id_tema' => $tema->id_tema));
+				$curso_tema = Model_CursoTema::find(array($id_curso, $tema->id_tema));
 				if(!isset($curso_tema)){
 					$curso_tema = new Model_CursoTema();
 					$curso_tema->id_curso = $id_curso;
@@ -607,13 +627,16 @@ class Controller_Curso_Examen extends Controller_Template
 					$curso_tema->cantidad_preguntas = 1;
 					$curso_tema->save();
 				}else{
-					$curso_tema = reset($curso_tema_lista);
 					$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
 					$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
+					$curso_tema->save();
 				}
 			}
-
-			$mensaje = $mensaje."La nueva pregunta ha sido agregada con éxito.";
+			if($modificar_pregunta){
+				$mensaje = $mensaje."La pregunta fue actualizada con éxito.";
+			}else{
+				$mensaje = $mensaje."La nueva pregunta ha sido agregada con éxito.";
+			}
 		}
 
 		if($error){
