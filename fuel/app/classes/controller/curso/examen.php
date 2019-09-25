@@ -635,7 +635,11 @@ class Controller_Curso_Examen extends Controller_Template
 			if($modificar_pregunta){
 				$mensaje = $mensaje."La pregunta fue actualizada con éxito.";
 			}else{
-				$mensaje = $mensaje."La nueva pregunta ha sido agregada con éxito.";
+				if (isset($pregunta_duplicada) && $pregunta_duplicada === "duplicada") {
+					$mensaje = $mensaje."La pregunta fue duplicada con éxito";
+				}else{
+					$mensaje = $mensaje."La nueva pregunta ha sido agregada con éxito.";
+				}
 			}
 		}
 

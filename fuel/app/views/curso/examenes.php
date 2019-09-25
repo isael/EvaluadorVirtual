@@ -171,36 +171,16 @@
 							if(isset($bibliografias)){//TODO_ISAEL Cambiar por lista de bibliografia
 								echo '<div class="row">';
 								foreach ($bibliografias as $fuente) {
-									echo $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero;
-									// echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-									// 	echo '<a href="examen/editar?id_examen='.$examen->id_examen.'">';
-									// 	echo '<div class="row">';
-									// 		echo '<div class="col-xs-6">';
-									// 			echo $examen->nombre;
-									// 			echo '<br>Inicio: '.$examen->fecha_inicio;
-									// 			echo '<br>Final: '.$examen->fecha_fin;
-									// 		echo '</div>';
-									// 		echo '<div class="col-xs-6">';
-									// 			echo 'Temas: ';
-									// 			if(isset($temas)){
-									// 				$es_primero = True;
-									// 				foreach ($temas as $tema) {
-									// 					if($tema->id_examen==$examen->id_examen){
-									// 						if($es_primero){
-									// 							echo $tema->nombre;
-									// 							$es_primero=False;
-									// 						}else{
-									// 							echo ", ".$tema->nombre;
-									// 						}
-									// 					}
-									// 				}
-									// 			}else{
-									// 				echo 'Sin fijar';
-									// 			}
-									// 		echo '</div>';
-									// 	echo '</div>';
-									// 	echo '</a>';
-									// echo '</div>';
+									echo '<div class="col-xs-12 col-md-6 col-lg-4">';
+										echo '<div class="col-xs-3">';
+											echo '<i class="fa fa-book" aria-hidden="true"></i>';
+										echo '</div>';
+										echo '<div class="col-xs-9">';
+											echo Html::anchor('curso/examen/mostrar_bibliografia/'.$fuente->id_fuente,$fuente->nombre.' - '.$fuente->autores.'. '.$fuente->numero.'ª Edición: '.', '.$fuente->anio.'<br>', array('class' => ''));
+											echo "<br>";
+										echo '</div>';
+										echo "</br>";
+									echo '</div>';
 								}
 								echo '</div>';
 							}else{
