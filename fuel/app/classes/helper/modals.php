@@ -21,6 +21,109 @@
  */
 class Modals
 {
+	public static function getModalBibliografia($is_modal = false, $id_fuente = null, $numero = null){
+		$result = '';
+		$nombre_bibliografia = '';
+		$autor_bibliografia = '';
+		$numero_edicion_bibliografia = '';
+		$anio_bibliografia = '';
+		$link_bibliografia = '';
+		$sufijo_modal = '';
+		if($is_modal){
+			$fuente = Model_Fuente::find_one_by('id_fuente', $id_fuente);
+			$edicion = Model_Edicion::find(array($id_fuente, $numero));
+			if(isset($fuente) && isset($edicion)){
+				$nombre_bibliografia = $fuente->nombre;
+				$autor_bibliografia = $fuente->autores;
+				$numero_edicion_bibliografia = $edicion->numero;
+				$anio_bibliografia = $edicion->anio;
+				$link_bibliografia = $edicion->liga;
+			}
+			$sufijo_modal = "_modal";
+			$result = 
+			'<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">Modificar Bibliografía</h4>
+					</div>
+					<div class="modal-body">';
+		}
+		$result = $result.Form::open('curso/examen/crear_bibliografia');
+		$result = $result.'<div class="form-group">
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Nombre', 'nombre_bibliografia').'
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::input('nombre_bibliografia'.$sufijo_modal,$nombre_bibliografia,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de la fuente')).'
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Autor(es)', 'autor_bibliografia').'
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::input('autor_bibliografia'.$sufijo_modal,$autor_bibliografia,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de los autores')).'
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Edición', 'edicion_bibliografia').'
+								</div>
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-4 col-sm-4 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('#', 'numero_edicion_bibliografia').'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('numero_edicion_bibliografia'.$sufijo_modal,$numero_edicion_bibliografia,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Número')).'
+										</div>
+									</div>
+									<div class="col-xs-8 col-sm-8 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Año', 'anio_bibliografia').'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('anio_bibliografia'.$sufijo_modal,$anio_bibliografia,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Año')).'
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Enlace en línea (si existe)', 'link_bibliografia').'
+								</div>'.
+								Form::input("fuente_id",$id_fuente? $id_fuente : '', array('type' => 'hidden')).''.
+								Form::input("fuente_numero",$numero ? $numero : '', array('type' => 'hidden')).'
+								<div class="col-xs-12 col-sm-12">'.
+									Form::input('link_bibliografia'.$sufijo_modal,$link_bibliografia,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Enlace o link a la fuente')).'
+								</div>
+								<br>
+								<div class="col-xs-12 col-sm-12">'.
+									Html::anchor($link_bibliografia,'Visitar la fuente',array('class'=>'form-control','target'=>'_blank')).'
+								</div>
+							</div>';
+		if($is_modal){
+			$result = $result.'
+					</div>
+					<div class="modal-footer">
+                          <div class="row text-center">
+							<div class="col-xs-6">
+								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
+							</div>
+							<div class="col-xs-6">'.
+								Form::submit('guardar_bibliografia','Guardar',array('class' => 'btn btn-danger btn-block')).'
+							</div>
+                          </div>
+                      </div>
+				</div>
+			</div>';
+		}else{
+			$result = $result.'<br>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
+								</div>
+								<br>';
+		}
+		$result = $result.Form::close();
+		echo $result;
+	}
 
 	public static function getModalPregunta($temas, $bibliografias, $tipos, $is_modal = false, $id_pregunta = null){
 		$pregunta_texto="";

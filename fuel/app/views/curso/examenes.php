@@ -9,6 +9,8 @@
 					$pestania = SESSION::get('pestania');
 					$data = SESSION::get('data');
 					$idPregunta = SESSION::get('id_pregunta');
+					$idFuente = SESSION::get('id_fuente');
+					$numeroFuente = SESSION::get('numero_fuente');
 					if(isset($pestania)){
 						SESSION::delete('pestania');
 					}
@@ -17,6 +19,12 @@
 					}
 					if(isset($idPregunta)){
 						SESSION::delete('id_pregunta');
+					}
+					if(isset($idFuente)){
+						SESSION::delete('id_fuente');
+					}
+					if(isset($numeroFuente)){
+						SESSION::delete('numero_fuente');
 					}
 				?>
 				<!-- /SESSION -->
@@ -176,7 +184,7 @@
 											echo '<i class="fa fa-book" aria-hidden="true"></i>';
 										echo '</div>';
 										echo '<div class="col-xs-9">';
-											echo Html::anchor('curso/examen/mostrar_bibliografia/'.$fuente->id_fuente,$fuente->nombre.' - '.$fuente->autores.'. '.$fuente->numero.'ª Edición: '.', '.$fuente->anio.'<br>', array('class' => ''));
+											echo Html::anchor('curso/examen/mostrar_bibliografia/'.$fuente->id_fuente.'/'.$fuente->numero,$fuente->nombre.' - '.$fuente->autores.'. '.$fuente->numero.'ª Edición: '.', '.$fuente->anio.'<br>', array('class' => ''));
 											echo "<br>";
 										echo '</div>';
 										echo "</br>";
@@ -196,7 +204,8 @@
 						</div>
 						<br>
 						<div id="agregarBibliografia" class="row" style="display: none;">
-							<?php echo Form::open('curso/examen/crear_bibliografia');?>
+							<?php echo Modals::getModalBibliografia(); ?>
+						<!-- 	<?php echo Form::open('curso/examen/crear_bibliografia');?>
 							<div class="form-group">
 								<div class="col-xs-12 col-sm-12">
 									<?php echo Form::label('Nombre', 'nombre_bibliografia');?>
@@ -242,7 +251,7 @@
 									<?php echo Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block'));?>
 								</div>
 							</div>
-							<?php echo Form::close();?>
+							<?php echo Form::close();?> -->
 						</div>
 						<!-- /Seccion agregar bibliografia -->
 					</div>
@@ -379,6 +388,17 @@
 				<div id="botonModal">
 
 				</div>
+
+				<?php
+					if(isset($idFuente)){
+				?>
+				<div class="modal fade" id="modalBibliografia" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<?php echo Modals::getModalBibliografia(True, $idFuente, $numeroFuente); ?>
+				</div>
+				<?php 
+					}
+				?>	
+
 				<?php
 					if(isset($idPregunta)){
 				?>
@@ -515,6 +535,23 @@
 	 		let botonModalPregunta = document.createElement('button');
 	 		botonModalPregunta.setAttribute('data-toggle','modal');
 	 		botonModalPregunta.setAttribute('data-target','#modalPregunta');
+	 		botonModalPregunta.style.visibility = "hidden";
+	 		let padre = document.getElementById('botonModal');
+	 		padre.appendChild(botonModalPregunta);
+	 		setTimeout(function(){
+	 			botonModalPregunta.click();
+	 			padre.removeChild(botonModalPregunta);
+	 		},100);
+	 		
+	 	<?php
+	 }
+	 ?>
+	 <?php
+	 if(isset($idFuente)){
+	 	?>
+	 		let botonModalPregunta = document.createElement('button');
+	 		botonModalPregunta.setAttribute('data-toggle','modal');
+	 		botonModalPregunta.setAttribute('data-target','#modalBibliografia');
 	 		botonModalPregunta.style.visibility = "hidden";
 	 		let padre = document.getElementById('botonModal');
 	 		padre.appendChild(botonModalPregunta);

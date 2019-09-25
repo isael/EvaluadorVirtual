@@ -101,8 +101,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 	}
 	/**
-	 * Controlador que muestra la pantalla de creacion de temas para
-	 * la creacion del examen correspondiente.
+	 * Controlador que permite la creación de temas a a
 	 *
 	 * @access  public
 	 * @return  Response
@@ -127,8 +126,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 	}
 	/**
-	 * Controlador que muestra la pantalla de creacion de fuentes bibliográficas para
-	 * la creacion del examen correspondiente.
+	 * Controlador que permite la creación y modificación de una fuente bibliográfica
 	 *
 	 * @access  public
 	 * @return  Response
@@ -137,19 +135,30 @@ class Controller_Curso_Examen extends Controller_Template
 	{
 		$id_curso = SESSION::get('id_curso');
 		$data = null;
-		$nombre = trim(Input::post('nombre_bibliografia'));
-		$autores=trim(Input::post('autor_bibliografia'));
-		$numero=trim(Input::post('numero_edicion_bibliografia'));
-		$anio=trim(Input::post('anio_bibliografia'));
-		$liga=trim(Input::post('link_bibliografia'));
+		$modificar_bibliografia = False;
+		$sufijo_modal = '';
+		$id_fuente = trim(Input::post('fuente_id'));
+		$numero_fuente = trim(Input::post('fuente_numero'));
+		if($id_fuente !== null && $id_fuente !== '' && $numero_fuente !== null && $numero_fuente !== ''){
+			$modificar_bibliografia = True;
+			$sufijo_modal = '_modal';
+		}
+		$nombre = trim(Input::post('nombre_bibliografia'.$sufijo_modal));
+		$autores=trim(Input::post('autor_bibliografia'.$sufijo_modal));
+		$numero=trim(Input::post('numero_edicion_bibliografia'.$sufijo_modal));
+		$anio=trim(Input::post('anio_bibliografia'.$sufijo_modal));
+		$liga=trim(Input::post('link_bibliografia'.$sufijo_modal));
 
 		$mensaje="";
 		$error = False;
 		$edicion = null;
-		$fuente = Model_Fuente::find_one_by(array('nombre' => $nombre, 'autores' => $autores ));
-		if($fuente!=null){
-			$edicion = Model_Edicion::find(array($fuente->id_fuente, $numero ));
+		if(!$modificar_bibliografia){
+			$fuente = Model_Fuente::find_one_by(array('nombre' => $nombre, 'autores' => $autores ));
+			if($fuente!=null){
+				$edicion = Model_Edicion::find(array($fuente->id_fuente, $numero ));
+			}
 		}
+			
 		if($edicion==null){
 			if($nombre==null||$nombre===""){
 				$error=True;
@@ -185,25 +194,53 @@ class Controller_Curso_Examen extends Controller_Template
 			}
 		
 			if(!$error){
-				if($fuente==null){
-					$fuente = new Model_Fuente();
+				if($modificar_bibliografia){
+					$fuente = Model_Fuente::find_one_by('id_fuente',$id_fuente);
 					$fuente->nombre = $nombre;
 					$fuente->autores = $autores;
 					$fuente->save();
+
+					$numero_fuente_iguales = $numero_fuente === $numero;
+					if($numero_fuente_iguales){
+						$edicion = Model_Edicion::find(array($id_fuente, $numero_fuente));
+						$edicion->anio = $anio;
+						$edicion->liga = $liga;
+						$edicion->save();
+					}else{
+						$edicion = Model_Edicion::find(array($id_fuente, $numero_fuente));
+						$edicion->delete();
+						$nueva_edicion = new Model_Edicion();
+						$nueva_edicion->id_fuente = $id_fuente;
+						$nueva_edicion->numero = $numero;
+						$nueva_edicion->anio = $anio;
+						$nueva_edicion->liga = $liga;
+						$nueva_edicion->save();
+					}
+					$mensaje = "La bibliografía ".$fuente->nombre." número ".$numero." ha sido actualizada con éxito.";
+
+				}else{
+					if($fuente==null){
+						$fuente = new Model_Fuente();
+						$fuente->nombre = $nombre;
+						$fuente->autores = $autores;
+						$fuente->save();
+					}
+					$nueva_edicion = new Model_Edicion();
+					$nueva_edicion->id_fuente = $fuente->id_fuente;
+					$nueva_edicion->numero = $numero;
+					$nueva_edicion->anio = $anio;
+					$nueva_edicion->liga = $liga;
+					$nueva_edicion->save();
+
+					$curso_fuente = new Model_CursoFuente();
+					$curso_fuente->id_curso = $id_curso;
+					$curso_fuente->id_fuente = $fuente->id_fuente;
+					$curso_fuente->save();
+
+					$mensaje = "La bibliografía ".$fuente->nombre." número ".$nueva_edicion->numero." ha sido registrada con éxito.";
 				}
-				$nueva_edicion = new Model_Edicion();
-				$nueva_edicion->id_fuente = $fuente->id_fuente;
-				$nueva_edicion->numero = $numero;
-				$nueva_edicion->anio = $anio;
-				$nueva_edicion->liga = $liga;
-				$nueva_edicion->save();
-
-				$curso_fuente = new Model_CursoFuente();
-				$curso_fuente->id_curso = $id_curso;
-				$curso_fuente->id_fuente = $fuente->id_fuente;
-				$curso_fuente->save();
-
-				$mensaje = "La bibliografía ".$fuente->nombre." número ".$nueva_edicion->numero." ha sido registrada con éxito.";
+				
+				
 			}
 
 		}else{
@@ -225,9 +262,8 @@ class Controller_Curso_Examen extends Controller_Template
 
 	}
 	/**
-	 * Controlador que muestra la pantalla de creacion de fuentes bibliográficas para
-	 * la creacion del examen correspondiente.
-	 *f
+	 * Controlador que permite la creación, actualización y duplicación de una pregunta
+	 *
 	 * @access  public
 	 * @return  Response
 	 */
@@ -658,9 +694,8 @@ class Controller_Curso_Examen extends Controller_Template
 	}
 
 	/**
-	 * Controlador que muestra la pantalla de creacion de fuentes bibliográficas para
-	 * la creacion del examen correspondiente.
-	 *f
+	 * Controlador que enviará la instrucción de mostrar la modal para modificar pregunta.
+	 *
 	 * @access  public
 	 * @return  Response
 	 */
@@ -678,6 +713,32 @@ class Controller_Curso_Examen extends Controller_Template
 		}else{
 			SESSION::set('id_pregunta',$id_pregunta);
 			SESSION::set('pestania','preguntas');
+			Response::redirect('curso/examenes');
+		}
+
+	}
+
+	/**
+	 * Controlador que enviará la instrucción de mostrar la modal para modificar bibliografía.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_mostrar_bibliografia($id_fuente,$numero_fuente)
+	{
+		$id_curso = SESSION::get('id_curso');
+		$mensaje = "";
+		$error = False;
+		if($error){
+			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
+			SESSION::set('mensaje',$mensaje);
+			SESSION::set('pestania','bibliografia');
+			// SESSION::set('data',$data);
+			Response::redirect('curso/examenes');
+		}else{
+			SESSION::set('numero_fuente',$numero_fuente);
+			SESSION::set('id_fuente',$id_fuente);
+			SESSION::set('pestania','bibliografia');
 			Response::redirect('curso/examenes');
 		}
 
