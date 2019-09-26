@@ -93,11 +93,14 @@ class Modals
 								Form::input("fuente_numero",$numero ? $numero : '', array('type' => 'hidden')).'
 								<div class="col-xs-12 col-sm-12">'.
 									Form::input('link_bibliografia'.$sufijo_modal,$link_bibliografia,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Enlace o link a la fuente')).'
-								</div>
-								<br>
+								</div>'.
+									($link_bibliografia!==null && $link_bibliografia!=="" ? 										
+								'<br>
 								<div class="col-xs-12 col-sm-12">'.
-									Html::anchor($link_bibliografia,'Visitar la fuente',array('class'=>'form-control','target'=>'_blank')).'
-								</div>
+										Html::anchor($link_bibliografia,'Visitar la fuente',array('class'=>'form-control','target'=>'_blank')).'
+								</div>'
+								: "").'
+								
 							</div>';
 		if($is_modal){
 			$result = $result.'
