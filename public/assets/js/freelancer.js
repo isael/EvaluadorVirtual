@@ -116,33 +116,9 @@ function mostrarFormulario(boton_id,formulario_id,mensaje1,mensaje0){
         $(boton).html(mensaje0);
     }
 }
-
-// function toogleSelector(response, listResults){
-//     resultados = document.getElementById(listResults.id);
-//     if(resultados.style.visibility !== "visible"){
-//         respuesta = document.getElementById(response.id);
-//         respuesta.focus();
-//     }else{
-//         resultados.style.visibility="hidden";
-//         resultados.style.opacity="0";
-//     }
-// }
-
-// function handleFocus(results, focusIn){
-//     resultados = document.getElementById(results.id);
-//     setTimeout(function(){
-//         if(focusIn){
-//             resultados.style.visibility="visible";
-//             resultados.style.opacity="1";
-//         }else{
-//             resultados.style.visibility="hidden";
-//             resultados.style.opacity="0";
-//         }
-//     },150);
-// }
-
-// function updateResponse(results, textElement, text){
-//     element = document.getElementById(textElement.id);
-//     element.value = text;
-//     toogleSelector(results);
-// }
+function cambia_preguntas_faltantes(examen_cantidad_preguntas,preguntas_faltantes){
+    let examen_cantidad_preguntas_elemento = document.getElementById(examen_cantidad_preguntas.id);
+    let preguntas_faltantes_elemento = document.getElementById(preguntas_faltantes.id);
+    let cantidad_maxima = parseInt(examen_cantidad_preguntas_elemento.value);
+    preguntas_faltantes_elemento.innerHTML = cantidad_maxima * 1.5;
+}

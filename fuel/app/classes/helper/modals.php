@@ -21,6 +21,149 @@
  */
 class Modals
 {
+	public static function getModalExamen($is_modal = false, $id_examen = null){
+		$result = '';
+		$examen_vidas = '';
+		$examen_oportunidades = '';
+		$examen_tema_nivel_desde = '';
+		$dia_actual = date("Y-m-d");
+		$examen_inicio = $dia_actual;
+		$examen_final = date("Y-m-d",strtotime($dia_actual."+ 1 month")); 
+		$examen_cantidad_preguntas = '10';
+		$nombre_bibliografia = '';
+		$autor_bibliografia = '';
+		$numero_edicion_bibliografia = '';
+		$anio_bibliografia = '';
+		$link_bibliografia = '';
+		$sufijo_modal = '';
+		$id_fuente='';
+		$numero='';
+		$vidas = array(array(1,1),array(2,2),array(3,3));
+		$oportunidades = array(array(3,3),array(4,4),array(5,5));
+		if($is_modal){
+			$fuente = Model_Fuente::find_one_by('id_fuente', $id_fuente);
+			$edicion = Model_Edicion::find(array($id_fuente, $numero));
+			if(isset($fuente) && isset($edicion)){
+				$nombre_bibliografia = $fuente->nombre;
+				$autor_bibliografia = $fuente->autores;
+				$numero_edicion_bibliografia = $edicion->numero;
+				$anio_bibliografia = $edicion->anio;
+				$link_bibliografia = $edicion->liga;
+			}
+			$sufijo_modal = "_modal";
+			$result = 
+			'<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">Modificar Bibliografía</h4>
+					</div>
+					<div class="modal-body">';
+		}
+		$result = $result.Form::open('curso/examen/crear_examen');
+		$result = $result.'<div class="form-group">
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Vidas y oportunidades', '').'
+								</div>
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-6 col-sm-6 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Vidas / Intentos', 'examen_vidas'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Special_Selector::createSpecialSelector("examen_vidas".$sufijo_modal, "results_vidas".$sufijo_modal, $vidas,"..." , null, array('value' => $examen_vidas), $examen_vidas).'
+										</div>
+									</div>
+									<div class="col-xs-6 col-sm-6 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Oportunidades por cada vida', 'examen_oportunidades'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Special_Selector::createSpecialSelector("examen_oportunidades".$sufijo_modal, "results_oportunidades".$sufijo_modal, $oportunidades,"..." , null, array('value' => $examen_oportunidades), $examen_oportunidades).'
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Vigencia', '').'
+								</div>
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-6 col-sm-6 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Inicio', 'examen_inicio'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('examen_inicio'.$sufijo_modal,$examen_inicio,array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
+										</div>
+									</div>
+									<div class="col-xs-6 col-sm-6 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Final', 'examen_final'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('examen_final'.$sufijo_modal,$examen_final,array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Preguntas y temas', '').'
+								</div>
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-6 col-sm-6 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Cantidad de preguntas', 'examen_cantidad_preguntas'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('examen_cantidad_preguntas'.$sufijo_modal,$examen_cantidad_preguntas,array('class'=>'form-control','type' => 'text','onchange' => 'javascript:cambia_preguntas_faltantes(examen_cantidad_preguntas,preguntas_faltantes);')).'
+										</div>
+									</div>
+									<div class="col-xs-6 col-sm-6 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Preguntas por añadir', 'examen_faltante').'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											'<div id="preguntas_faltantes'.$sufijo_modal.'">15</div>'.'
+										</div>
+									</div>
+								</div>'.
+								Form::input("id_examen",$id_examen ? $id_examen : '', array('type' => 'hidden')).'
+								<div class="col-xs-12">
+									<button id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas del tema y dificultad seleccionados\',\'- Cancelar nuevo tema\')">+ Agregar preguntas del tema y dificultad seleccionados</button>
+								</div>
+								<div id="agregarPreguntasPorTema'.$sufijo_modal.'" class="row" style="display: none;">'.
+									Special_Selector::createSpecialSelector("examen_tema_nivel_desde".$sufijo_modal, "results_oportunidades".$sufijo_modal, $oportunidades,"..." , null, array('value' => $examen_tema_nivel_desde), $examen_tema_nivel_desde).'
+								</div>
+								<div id="lista_de_preguntas_por_tema'.$sufijo_modal.'" class="row" >
+
+								</div>
+							</div>';
+		if($is_modal){
+			$result = $result.'
+					</div>
+					<div class="modal-footer">
+                          <div class="row text-center">
+							<div class="col-xs-6">
+								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
+							</div>
+							<div class="col-xs-6">'.
+								Form::submit('guardar_examen','Guardar',array('class' => 'btn btn-danger btn-block')).'
+							</div>
+                          </div>
+                      </div>
+				</div>
+			</div>';
+		}else{
+			$result = $result.'<br>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
+								</div>
+								<br>';
+		}
+		$result = $result.Form::close();
+		echo $result;
+	}
+
 	public static function getModalBibliografia($is_modal = false, $id_fuente = null, $numero = null){
 		$result = '';
 		$nombre_bibliografia = '';
