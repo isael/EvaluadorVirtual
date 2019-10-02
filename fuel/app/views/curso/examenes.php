@@ -150,7 +150,7 @@
 									</div>
 									<br>
 									<div id="agregarExamen" class="row" style="display: none;">
-										<?php echo Modals::getModalExamen(); ?>
+										<?php echo Modals::getModalExamen($temas); ?>
 									</div>
 
 								<?php 

@@ -122,3 +122,31 @@ function cambia_preguntas_faltantes(examen_cantidad_preguntas,preguntas_faltante
     let cantidad_maxima = parseInt(examen_cantidad_preguntas_elemento.value);
     preguntas_faltantes_elemento.innerHTML = cantidad_maxima * 1.5;
 }
+
+function agregarPreguntasPorTemaYNivel(listaPreguntas){
+    let listaPreguntas_elemento = document.getElementById(listaPreguntas.id);
+    let divLabelPreguntas = document.createElement('div');
+    divLabelPreguntas.className = "col-xs-12 col-sm-12 table-row";
+
+    let divBotonBorrar = document.createElement('div');
+    divBotonBorrar.className = "col-xs-2 col-sm-2 table-row";
+
+    let botonBorrar = document.createElement('button');
+    botonBorrar.innerHTML = "-"
+    botonBorrar.type = "button";
+    botonBorrar.className = "btn btn-danger btn-block btn-lg";
+
+    divBotonBorrar.appendChild(botonBorrar);
+
+    let divSpan = document.createElement('div');
+    divSpan.className = "col-xs-10 col-sm-10 table-row";
+
+    let spanT = document.createElement('span');
+    spanT.innerHTML = "Tema 2. 25 preguntas. Nivel de 2-3";
+
+    divSpan.appendChild(spanT);
+    
+    divLabelPreguntas.appendChild(divBotonBorrar);
+    divLabelPreguntas.appendChild(divSpan);
+    listaPreguntas_elemento.appendChild(divLabelPreguntas);
+}

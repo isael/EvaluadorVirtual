@@ -21,25 +21,29 @@
  */
 class Modals
 {
-	public static function getModalExamen($is_modal = false, $id_examen = null){
+	public static function getModalExamen($temas, $is_modal = false, $id_examen = null){
 		$result = '';
-		$examen_vidas = '';
-		$examen_oportunidades = '';
-		$examen_tema_nivel_desde = '';
+		$examen_vidas = '1';
+		$examen_oportunidades = '3';
+		$examen_tema = '';
+		$examen_tema_id = '';
+		$examen_tema_nivel_desde = '1';
+		$examen_tema_nivel_hasta = '3';
+		$sufijo_modal = '';
 		$dia_actual = date("Y-m-d");
 		$examen_inicio = $dia_actual;
 		$examen_final = date("Y-m-d",strtotime($dia_actual."+ 1 month")); 
 		$examen_cantidad_preguntas = '10';
-		$nombre_bibliografia = '';
-		$autor_bibliografia = '';
-		$numero_edicion_bibliografia = '';
-		$anio_bibliografia = '';
-		$link_bibliografia = '';
-		$sufijo_modal = '';
-		$id_fuente='';
-		$numero='';
 		$vidas = array(array(1,1),array(2,2),array(3,3));
+		$niveles = array(array(1,1),array(2,2),array(3,3));
 		$oportunidades = array(array(3,3),array(4,4),array(5,5));
+		$lista_de_temas = [];
+		if(isset($temas)){
+			foreach ($temas as $tema) {
+				$cantidad_preguntas = Model_Genera::find('all',array('where' => array(array('id_tema', $tema->id_tema))));
+				array_push($lista_de_temas, array($tema->id_tema, $tema->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.sizeof($cantidad_preguntas).' preguntas en total'));
+			}
+		}
 		if($is_modal){
 			$fuente = Model_Fuente::find_one_by('id_fuente', $id_fuente);
 			$edicion = Model_Edicion::find(array($id_fuente, $numero));
@@ -128,14 +132,45 @@ class Modals
 									</div>
 								</div>'.
 								Form::input("id_examen",$id_examen ? $id_examen : '', array('type' => 'hidden')).'
-								<div class="col-xs-12">
-									<button id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas del tema y dificultad seleccionados\',\'- Cancelar nuevo tema\')">+ Agregar preguntas del tema y dificultad seleccionados</button>
-								</div>
-								<div id="agregarPreguntasPorTema'.$sufijo_modal.'" class="row" style="display: none;">'.
-									Special_Selector::createSpecialSelector("examen_tema_nivel_desde".$sufijo_modal, "results_oportunidades".$sufijo_modal, $oportunidades,"..." , null, array('value' => $examen_tema_nivel_desde), $examen_tema_nivel_desde).'
-								</div>
-								<div id="lista_de_preguntas_por_tema'.$sufijo_modal.'" class="row" >
-
+								<div class="col-xs-1"></div>
+									<div class="col-xs-10">
+										<button type="button" id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas del tema y dificultad seleccionados\',\'- Cancelar nuevo tema\')">+ Agregar preguntas del tema y dificultad seleccionados</button>
+										<div id="agregarPreguntasPorTema'.$sufijo_modal.'" class="row" style="display: none;">'.'
+											<div class="col-xs-12 col-sm-12">'.
+												Form::label('tema', 'examen_tema'.$sufijo_modal).'
+											</div>
+											<div class="col-xs-12 col-sm-12">'.
+												Special_Selector::createSpecialSelector("examen_tema".$sufijo_modal, "results_examen_tema".$sufijo_modal, $lista_de_temas,"Selecciona" , null, array('value' => $examen_tema), $examen_tema_id).'
+											</div>
+											<div class="col-xs-12 col-sm-12 table">
+												<div class="col-xs-6 col-sm-6 table-row">
+													<div class="col-xs-12 col-sm-12">'.
+														Form::label('Desde nivel', 'examen_tema_nivel_desde'.$sufijo_modal).'
+													</div>
+													<div class="col-xs-12 col-sm-12">'.
+														Special_Selector::createSpecialSelector("examen_tema_nivel_desde".$sufijo_modal, "results_examen_tema_nivel_desde".$sufijo_modal, $niveles,"..." , null, array('value' => $examen_tema_nivel_desde), $examen_tema_nivel_desde).'
+													</div>
+												</div>
+												<div class="col-xs-6 col-sm-6 table-row">
+													<div class="col-xs-12 col-sm-12">'.
+														Form::label('Hasta nivel', 'examen_tema_nivel_hasta'.$sufijo_modal).'
+													</div>
+													<div class="col-xs-12 col-sm-12">'.
+														Special_Selector::createSpecialSelector("examen_tema_nivel_hasta".$sufijo_modal, "results_examen_tema_nivel_hasta".$sufijo_modal, $niveles,"..." , null, array('value' => $examen_tema_nivel_hasta), $examen_tema_nivel_hasta).'
+													</div>
+												</div>
+											</div>											
+											<div class="col-xs-12 col-sm-12 table">
+												<button type="button" id="agregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="javascript:agregarPreguntasPorTemaYNivel(lista_de_preguntas_por_tema'.$sufijo_modal.');">+ Agregar </button>
+											</div>
+										</div>
+									</div>								
+								<div class="col-xs-1"></div>
+								<br>
+								<div id="lista_de_preguntas_por_tema'.$sufijo_modal.'" class="table" >
+									<div class="col-xs-12 table-row">
+										HOLA
+									</div>
 								</div>
 							</div>';
 		if($is_modal){
