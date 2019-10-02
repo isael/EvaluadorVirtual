@@ -40,8 +40,27 @@ class Modals
 		$lista_de_temas = [];
 		if(isset($temas)){
 			foreach ($temas as $tema) {
-				$cantidad_preguntas = Model_Genera::find('all',array('where' => array(array('id_tema', $tema->id_tema))));
-				array_push($lista_de_temas, array($tema->id_tema, $tema->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.sizeof($cantidad_preguntas).' preguntas en total'));
+				$id_tema = $tema->id_tema;
+				$cantidad_preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
+			    return $query->join('Genera')
+			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->where('Genera.id_tema', '=', $id_tema)
+			                 ->where('Pregunta.dificultad', '=', '1');
+				});
+				$cantidad_preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
+			    return $query->join('Genera')
+			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->where('Genera.id_tema', '=', $id_tema)
+			                 ->where('Pregunta.dificultad', '=', '2');
+				});
+				$cantidad_preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
+			    return $query->join('Genera')
+			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->where('Genera.id_tema', '=', $id_tema)
+			                 ->where('Pregunta.dificultad', '=', '3');
+				});
+				$texto_tema = $tema->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.sizeof($cantidad_preguntas_nivel_1).', N2: '.sizeof($cantidad_preguntas_nivel_2).', N3: '.sizeof($cantidad_preguntas_nivel_3).'.';
+				array_push($lista_de_temas, array($id_tema, $texto_tema));
 			}
 		}
 		if($is_modal){
@@ -161,16 +180,13 @@ class Modals
 												</div>
 											</div>											
 											<div class="col-xs-12 col-sm-12 table">
-												<button type="button" id="agregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="javascript:agregarPreguntasPorTemaYNivel(lista_de_preguntas_por_tema'.$sufijo_modal.');">+ Agregar </button>
+												<button type="button" id="agregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block" onclick="javascript:agregarPreguntasPorTemaYNivel(lista_de_preguntas_por_tema,examen_tema,examen_tema_nivel_desde,examen_tema_nivel_hasta,'.($is_modal ? 'true':'false').');">+ Agregar </button>
 											</div>
 										</div>
 									</div>								
 								<div class="col-xs-1"></div>
 								<br>
 								<div id="lista_de_preguntas_por_tema'.$sufijo_modal.'" class="table" >
-									<div class="col-xs-12 table-row">
-										HOLA
-									</div>
 								</div>
 							</div>';
 		if($is_modal){

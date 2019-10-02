@@ -123,18 +123,83 @@ function cambia_preguntas_faltantes(examen_cantidad_preguntas,preguntas_faltante
     preguntas_faltantes_elemento.innerHTML = cantidad_maxima * 1.5;
 }
 
-function agregarPreguntasPorTemaYNivel(listaPreguntas){
-    let listaPreguntas_elemento = document.getElementById(listaPreguntas.id);
+function limpiaEliminar(e, botonBorrar, divBotonBorrar) {
+    if (e.target !== botonBorrar){
+        botonBorrar.innerHTML = "-";
+        divBotonBorrar.className = "col-xs-1 col-sm-1 table-row";
+    }
+}
+
+function agregarValoresAlInputEscondido(listaPreguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento) {
+    $sufijo_modal = esModal ? "_modal" : "";
+    const id = "examen_temas"+$sufijo_modal;
+    let inputEscondido = document.getElementById(id);
+    if(inputEscondido){
+        let arreglo = inputEscondido.value.split(",");
+        arreglo.push(tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value);
+        inputEscondido.value = arreglo;
+    }else{
+        inputEscondido = document.createElement('input');
+        inputEscondido.type = "hidden";
+        inputEscondido.id = id;
+        inputEscondido.name = id;
+        inputEscondido.value = [tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value];
+        listaPreguntas_elemento.appendChild(inputEscondido);
+    }
+}
+
+function quitarValoresAlInputEscondido(esModal,tema_elemento,desde_elemento,hasta_elemento) {
+    $sufijo_modal = esModal ? "_modal" : "";
+    const id = "examen_temas"+$sufijo_modal;
+    let inputEscondido = document.getElementById(id);
+    if(inputEscondido){
+        let arreglo = inputEscondido.value.split(",");
+        const i = arreglo.indexOf( tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value );
+        i !== -1 && arreglo.splice( i, 1 );
+        inputEscondido.value = arreglo;
+    }
+}
+
+function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esModal = false){
+    $sufijo_modal = esModal ? "_modal" : "";
+    let listaPreguntas_elemento = document.getElementById(listaPreguntas.id+$sufijo_modal);
+    let tema_elemento_texto = document.getElementById(tema.id+$sufijo_modal);
+    let tema_elemento = document.getElementById(tema.id+'_option_selected'+$sufijo_modal);
+    let desde_elemento_texto = document.getElementById(desde.id+$sufijo_modal);
+    let desde_elemento = document.getElementById(desde.id+'_option_selected'+$sufijo_modal);
+    let hasta_elemento_texto = document.getElementById(hasta.id+$sufijo_modal);
+    let hasta_elemento = document.getElementById(hasta.id+'_option_selected'+$sufijo_modal);
+
+    if(!tema_elemento || tema_elemento.value === ''){
+        alert("Falta agregar tema");
+        return;
+    }
+
     let divLabelPreguntas = document.createElement('div');
     divLabelPreguntas.className = "col-xs-12 col-sm-12 table-row";
 
     let divBotonBorrar = document.createElement('div');
-    divBotonBorrar.className = "col-xs-2 col-sm-2 table-row";
+    divBotonBorrar.className = "col-xs-1 col-sm-1 table-row";
+
+    agregarValoresAlInputEscondido(listaPreguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento);
 
     let botonBorrar = document.createElement('button');
-    botonBorrar.innerHTML = "-"
+    botonBorrar.innerHTML = "-";
     botonBorrar.type = "button";
     botonBorrar.className = "btn btn-danger btn-block btn-lg";
+    let funcionAnomina = function(e){limpiaEliminar(e,botonBorrar,divBotonBorrar)};
+    botonBorrar.onclick = function(){
+        if(botonBorrar.innerHTML === "-"){
+            botonBorrar.innerHTML = "Eliminar";
+            divBotonBorrar.className = "col-xs-2 col-sm-2 table-row";
+        }else{
+            document.removeEventListener('click', funcionAnomina);
+            listaPreguntas_elemento.removeChild(divLabelPreguntas);
+            quitarValoresAlInputEscondido(esModal,tema_elemento,desde_elemento,hasta_elemento);
+        }
+    };
+    document.removeEventListener('click', funcionAnomina);
+    document.addEventListener('click', funcionAnomina);
 
     divBotonBorrar.appendChild(botonBorrar);
 
@@ -142,7 +207,7 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas){
     divSpan.className = "col-xs-10 col-sm-10 table-row";
 
     let spanT = document.createElement('span');
-    spanT.innerHTML = "Tema 2. 25 preguntas. Nivel de 2-3";
+    spanT.innerHTML = tema_elemento_texto.value+". 25 preguntas. Nivel de "+desde_elemento.value+"-"+hasta_elemento.value;
 
     divSpan.appendChild(spanT);
     
