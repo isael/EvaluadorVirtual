@@ -31,12 +31,14 @@ class Modals
 		$examen_tema_nivel_hasta = '3';
 		$sufijo_modal = '';
 		$dia_actual = date("Y-m-d");
+		$examen_nombre = 'Examen: ('.$dia_actual.')';
 		$examen_inicio = $dia_actual;
 		$examen_final = date("Y-m-d",strtotime($dia_actual."+ 1 month")); 
 		$examen_cantidad_preguntas = '10';
 		$vidas = array(array(1,1),array(2,2),array(3,3));
 		$niveles = array(array(1,1),array(2,2),array(3,3));
 		$oportunidades = array(array(3,3),array(4,4),array(5,5));
+		$multiplo_total_preguntas = 1.5;
 		$lista_de_temas = [];
 		if(isset($temas)){
 			foreach ($temas as $tema) {
@@ -59,6 +61,8 @@ class Modals
 			                 ->where('Genera.id_tema', '=', $id_tema)
 			                 ->where('Pregunta.dificultad', '=', '3');
 				});
+				//Es super importante no modificar la manera en que se muestran las preguntas ($texto_tema) para el funcionamiento actual, es decir con la cantidad de preguntas por nivel.
+				//En caso de querer modificarlo, la manera de obtener el número de preguntas por cada tema y nivel deberá ser acorde a lo que necesiten los metodos para conteo de preguntas.
 				$texto_tema = $tema->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.sizeof($cantidad_preguntas_nivel_1).', N2: '.sizeof($cantidad_preguntas_nivel_2).', N3: '.sizeof($cantidad_preguntas_nivel_3).'.';
 				array_push($lista_de_temas, array($id_tema, $texto_tema));
 			}
@@ -87,6 +91,14 @@ class Modals
 		}
 		$result = $result.Form::open('curso/examen/crear_examen');
 		$result = $result.'<div class="form-group">
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-12 col-sm-12">'.
+										Form::label('Nombre', 'examen_nombre'.$sufijo_modal).'
+									</div>
+									<div class="col-xs-12 col-sm-12">'.
+										Form::input('examen_nombre'.$sufijo_modal,$examen_nombre,array('class'=>'form-control','type' => 'text')).'
+									</div>
+								</div>
 								<div class="col-xs-12 col-sm-12">'.
 									Form::label('Vidas y oportunidades', '').'
 								</div>
@@ -138,7 +150,7 @@ class Modals
 											Form::label('Cantidad de preguntas', 'examen_cantidad_preguntas'.$sufijo_modal).'
 										</div>
 										<div class="col-xs-12 col-sm-12">'.
-											Form::input('examen_cantidad_preguntas'.$sufijo_modal,$examen_cantidad_preguntas,array('class'=>'form-control','type' => 'text','onchange' => 'javascript:cambia_preguntas_faltantes(examen_cantidad_preguntas,preguntas_faltantes);')).'
+											Form::input('examen_cantidad_preguntas'.$sufijo_modal,$examen_cantidad_preguntas,array('class'=>'form-control','type' => 'text','onchange' => 'javascript:cambia_preguntas_faltantes('.($is_modal ? 'true':'false').');')).'
 										</div>
 									</div>
 									<div class="col-xs-6 col-sm-6 table-row">
@@ -146,7 +158,9 @@ class Modals
 											Form::label('Preguntas por añadir', 'examen_faltante').'
 										</div>
 										<div class="col-xs-12 col-sm-12">'.
-											'<div id="preguntas_faltantes'.$sufijo_modal.'">15</div>'.'
+											'<div id="preguntas_faltantes'.$sufijo_modal.'">'.intval($examen_cantidad_preguntas)*$multiplo_total_preguntas.'</div>'.
+											Form::input("preguntas_agregadas".$sufijo_modal,'0', array('type' => 'hidden')).''.
+											Form::input("preguntas_multiplo".$sufijo_modal,$multiplo_total_preguntas, array('type' => 'hidden')).'
 										</div>
 									</div>
 								</div>'.
@@ -156,7 +170,7 @@ class Modals
 										<button type="button" id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas del tema y dificultad seleccionados\',\'- Cancelar nuevo tema\')">+ Agregar preguntas del tema y dificultad seleccionados</button>
 										<div id="agregarPreguntasPorTema'.$sufijo_modal.'" class="row" style="display: none;">'.'
 											<div class="col-xs-12 col-sm-12">'.
-												Form::label('tema', 'examen_tema'.$sufijo_modal).'
+												Form::label('Tema', 'examen_tema'.$sufijo_modal).'
 											</div>
 											<div class="col-xs-12 col-sm-12">'.
 												Special_Selector::createSpecialSelector("examen_tema".$sufijo_modal, "results_examen_tema".$sufijo_modal, $lista_de_temas,"Selecciona" , null, array('value' => $examen_tema), $examen_tema_id).'
@@ -187,6 +201,7 @@ class Modals
 								<div class="col-xs-1"></div>
 								<br>
 								<div id="lista_de_preguntas_por_tema'.$sufijo_modal.'" class="table" >
+									<br>
 								</div>
 							</div>';
 		if($is_modal){

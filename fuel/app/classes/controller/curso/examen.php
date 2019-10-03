@@ -131,6 +131,117 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
+	public function action_crear_examen()
+	{
+		$id_curso = SESSION::get('id_curso');
+		$id_examen = trim(Input::post('id_examen'));
+		$modificar_examen = False;
+		$sufijo_modal = '';
+		if($id_examen !== null && $id_examen !== ''){
+			$modificar_examen = True;
+			$sufijo_modal = '_modal';
+		}
+		$examen_temas_y_niveles = trim(Input::post('examen_temas'.$sufijo_modal));
+		$examen_nombre = trim(Input::post('examen_nombre'.$sufijo_modal));
+		$examen_vidas_value = trim(Input::post('examen_vidas'.$sufijo_modal.'_option_selected'));
+		$examen_oportunidades_value = trim(Input::post('examen_oportunidades'.$sufijo_modal.'_option_selected'));
+		$examen_inicio = trim(Input::post('examen_inicio'.$sufijo_modal));
+		$examen_final = trim(Input::post('examen_final'.$sufijo_modal));
+		$examen_cantidad_preguntas = trim(Input::post('examen_cantidad_preguntas'.$sufijo_modal));
+		$preguntas_agregadas = trim(Input::post('preguntas_agregadas'.$sufijo_modal));
+		$preguntas_multiplo = trim(Input::post('preguntas_multiplo'.$sufijo_modal));
+
+		$mensaje="";
+		$error = False;
+
+		if($examen_cantidad_preguntas==null||$examen_cantidad_preguntas===""){
+			$error=True;
+			$mensaje=$mensaje."El campo Cantidad de preguntas está vacío.<br>";
+		}elseif($preguntas_multiplo==null || $preguntas_multiplo === ""){
+			$error=True;
+			$mensaje=$mensaje."El campo Cantidad de preguntas está vacío.<br>";
+		}elseif(intval($preguntas_multiplo)*intval($examen_cantidad_preguntas) > intval($preguntas_agregadas)*intval($preguntas_multiplo)){
+			$error=True;
+			$mensaje=$mensaje."Las preguntas son insuficientes para crear el examen.<br>";
+		}
+
+		if($examen_nombre==null||$examen_nombre===""){
+			$error=True;
+			$mensaje=$mensaje."El campo Nombre está vacío.<br>";
+		}
+
+		if($examen_vidas_value==null||$examen_vidas_value===""){
+			$error=True;
+			$mensaje=$mensaje."El campo de Vidas está vacío.<br>";
+		}elseif(!preg_match("/^[0-9]+$/",$examen_vidas_value)){
+			$error=True;
+			$mensaje=$mensaje."El campo de Vidas contiene más que números.<br>";
+		}
+
+		if($examen_oportunidades_value==null||$examen_oportunidades_value===""){
+			$error=True;
+			$mensaje=$mensaje."El campo de Oportunidades está vacío.<br>";
+		}elseif(!preg_match("/^[0-9]+$/",$examen_oportunidades_value)){
+			$error=True;
+			$mensaje=$mensaje."El campo de Oportunidades contiene más que números.<br>";
+		}
+
+		if($examen_inicio==null||$examen_inicio===""){
+			$error=True;
+			$mensaje=$mensaje."El campo de Vigencia-Inicio está vacío.<br>";
+		}elseif(!preg_match("/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/",$examen_inicio)){
+			$error=True;
+			$mensaje=$mensaje."El campo de Vigencia-Inicio no tiene el formato de fecha AAAA-MM-DD.<br>";
+		}else{
+			$arreglo_fecha = explode("-", $examen_inicio);
+			if(!checkdate(intval($arreglo_fecha[2]), intval($arreglo_fecha[1]), intval($arreglo_fecha[0]))){
+				$error=True;
+				$mensaje=$mensaje."El campo de Vigencia-Inicio no tiene una fecha válida.<br>";
+			}
+		}
+
+		if($examen_final==null||$examen_final===""){
+			$error=True;
+			$mensaje=$mensaje."El campo de Vigencia-Final está vacío.<br>";
+		}elseif(!preg_match("/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/",$examen_final)){
+			$error=True;
+			$mensaje=$mensaje."El campo de Vigencia-Final no tiene el formato de fecha AAAA-MM-DD.<br>";
+		}else{
+			$arreglo_fecha = explode("-", $examen_final);
+			if(!checkdate(intval($arreglo_fecha[2]), intval($arreglo_fecha[1]), intval($arreglo_fecha[0]))){
+				$error=True;
+				$mensaje=$mensaje."El campo de Vigencia-Final no tiene una fecha válida.<br>";
+			}
+		}
+
+		$tema=null;
+		if(isset($examen_temas_y_niveles) && $examen_temas_y_niveles!==""){
+			// if(is_numeric($pregunta_tema_id)){
+			// 	$tema = Model_Tema::find_one_by( 'id_tema', $pregunta_tema_id);
+			// }
+		}else{
+			$error=True;
+			$mensaje=$mensaje."No se tiene registrada ninguna pregunta para el examen.<br>";
+		}
+
+		if($error){
+			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
+			SESSION::set('mensaje',$mensaje);
+			SESSION::set('pestania','edicion');
+			// SESSION::set('data',$data);
+			Response::redirect('curso/examenes');
+		}else{
+			SESSION::set('mensaje',$mensaje);
+			SESSION::set('pestania','edicion');
+			Response::redirect('curso/examenes');
+		}
+	}
+	/**
+	 * Controlador que permite la creación y modificación de una fuente bibliográfica
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
 	public function action_crear_bibliografia()
 	{
 		$id_curso = SESSION::get('id_curso');

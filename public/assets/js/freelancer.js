@@ -116,11 +116,15 @@ function mostrarFormulario(boton_id,formulario_id,mensaje1,mensaje0){
         $(boton).html(mensaje0);
     }
 }
-function cambia_preguntas_faltantes(examen_cantidad_preguntas,preguntas_faltantes){
-    let examen_cantidad_preguntas_elemento = document.getElementById(examen_cantidad_preguntas.id);
-    let preguntas_faltantes_elemento = document.getElementById(preguntas_faltantes.id);
+function cambia_preguntas_faltantes(esModal){
+    let sufijo_modal = esModal ? "_modal" : "";
+    let examen_cantidad_preguntas_elemento = document.getElementById("examen_cantidad_preguntas"+sufijo_modal) || document.getElementById("form_examen_cantidad_preguntas"+sufijo_modal);
+    let preguntas_faltantes_elemento = document.getElementById("preguntas_faltantes"+sufijo_modal) || document.getElementById("form_preguntas_faltantes"+sufijo_modal);
+    let preguntas_agregadas_elemento = document.getElementById("preguntas_agregadas"+sufijo_modal) || document.getElementById("form_preguntas_agregadas"+sufijo_modal);
     let cantidad_maxima = parseInt(examen_cantidad_preguntas_elemento.value);
-    preguntas_faltantes_elemento.innerHTML = cantidad_maxima * 1.5;
+    let cantidad_actual = parseInt(preguntas_agregadas_elemento.value);
+    cantidad_actual = cantidad_actual > (cantidad_maxima * 1.5) ? (cantidad_maxima * 1.5) : cantidad_actual;
+    preguntas_faltantes_elemento.innerHTML = (cantidad_maxima * 1.5) - cantidad_actual;
 }
 
 function limpiaEliminar(e, botonBorrar, divBotonBorrar) {
@@ -130,88 +134,206 @@ function limpiaEliminar(e, botonBorrar, divBotonBorrar) {
     }
 }
 
-function agregarValoresAlInputEscondido(listaPreguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento) {
-    $sufijo_modal = esModal ? "_modal" : "";
-    const id = "examen_temas"+$sufijo_modal;
-    let inputEscondido = document.getElementById(id);
-    if(inputEscondido){
-        let arreglo = inputEscondido.value.split(",");
-        arreglo.push(tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value);
-        inputEscondido.value = arreglo;
+function limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento,desde_elemento_texto,hasta_elemento,hasta_elemento_texto,boton_cancelar_tema){
+    tema_elemento.value = "";
+    tema_elemento_texto.value = "";
+    desde_elemento.value = "1";
+    desde_elemento_texto.value = "1";
+    hasta_elemento.value = "3";
+    hasta_elemento_texto.value = "3";
+    boton_cancelar_tema.click();
+}
+
+function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,tema_elemento_texto,desde_elemento,hasta_elemento) {
+    let sufijo_modal = esModal ? "_modal" : "";
+    const id = "examen_temas"+sufijo_modal;
+    let input_escondido = document.getElementById(id);
+    let arreglo_valores = [tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value];
+    let regex = new RegExp("^"+tema_elemento.value);
+    let tema_previo = false;
+    if(input_escondido){
+        if(!input_escondido.value || input_escondido.value === ""){
+            input_escondido.value = arreglo_valores;
+        }else{
+            let arreglo = input_escondido.value.split(",");
+
+            for (let i = 0; i < arreglo.length; i++) {
+                let valor = arreglo[i];
+                if(valor.match(regex)){
+                    tema_previo=true;
+                    alert("Ya hay un grupo de preguntas con este tema. Se tomarán preguntas desde el mínimo nivel hasta el máximo nivel que hayan sido declarados hasta ahora.")
+                    tema_rango = valor.split('-');
+                    let minimo = desde_elemento.value < tema_rango[1] ? desde_elemento.value : tema_rango[1];
+                    let maximo = hasta_elemento.value > tema_rango[2] ? hasta_elemento.value : tema_rango[2];
+                    const span_elemento = document.getElementById('span_'+tema_elemento.value);
+                    if(span_elemento){
+                        tema_rango[1] = minimo;
+                        tema_rango[2] = maximo;
+                        span_elemento.innerHTML = getTextoSpan(tema_elemento_texto, tema_rango);
+                    }
+                    arreglo[i] = tema_elemento.value+"-"+minimo+"-"+maximo;
+                    i=arreglo.length;
+                }
+            }
+            if(!tema_previo){
+                arreglo.push(tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value);            
+            }
+            input_escondido.value = arreglo;
+            arreglo_valores = arreglo;
+        }
     }else{
-        inputEscondido = document.createElement('input');
-        inputEscondido.type = "hidden";
-        inputEscondido.id = id;
-        inputEscondido.name = id;
-        inputEscondido.value = [tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value];
-        listaPreguntas_elemento.appendChild(inputEscondido);
+        input_escondido = document.createElement('input');
+        input_escondido.type = "hidden";
+        input_escondido.id = id;
+        input_escondido.name = id;
+        input_escondido.value = arreglo_valores;
+        lista_preguntas_elemento.appendChild(input_escondido);
+    }
+    return arreglo_valores;
+}
+
+function quitarValoresAlInputEscondido(esModal,tema_elemento_value,desde_elemento_value,hasta_elemento_value) {
+    let sufijo_modal = esModal ? "_modal" : "";
+    const id = "examen_temas"+sufijo_modal;
+    let input_escondido = document.getElementById(id);
+    if(input_escondido){
+        let arreglo = input_escondido.value.split(",");
+        let posicion = (-1);
+        let regex = new RegExp("^"+tema_elemento_value);
+        for(let i=0; i<arreglo.length; i++){
+            if(arreglo[i].match(regex)){
+                posicion = i;
+                i = arreglo.length;
+            }
+        }
+        posicion !== -1 && arreglo.splice( posicion, 1 );
+        input_escondido.value = arreglo;
     }
 }
 
-function quitarValoresAlInputEscondido(esModal,tema_elemento,desde_elemento,hasta_elemento) {
-    $sufijo_modal = esModal ? "_modal" : "";
-    const id = "examen_temas"+$sufijo_modal;
-    let inputEscondido = document.getElementById(id);
-    if(inputEscondido){
-        let arreglo = inputEscondido.value.split(",");
-        const i = arreglo.indexOf( tema_elemento.value+"-"+desde_elemento.value+"-"+hasta_elemento.value );
-        i !== -1 && arreglo.splice( i, 1 );
-        inputEscondido.value = arreglo;
+function getTextoSpan(tema_elemento_texto, tema_rango) {
+    const arreglo_texto = tema_elemento_texto.value.split(':');
+    const preguntas_texto = tema_elemento_texto.value.substring(tema_elemento_texto.value.indexOf(arreglo_texto[2]));
+    const arreglo_preguntas_texto = preguntas_texto.split(',');
+    let texto_span = arreglo_texto[0]+". &nbsp;&nbsp;&nbsp;&nbsp;Cantidad de preguntas:";
+    if(tema_rango){
+        texto_span = "";
+        for(let i = parseInt(tema_rango[1]); i <= parseInt(tema_rango[2]); i++ ){
+            texto_span = texto_span + " " + arreglo_preguntas_texto[i-1];
+            if(i < parseInt(tema_rango[2])){
+                texto_span = texto_span + ", ";
+            }
+        }
     }
+    return texto_span;
+}
+
+function actualizarPreguntasAgregadas(esModal = false){
+    let sufijo_modal = esModal ? "_modal" : "";
+    let preguntas_agregadas = document.getElementById('preguntas_agregadas'+sufijo_modal) || document.getElementById('form_preguntas_agregadas'+sufijo_modal);
+    const id = "examen_temas"+sufijo_modal;
+    let input_escondido = document.getElementById(id);
+    let arreglo = input_escondido.value.split(",");
+    let suma = 0;
+    for (let i = 0; i < arreglo.length; i++) {
+        let valor = arreglo[i];
+        if(valor && valor!==''){
+            tema_rango = valor.split('-');
+
+            let span = document.getElementById('span_'+tema_rango[0]);
+            if(span){
+                let niveles = span.innerHTML.split(',');
+
+                for(let j = 0; j < niveles.length; j++){
+                    let nivel = niveles[j].split(':');
+                    suma = suma + parseInt(nivel[1]);
+                }
+            }
+        }
+    }
+    preguntas_agregadas.value = suma;
+    cambia_preguntas_faltantes(esModal);
 }
 
 function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esModal = false){
-    $sufijo_modal = esModal ? "_modal" : "";
-    let listaPreguntas_elemento = document.getElementById(listaPreguntas.id+$sufijo_modal);
-    let tema_elemento_texto = document.getElementById(tema.id+$sufijo_modal);
-    let tema_elemento = document.getElementById(tema.id+'_option_selected'+$sufijo_modal);
-    let desde_elemento_texto = document.getElementById(desde.id+$sufijo_modal);
-    let desde_elemento = document.getElementById(desde.id+'_option_selected'+$sufijo_modal);
-    let hasta_elemento_texto = document.getElementById(hasta.id+$sufijo_modal);
-    let hasta_elemento = document.getElementById(hasta.id+'_option_selected'+$sufijo_modal);
+    let sufijo_modal = esModal ? "_modal" : "";
+    let lista_preguntas_elemento = document.getElementById(listaPreguntas.id+sufijo_modal);
+    let tema_elemento_texto = document.getElementById(tema.id+sufijo_modal);
+    let tema_elemento = document.getElementById(tema.id+sufijo_modal+'_option_selected');
+    let desde_elemento_texto = document.getElementById(desde.id+sufijo_modal);
+    let desde_elemento = document.getElementById(desde.id+sufijo_modal+'_option_selected');
+    let hasta_elemento_texto = document.getElementById(hasta.id+sufijo_modal);
+    let hasta_elemento = document.getElementById(hasta.id+sufijo_modal+'_option_selected');
 
     if(!tema_elemento || tema_elemento.value === ''){
         alert("Falta agregar tema");
         return;
     }
+    let arreglo_valores = agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,tema_elemento_texto,desde_elemento,hasta_elemento);
+    const span_elemento = document.getElementById('span_'+tema_elemento.value);
+    if(!span_elemento){
 
-    let divLabelPreguntas = document.createElement('div');
-    divLabelPreguntas.className = "col-xs-12 col-sm-12 table-row";
+        let divLabelPreguntas = document.createElement('div');
+        divLabelPreguntas.className = "col-xs-12 col-sm-12 table-row";
 
-    let divBotonBorrar = document.createElement('div');
-    divBotonBorrar.className = "col-xs-1 col-sm-1 table-row";
+        let divBotonBorrar = document.createElement('div');
+        divBotonBorrar.className = "col-xs-1 col-sm-1 table-row";
 
-    agregarValoresAlInputEscondido(listaPreguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento);
 
-    let botonBorrar = document.createElement('button');
-    botonBorrar.innerHTML = "-";
-    botonBorrar.type = "button";
-    botonBorrar.className = "btn btn-danger btn-block btn-lg";
-    let funcionAnomina = function(e){limpiaEliminar(e,botonBorrar,divBotonBorrar)};
-    botonBorrar.onclick = function(){
-        if(botonBorrar.innerHTML === "-"){
-            botonBorrar.innerHTML = "Eliminar";
-            divBotonBorrar.className = "col-xs-2 col-sm-2 table-row";
-        }else{
-            document.removeEventListener('click', funcionAnomina);
-            listaPreguntas_elemento.removeChild(divLabelPreguntas);
-            quitarValoresAlInputEscondido(esModal,tema_elemento,desde_elemento,hasta_elemento);
+        let botonBorrar = document.createElement('button');
+        botonBorrar.innerHTML = "-";
+        botonBorrar.type = "button";
+        botonBorrar.className = "btn btn-danger btn-block btn-lg";
+        let funcionAnomina = function(e){limpiaEliminar(e,botonBorrar,divBotonBorrar)};
+        let tema_elemento_value = tema_elemento.value;
+        let desde_elemento_value = desde_elemento.value;
+        let hasta_elemento_value = hasta_elemento.value;
+        botonBorrar.onclick = function(){
+            if(botonBorrar.innerHTML === "-"){
+                botonBorrar.innerHTML = "Eliminar";
+                divBotonBorrar.className = "col-xs-2 col-sm-2 table-row";
+            }else{
+                document.removeEventListener('click', funcionAnomina);
+                lista_preguntas_elemento.removeChild(divLabelPreguntas);
+                quitarValoresAlInputEscondido(esModal,tema_elemento_value,desde_elemento_value,hasta_elemento_value);
+                actualizarPreguntasAgregadas(esModal);
+            }
+        };
+        document.removeEventListener('click', funcionAnomina);
+        document.addEventListener('click', funcionAnomina);
+
+        divBotonBorrar.appendChild(botonBorrar);
+
+        let divSpan = document.createElement('div');
+        divSpan.className = "col-xs-10 col-sm-10 table-row";
+
+        let tema_rango = null;
+        let regex = new RegExp("^"+tema_elemento.value);
+        for (let i = 0; i < arreglo_valores.length; i++) {
+            let valor = arreglo_valores[i];
+            if(valor.match(regex)){
+                tema_rango = valor.split('-');
+                i=arreglo_valores.length;
+            }
         }
-    };
-    document.removeEventListener('click', funcionAnomina);
-    document.addEventListener('click', funcionAnomina);
 
-    divBotonBorrar.appendChild(botonBorrar);
+        let spanT = document.createElement('span');
+        let texto_span = getTextoSpan(tema_elemento_texto, false);
+        spanT.innerHTML = texto_span;
 
-    let divSpan = document.createElement('div');
-    divSpan.className = "col-xs-10 col-sm-10 table-row";
+        let spanPreguntas = document.createElement('span');
+        spanPreguntas.id = 'span_'+tema_elemento.value;
+        let texto_span_preguntas = getTextoSpan(tema_elemento_texto, tema_rango);
+        spanPreguntas.innerHTML = texto_span_preguntas;
 
-    let spanT = document.createElement('span');
-    spanT.innerHTML = tema_elemento_texto.value+". 25 preguntas. Nivel de "+desde_elemento.value+"-"+hasta_elemento.value;
-
-    divSpan.appendChild(spanT);
-    
-    divLabelPreguntas.appendChild(divBotonBorrar);
-    divLabelPreguntas.appendChild(divSpan);
-    listaPreguntas_elemento.appendChild(divLabelPreguntas);
+        divSpan.appendChild(spanT);
+        divSpan.appendChild(spanPreguntas);
+        
+        divLabelPreguntas.appendChild(divBotonBorrar);
+        divLabelPreguntas.appendChild(divSpan);
+        lista_preguntas_elemento.appendChild(divLabelPreguntas);
+    }
+    let boton_cancelar_tema = document.getElementById('mostrarAgregarPreguntasPorTema'+sufijo_modal);
+    limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento,desde_elemento_texto,hasta_elemento,hasta_elemento_texto,boton_cancelar_tema);
+    actualizarPreguntasAgregadas(esModal);
 }
