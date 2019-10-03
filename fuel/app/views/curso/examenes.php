@@ -78,7 +78,7 @@
 								foreach ($examenes as $examen) {
 									
 									echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-										echo '<a href="examen/editar?id_examen='.$examen->id_examen.'">';
+										echo '<a href="">';
 										echo '<div class="row">';
 											echo '<div class="col-xs-6">';
 												echo $examen->nombre;
@@ -87,21 +87,6 @@
 											echo '</div>';
 											echo '<div class="col-xs-6">';
 												echo 'Temas: ';
-												if(isset($temas)){
-													$es_primero = True;
-													foreach ($temas as $tema) {
-														if($tema->id_examen==$examen->id_examen){
-															if($es_primero){
-																echo $tema->nombre;
-																$es_primero=False;
-															}else{
-																echo ", ".$tema->nombre;
-															}
-														}
-													}
-												}else{
-													echo 'Sin fijar';
-												}
 											echo '</div>';
 										echo '</div>';
 										echo '</a>';

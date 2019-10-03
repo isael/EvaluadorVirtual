@@ -34,98 +34,6 @@ class Controller_Curso_Examen extends Controller_Template
     }
 
 	/**
-	 * Controlador que reenvia a la pagina de edicion de cada examen
-	 *
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_editar()
-	{	
-		$id_curso = SESSION::get('id_curso');
-		if (isset($id_curso)) {
-			$id_examen = trim(Input::get('id_examen'));
-			if (isset($id_examen) && $id_examen!="") {
-				$examen = Model_Examen::find_one_by('id_examen',$id_examen);
-				$curso = Model_Curso::find_one_by('id_curso',$id_curso);
-				$temas = Model_Tema::find(function ($query) use ($examen){
-			    return $query->join('BasadoEn')
-			                 ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			                 ->where('BasadoEn.id_examen', '=', $examen->id_examen)
-			                 ->order_by('BasadoEn.id_examen');
-				});
-				$data = array('examen' => $examen , 'curso'=>$curso,'temas'=>$temas);;
-				$this->template->content = View::forge('curso/examen/editar', $data);
-			}else{
-				Response::redirect('curso/index');
-			}
-		}else{
-			Response::redirect('sesion/index');
-		}
-		
-
-	}
-
-	/**
-	 * Controlador que muestra la pantalla de seleccion de temas para
-	 * la creacion del examen correspondiente.
-	 *
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_temas()
-	{	
-		$id_curso = SESSION::get('id_curso');
-		if (isset($id_curso)) {
-			$id_examen = trim(Input::get('id_examen'));
-			if (isset($id_examen) && $id_examen!="") {
-				$examen = Model_Examen::find_one_by('id_examen',$id_examen);
-				$volver = "curso/examen/editar?id_examen=".$examen->id_examen;
-				$curso = Model_Curso::find_one_by('id_curso',$id_curso);
-				$temas = Model_Tema::find(function ($query) use ($id_curso,$id_examen){
-			    return $query->join('CursoTema')
-			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
-			                 ->join('BasadoEn')
-			                 ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			                 ->where('CursoTema.id_curso', '=', $id_curso)
-			                 ->order_by('BasadoEn.id_examen');
-				});
-				$data = array('examen' => $examen , 'curso'=>$curso,'temas'=>$temas,'volver'=>$volver);;
-				$this->template->content = View::forge('curso/examen/temas', $data);
-			}else{
-				Response::redirect('curso/index');
-			}
-		}else{
-			Response::redirect('sesion/index');
-		}
-		
-
-	}
-	/**
-	 * Controlador que permite la creación de temas a a
-	 *
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_crear_tema()
-	{	
-		$id_curso = SESSION::get('id_curso');
-		if (isset($id_curso)) {
-			$id_examen = trim(Input::get('id_examen'));
-			if (isset($id_examen) && $id_examen!="") {
-				$volver = "curso/examen/temas?id_examen=".$id_examen;
-				$curso = Model_Curso::find_one_by('id_curso',$id_curso);
-				$data = array('curso'=>$curso, 'volver'=>$volver);;
-				$this->template->content = View::forge('curso/temas/crear', $data);
-			}else{
-				Response::redirect('curso/index');
-			}
-		}else{
-			Response::redirect('sesion/index');
-		}
-		
-
-	}
-	/**
 	 * Controlador que permite la creación y modificación de una fuente bibliográfica
 	 *
 	 * @access  public
@@ -153,6 +61,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 		$mensaje="";
 		$error = False;
+		$examen_temas_y_niveles_arreglo = [];
 
 		if($examen_cantidad_preguntas==null||$examen_cantidad_preguntas===""){
 			$error=True;
@@ -216,12 +125,44 @@ class Controller_Curso_Examen extends Controller_Template
 
 		$tema=null;
 		if(isset($examen_temas_y_niveles) && $examen_temas_y_niveles!==""){
-			// if(is_numeric($pregunta_tema_id)){
-			// 	$tema = Model_Tema::find_one_by( 'id_tema', $pregunta_tema_id);
-			// }
+			$examen_temas_y_niveles_arreglo = explode(",",$examen_temas_y_niveles);
 		}else{
 			$error=True;
 			$mensaje=$mensaje."No se tiene registrada ninguna pregunta para el examen.<br>";
+		}
+
+		if(!$error){
+			if($modificar_examen){
+
+			}else{
+				$new_examen = new Model_Examen();
+				$new_examen->nombre = $examen_nombre;
+				$new_examen->fecha_inicio = $examen_inicio;
+				$new_examen->fecha_fin = $examen_final;
+				$new_examen->oportunidades = $examen_oportunidades_value;
+				$new_examen->vidas = $examen_vidas_value;
+				$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
+				$new_examen->preguntas_por_mezclar = $preguntas_agregadas;
+				$new_examen->save();
+				$id_examen = $new_examen->id_examen;
+
+				$new_evalua = new Model_Evalua();
+				$new_evalua->id_curso = $id_curso;
+				$new_evalua->id_examen = $id_examen;
+				$new_evalua->save();
+
+				$length = sizeof($examen_temas_y_niveles_arreglo);
+				for ($i=0; $i < $length; $i++) {
+					$tema_niveles_array = explode("-",$examen_temas_y_niveles_arreglo[$i]);
+					$new_basado_en = new Model_BasadoEn();
+					$new_basado_en->id_examen = $id_examen;
+					$new_basado_en->id_tema = $tema_niveles_array[0];
+					$new_basado_en->desde_dificultad = $tema_niveles_array[1];
+					$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
+					$new_basado_en->save();
+				}
+
+			}
 		}
 
 		if($error){
@@ -849,6 +790,31 @@ class Controller_Curso_Examen extends Controller_Template
 		}else{
 			SESSION::set('numero_fuente',$numero_fuente);
 			SESSION::set('id_fuente',$id_fuente);
+			SESSION::set('pestania','bibliografia');
+			Response::redirect('curso/examenes');
+		}
+
+	}
+
+	/**
+	 * Controlador que enviará la instrucción de mostrar la modal para modificar un examen.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_mostrar_examen($id_examen)
+	{
+		$id_curso = SESSION::get('id_curso');
+		$mensaje = "";
+		$error = False;
+		if($error){
+			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
+			SESSION::set('mensaje',$mensaje);
+			SESSION::set('pestania','bibliografia');
+			// SESSION::set('data',$data);
+			Response::redirect('curso/examenes');
+		}else{
+			SESSION::set('id_examen',$id_examen);
 			SESSION::set('pestania','bibliografia');
 			Response::redirect('curso/examenes');
 		}
