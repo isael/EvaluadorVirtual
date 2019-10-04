@@ -30,6 +30,7 @@ class Modals
 		$examen_tema_nivel_desde = '1';
 		$examen_tema_nivel_hasta = '3';
 		$sufijo_modal = '';
+		$temas_y_niveles='';
 		$dia_actual = date("Y-m-d");
 		$examen_nombre = 'Examen: ('.$dia_actual.')';
 		$examen_inicio = $dia_actual;
@@ -68,15 +69,6 @@ class Modals
 			}
 		}
 		if($is_modal){
-			$fuente = Model_Fuente::find_one_by('id_fuente', $id_fuente);
-			$edicion = Model_Edicion::find(array($id_fuente, $numero));
-			if(isset($fuente) && isset($edicion)){
-				$nombre_bibliografia = $fuente->nombre;
-				$autor_bibliografia = $fuente->autores;
-				$numero_edicion_bibliografia = $edicion->numero;
-				$anio_bibliografia = $edicion->anio;
-				$link_bibliografia = $edicion->liga;
-			}
 			$sufijo_modal = "_modal";
 			$result = 
 			'<div class="modal-dialog" role="document">
@@ -85,9 +77,28 @@ class Modals
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title" id="myModalLabel">Modificar Bibliografía</h4>
+					<h4 class="modal-title" id="myModalLabel">Modificar Examen</h4>
 					</div>
 					<div class="modal-body">';
+			$temas_y_niveles =	'<input type="hidden" id="examen_temas_modal" name="examen_temas_modal" value="7-1-3,8-1-3,9-1-3" onclick="javascript:rellenar_examen_con_temas(examen_temas_modal,lista_de_preguntas_por_tema_modal,examen_tema_modal,examen_tema_nivel_desde_modal,examen_tema_nivel_hasta_modal);">';
+								// <div class="col-xs-12 col-sm-12 table-row">
+								// 	<div class="col-xs-1 col-sm-1 table-row">
+								// 		<button type="button" class="btn btn-danger btn-block btn-lg">-</button>
+								// 	</div>
+								// 	<div class="col-xs-10 col-sm-10 table-row">
+								// 		<span>Mi primer tema. &nbsp;&nbsp;&nbsp;&nbsp;Cantidad de preguntas:</span>
+								// 		<span id="span_7">  N1: 3,   N2: 2,   N3: 1.</span>
+								// 	</div>
+								// </div>
+								// <div class="col-xs-12 col-sm-12 table-row">
+								// 	<div class="col-xs-1 col-sm-1 table-row">
+								// 		<button type="button" class="btn btn-danger btn-block btn-lg">-</button>
+								// 	</div>
+								// 	<div class="col-xs-10 col-sm-10 table-row">
+								// 		<span>Mi tercer tema. &nbsp;&nbsp;&nbsp;&nbsp;Cantidad de preguntas:</span>
+								// 		<span id="span_9">  N1: 2,   N2: 2,   N3: 0.</span>
+								// 	</div>
+								// </div>';
 		}
 		$result = $result.Form::open('curso/examen/crear_examen');
 		$result = $result.'<div class="form-group">
@@ -201,7 +212,8 @@ class Modals
 								<div class="col-xs-1"></div>
 								<br>
 								<div id="lista_de_preguntas_por_tema'.$sufijo_modal.'" class="table" >
-									<br>
+									<br>'.
+									$temas_y_niveles.'
 								</div>
 							</div>';
 		if($is_modal){
@@ -222,7 +234,7 @@ class Modals
 		}else{
 			$result = $result.'<br>
 								<div class="col-xs-12 col-sm-12">'.
-									Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
+									Form::button('boton_agregar_examen', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
 								</div>
 								<br>';
 		}

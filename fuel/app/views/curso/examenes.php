@@ -11,6 +11,7 @@
 					$idPregunta = SESSION::get('id_pregunta');
 					$idFuente = SESSION::get('id_fuente');
 					$numeroFuente = SESSION::get('numero_fuente');
+					$idExamen = SESSION::get('id_examen');
 					if(isset($pestania)){
 						SESSION::delete('pestania');
 					}
@@ -25,6 +26,9 @@
 					}
 					if(isset($numeroFuente)){
 						SESSION::delete('numero_fuente');
+					}
+					if(isset($idExamen)){
+						SESSION::delete('id_examen');
 					}
 				?>
 				<!-- /SESSION -->
@@ -78,18 +82,28 @@
 								foreach ($examenes as $examen) {
 									
 									echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-										echo '<a href="">';
-										echo '<div class="row">';
-											echo '<div class="col-xs-6">';
-												echo $examen->nombre;
-												echo '<br>Inicio: '.$examen->fecha_inicio;
-												echo '<br>Final: '.$examen->fecha_fin;
-											echo '</div>';
-											echo '<div class="col-xs-6">';
-												echo 'Temas: ';
-											echo '</div>';
-										echo '</div>';
-										echo '</a>';
+										// echo '<a href="curso/examen/mostrar_examen/'.$examen->id_examen.'">';
+										echo Html::anchor('curso/examen/mostrar_examen/'.$examen->id_examen,
+												'<div class="row">'.
+													'<div class="col-xs-3">'.
+														'<i i="" class="fa fa-file-text-o fav_icon"></i>'.
+													'</div>'.
+													'<div class="col-xs-9">'.
+														$examen->nombre.': '.
+														' '.$examen->preguntas_por_mostrar.' preguntas'.
+													'</div>'.
+												'</div>'
+											, array('class' => ''));
+										// echo '<div class="row">';
+										// 	echo '<div class="col-xs-3">';
+										// 		echo '<i i="" class="fa fa-file-text-o fav_icon"></i>';
+										// 	echo '</div>';
+										// 	echo '<div class="col-xs-9">';
+										// 		echo $examen->nombre.': ';
+										// 		echo ' '.$examen->preguntas_por_mostrar.' preguntas';
+										// 	echo '</div>';
+										// echo '</div>';
+										// echo '</a>';
 									echo '</div>';
 								}
 								echo '</div>';
@@ -316,6 +330,16 @@
 				</div>
 
 				<?php
+					if(isset($idExamen)){
+				?>
+				<div class="modal fade" id="modalExamen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<?php echo Modals::getModalExamen($temas, True, $idExamen); ?>
+				</div>
+				<?php 
+					}
+				?>	
+
+				<?php
 					if(isset($idFuente)){
 				?>
 				<div class="modal fade" id="modalBibliografia" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -456,6 +480,25 @@
 		echo "}";
 	 ?>;
 	 <?php
+	 if(isset($idExamen)){
+	 	?>
+	 		let botonModalExamen = document.createElement('button');
+	 		botonModalExamen.setAttribute('data-toggle','modal');
+	 		botonModalExamen.setAttribute('data-target','#modalExamen');
+	 		botonModalExamen.style.visibility = "hidden";
+	 		let padre = document.getElementById('botonModal');
+	 		padre.appendChild(botonModalExamen);
+	 		setTimeout(function(){
+	 			botonModalExamen.click();
+	 			padre.removeChild(botonModalExamen);
+	 			let input_oculto = document.getElementById('examen_temas_modal');
+	 			input_oculto.click();
+	 		},100);
+	 		
+	 	<?php
+	 }
+	 ?>
+	 <?php
 	 if(isset($idPregunta)){
 	 	?>
 	 		let botonModalPregunta = document.createElement('button');
@@ -475,15 +518,15 @@
 	 <?php
 	 if(isset($idFuente)){
 	 	?>
-	 		let botonModalPregunta = document.createElement('button');
-	 		botonModalPregunta.setAttribute('data-toggle','modal');
-	 		botonModalPregunta.setAttribute('data-target','#modalBibliografia');
-	 		botonModalPregunta.style.visibility = "hidden";
+	 		let botonModalBibliografia = document.createElement('button');
+	 		botonModalBibliografia.setAttribute('data-toggle','modal');
+	 		botonModalBibliografia.setAttribute('data-target','#modalBibliografia');
+	 		botonModalBibliografia.style.visibility = "hidden";
 	 		let padre = document.getElementById('botonModal');
-	 		padre.appendChild(botonModalPregunta);
+	 		padre.appendChild(botonModalBibliografia);
 	 		setTimeout(function(){
-	 			botonModalPregunta.click();
-	 			padre.removeChild(botonModalPregunta);
+	 			botonModalBibliografia.click();
+	 			padre.removeChild(botonModalBibliografia);
 	 		},100);
 	 		
 	 	<?php

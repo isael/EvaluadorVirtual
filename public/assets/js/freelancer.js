@@ -165,7 +165,7 @@ function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_el
                     tema_rango = valor.split('-');
                     let minimo = desde_elemento.value < tema_rango[1] ? desde_elemento.value : tema_rango[1];
                     let maximo = hasta_elemento.value > tema_rango[2] ? hasta_elemento.value : tema_rango[2];
-                    const span_elemento = document.getElementById('span_'+tema_elemento.value);
+                    const span_elemento = document.getElementById('span_'+tema_elemento.value+sufijo_modal);
                     if(span_elemento){
                         tema_rango[1] = minimo;
                         tema_rango[2] = maximo;
@@ -240,7 +240,7 @@ function actualizarPreguntasAgregadas(esModal = false){
         if(valor && valor!==''){
             tema_rango = valor.split('-');
 
-            let span = document.getElementById('span_'+tema_rango[0]);
+            let span = document.getElementById('span_'+tema_rango[0]+'sufijo_modal');
             if(span){
                 let niveles = span.innerHTML.split(',');
 
@@ -270,7 +270,7 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
         return;
     }
     let arreglo_valores = agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,tema_elemento_texto,desde_elemento,hasta_elemento);
-    const span_elemento = document.getElementById('span_'+tema_elemento.value);
+    const span_elemento = document.getElementById('span_'+tema_elemento.value+sufijo_modal);
     if(!span_elemento){
 
         let divLabelPreguntas = document.createElement('div');
@@ -322,7 +322,7 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
         spanT.innerHTML = texto_span;
 
         let spanPreguntas = document.createElement('span');
-        spanPreguntas.id = 'span_'+tema_elemento.value;
+        spanPreguntas.id = 'span_'+tema_elemento.value+sufijo_modal;
         let texto_span_preguntas = getTextoSpan(tema_elemento_texto, tema_rango);
         spanPreguntas.innerHTML = texto_span_preguntas;
 
@@ -336,4 +336,26 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
     let boton_cancelar_tema = document.getElementById('mostrarAgregarPreguntasPorTema'+sufijo_modal);
     limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento,desde_elemento_texto,hasta_elemento,hasta_elemento_texto,boton_cancelar_tema);
     actualizarPreguntasAgregadas(esModal);
+}
+
+function rellenar_examen_con_temas(inputOculto, listaPreguntas, tema, desde, hasta) {
+    let input_oculto_elemento = document.getElementById(inputOculto.id);
+    let lista_preguntas_elemento = document.getElementById(listaPreguntas.id);
+    let tema_elemento_texto = document.getElementById(tema.id);
+    let tema_elemento = document.getElementById(tema.id+'_option_selected');
+    let desde_elemento_texto = document.getElementById(desde.id);
+    let desde_elemento = document.getElementById(desde.id+'_option_selected');
+    let hasta_elemento_texto = document.getElementById(hasta.id);
+    let hasta_elemento = document.getElementById(hasta.id+'_option_selected');
+
+    let arreglo = input_oculto_elemento.value.split(",");
+
+    for (let i = 0; i < arreglo.length; i++) {
+        let valor = arreglo[i];
+        tema_rango = valor.split('-');
+        let tema = tema_rango[0];
+        let minimo = tema_rango[1];
+        let maximo = tema_rango[2];
+        //Se debe cambiar la manera en que se agregan las cantidades de pregunta
+    }
 }

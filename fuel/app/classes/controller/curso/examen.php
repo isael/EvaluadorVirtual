@@ -810,12 +810,12 @@ class Controller_Curso_Examen extends Controller_Template
 		if($error){
 			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
 			SESSION::set('mensaje',$mensaje);
-			SESSION::set('pestania','bibliografia');
+			SESSION::set('pestania','edicion');
 			// SESSION::set('data',$data);
 			Response::redirect('curso/examenes');
 		}else{
 			SESSION::set('id_examen',$id_examen);
-			SESSION::set('pestania','bibliografia');
+			SESSION::set('pestania','edicion');
 			Response::redirect('curso/examenes');
 		}
 
