@@ -34,13 +34,17 @@ class Modals
 		$dia_actual = date("Y-m-d");
 		$examen_nombre = 'Examen: ('.$dia_actual.')';
 		$examen_inicio = $dia_actual;
-		$examen_final = date("Y-m-d",strtotime($dia_actual."+ 1 month")); 
+		$examen_final = date("Y-m-d",strtotime($dia_actual."+ 1 month"));
 		$examen_cantidad_preguntas = '10';
 		$vidas = array(array(1,1),array(2,2),array(3,3));
 		$niveles = array(array(1,1),array(2,2),array(3,3));
 		$oportunidades = array(array(3,3),array(4,4),array(5,5));
 		$multiplo_total_preguntas = 1.5;
 		$lista_de_temas = [];
+		$examen_lista_de_cantidad_de_preguntas = '';
+		$examen_lista_de_nombres_de_preguntas = '';
+		$examen_temas_modal = '';
+		$examen_temas_rangos = [];
 		if(isset($temas)){
 			foreach ($temas as $tema) {
 				$id_tema = $tema->id_tema;
@@ -66,9 +70,30 @@ class Modals
 				//En caso de querer modificarlo, la manera de obtener el número de preguntas por cada tema y nivel deberá ser acorde a lo que necesiten los metodos para conteo de preguntas.
 				$texto_tema = $tema->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.sizeof($cantidad_preguntas_nivel_1).', N2: '.sizeof($cantidad_preguntas_nivel_2).', N3: '.sizeof($cantidad_preguntas_nivel_3).'.';
 				array_push($lista_de_temas, array($id_tema, $texto_tema));
+
+				$input_preguntas_por_tema = Form::input('input_'.$id_tema.$sufijo_modal,sizeof($cantidad_preguntas_nivel_1).','.sizeof($cantidad_preguntas_nivel_2).','.sizeof($cantidad_preguntas_nivel_3),array('class'=>'form-control','type' => 'hidden'));
+				$examen_lista_de_cantidad_de_preguntas = $examen_lista_de_cantidad_de_preguntas.$input_preguntas_por_tema;
+
+				$input_nombre_por_tema = Form::input('input_tema_'.$id_tema.$sufijo_modal,$tema->nombre,array('class'=>'form-control','type' => 'hidden'));
+				$examen_lista_de_nombres_de_preguntas = $examen_lista_de_nombres_de_preguntas.$input_nombre_por_tema;
+
+				if($is_modal && isset($id_examen)){
+					$rango = Model_BasadoEn::find(array('id_examen' => $id_examen, 'id_tema' => $id_tema ));
+					array_push($examen_temas_rangos, $rango->id_tema.'-'.$rango->desde_dificultad.'-'.$rango->hasta_dificultad);
+				}
 			}
 		}
 		if($is_modal){
+
+			$examen = Model_Examen::find_one_by('id_examen', $id_examen);
+
+			$examen_nombre = $examen->nombre;
+			$examen_inicio = substr($examen->fecha_inicio, 0, 10);
+			$examen_final = substr($examen->fecha_fin, 0, 10);
+			$examen_cantidad_preguntas = $examen->preguntas_por_mostrar;
+			$vidas = $examen->vidas;
+			$oportunidades = $examen->oportunidades;
+
 			$sufijo_modal = "_modal";
 			$result = 
 			'<div class="modal-dialog" role="document">
@@ -80,7 +105,7 @@ class Modals
 					<h4 class="modal-title" id="myModalLabel">Modificar Examen</h4>
 					</div>
 					<div class="modal-body">';
-			$temas_y_niveles =	'<input type="hidden" id="examen_temas_modal" name="examen_temas_modal" value="7-1-3,8-1-3,9-1-3" onclick="javascript:rellenar_examen_con_temas(examen_temas_modal,lista_de_preguntas_por_tema_modal,examen_tema_modal,examen_tema_nivel_desde_modal,examen_tema_nivel_hasta_modal);">';
+			$temas_y_niveles =	'<input type="hidden" id="examen_temas_modal" name="examen_temas_modal" value="'.implode(',', $examen_temas_rangos).'" onclick="javascript:rellenar_modal_examen_con_temas(examen_temas_modal,lista_de_preguntas_por_tema,examen_tema,examen_tema_nivel_desde,examen_tema_nivel_hasta);">';
 								// <div class="col-xs-12 col-sm-12 table-row">
 								// 	<div class="col-xs-1 col-sm-1 table-row">
 								// 		<button type="button" class="btn btn-danger btn-block btn-lg">-</button>
@@ -185,6 +210,10 @@ class Modals
 											</div>
 											<div class="col-xs-12 col-sm-12">'.
 												Special_Selector::createSpecialSelector("examen_tema".$sufijo_modal, "results_examen_tema".$sufijo_modal, $lista_de_temas,"Selecciona" , null, array('value' => $examen_tema), $examen_tema_id).'
+												<div>'.
+													$examen_lista_de_cantidad_de_preguntas.
+													$examen_lista_de_nombres_de_preguntas.'
+												</div>
 											</div>
 											<div class="col-xs-12 col-sm-12 table">
 												<div class="col-xs-6 col-sm-6 table-row">

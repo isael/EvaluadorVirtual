@@ -144,7 +144,7 @@ function limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento
     boton_cancelar_tema.click();
 }
 
-function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,tema_elemento_texto,desde_elemento,hasta_elemento) {
+function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento,esRellenado) {
     let sufijo_modal = esModal ? "_modal" : "";
     const id = "examen_temas"+sufijo_modal;
     let input_escondido = document.getElementById(id);
@@ -152,7 +152,9 @@ function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_el
     let regex = new RegExp("^"+tema_elemento.value);
     let tema_previo = false;
     if(input_escondido){
-        if(!input_escondido.value || input_escondido.value === ""){
+        if(esRellenado){
+            arreglo_valores = input_escondido.value.split(",");
+        }else if(!input_escondido.value || input_escondido.value === ""){
             input_escondido.value = arreglo_valores;
         }else{
             let arreglo = input_escondido.value.split(",");
@@ -169,7 +171,7 @@ function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_el
                     if(span_elemento){
                         tema_rango[1] = minimo;
                         tema_rango[2] = maximo;
-                        span_elemento.innerHTML = getTextoSpan(tema_elemento_texto, tema_rango);
+                        span_elemento.innerHTML = getTextoSpan(tema_rango);
                     }
                     arreglo[i] = tema_elemento.value+"-"+minimo+"-"+maximo;
                     i=arreglo.length;
@@ -211,18 +213,23 @@ function quitarValoresAlInputEscondido(esModal,tema_elemento_value,desde_element
     }
 }
 
-function getTextoSpan(tema_elemento_texto, tema_rango) {
-    const arreglo_texto = tema_elemento_texto.value.split(':');
-    const preguntas_texto = tema_elemento_texto.value.substring(tema_elemento_texto.value.indexOf(arreglo_texto[2]));
-    const arreglo_preguntas_texto = preguntas_texto.split(',');
-    let texto_span = arreglo_texto[0]+". &nbsp;&nbsp;&nbsp;&nbsp;Cantidad de preguntas:";
+function getTextoSpan(tema_rango, es_para_nombre_de_tema) {
+    //const arreglo_texto = tema_elemento_texto.value.split(':');
+    let texto_span = '';
     if(tema_rango){
-        texto_span = "";
-        for(let i = parseInt(tema_rango[1]); i <= parseInt(tema_rango[2]); i++ ){
-            texto_span = texto_span + " " + arreglo_preguntas_texto[i-1];
-            if(i < parseInt(tema_rango[2])){
-                texto_span = texto_span + ", ";
-            }
+        if(es_para_nombre_de_tema){
+            const tema_texto_emento = document.getElementById('input_tema_'+tema_rango[0]) || document.getElementById('form_input_tema_'+tema_rango[0]);
+            texto_span = tema_texto_emento.value+". &nbsp;&nbsp;&nbsp;&nbsp;Cantidad de preguntas:";
+        }else{
+            const preguntas_texto = document.getElementById('input_'+tema_rango[0]) || document.getElementById('form_input_'+tema_rango[0]);
+            const arreglo_preguntas_texto = preguntas_texto.value.split(',');
+            texto_span = "";
+            for(let i = parseInt(tema_rango[1]); i <= parseInt(tema_rango[2]); i++ ){
+                texto_span = texto_span + " N"+ i + ": " + arreglo_preguntas_texto[i-1];
+                if(i < parseInt(tema_rango[2])){
+                    texto_span = texto_span + ", ";
+                }
+            }            
         }
     }
     return texto_span;
@@ -240,13 +247,12 @@ function actualizarPreguntasAgregadas(esModal = false){
         if(valor && valor!==''){
             tema_rango = valor.split('-');
 
-            let span = document.getElementById('span_'+tema_rango[0]+'sufijo_modal');
-            if(span){
-                let niveles = span.innerHTML.split(',');
+            let preguntas_texto = document.getElementById('input_'+tema_rango[0]) || document.getElementById('form_input_'+tema_rango[0]);
+            if(preguntas_texto){
+                let cantidades = preguntas_texto.value.split(',');
 
-                for(let j = 0; j < niveles.length; j++){
-                    let nivel = niveles[j].split(':');
-                    suma = suma + parseInt(nivel[1]);
+                for(let j = parseInt(tema_rango[1]); j <= parseInt(tema_rango[2]); j++){
+                    suma = suma + parseInt(cantidades[j-1]);
                 }
             }
         }
@@ -255,7 +261,7 @@ function actualizarPreguntasAgregadas(esModal = false){
     cambia_preguntas_faltantes(esModal);
 }
 
-function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esModal = false){
+function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esModal = false, esRellenado = false){
     let sufijo_modal = esModal ? "_modal" : "";
     let lista_preguntas_elemento = document.getElementById(listaPreguntas.id+sufijo_modal);
     let tema_elemento_texto = document.getElementById(tema.id+sufijo_modal);
@@ -266,10 +272,16 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
     let hasta_elemento = document.getElementById(hasta.id+sufijo_modal+'_option_selected');
 
     if(!tema_elemento || tema_elemento.value === ''){
+        debugger;
         alert("Falta agregar tema");
         return;
     }
-    let arreglo_valores = agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,tema_elemento_texto,desde_elemento,hasta_elemento);
+    if(parseInt(desde_elemento.value) > parseInt(hasta_elemento.value)){
+        alert("El valor del nivel Desde no puede ser menor al valor del Hasta");
+        return;        
+    }
+
+    let arreglo_valores = agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento,esRellenado);
     const span_elemento = document.getElementById('span_'+tema_elemento.value+sufijo_modal);
     if(!span_elemento){
 
@@ -318,12 +330,12 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
         }
 
         let spanT = document.createElement('span');
-        let texto_span = getTextoSpan(tema_elemento_texto, false);
+        let texto_span = getTextoSpan(tema_rango, true);
         spanT.innerHTML = texto_span;
 
         let spanPreguntas = document.createElement('span');
         spanPreguntas.id = 'span_'+tema_elemento.value+sufijo_modal;
-        let texto_span_preguntas = getTextoSpan(tema_elemento_texto, tema_rango);
+        let texto_span_preguntas = getTextoSpan(tema_rango);
         spanPreguntas.innerHTML = texto_span_preguntas;
 
         divSpan.appendChild(spanT);
@@ -338,24 +350,25 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
     actualizarPreguntasAgregadas(esModal);
 }
 
-function rellenar_examen_con_temas(inputOculto, listaPreguntas, tema, desde, hasta) {
+function rellenar_modal_examen_con_temas(inputOculto, listaPreguntas, tema, desde, hasta) {
     let input_oculto_elemento = document.getElementById(inputOculto.id);
-    let lista_preguntas_elemento = document.getElementById(listaPreguntas.id);
-    let tema_elemento_texto = document.getElementById(tema.id);
-    let tema_elemento = document.getElementById(tema.id+'_option_selected');
-    let desde_elemento_texto = document.getElementById(desde.id);
-    let desde_elemento = document.getElementById(desde.id+'_option_selected');
-    let hasta_elemento_texto = document.getElementById(hasta.id);
-    let hasta_elemento = document.getElementById(hasta.id+'_option_selected');
+    let tema_elemento_modal = document.getElementById(tema.id+'_modal'+'_option_selected');
+    let desde_elemento_modal = document.getElementById(desde.id+'_modal'+'_option_selected');
+    let hasta_elemento_modal = document.getElementById(hasta.id+'_modal'+'_option_selected');
 
     let arreglo = input_oculto_elemento.value.split(",");
 
     for (let i = 0; i < arreglo.length; i++) {
         let valor = arreglo[i];
         tema_rango = valor.split('-');
-        let tema = tema_rango[0];
-        let minimo = tema_rango[1];
-        let maximo = tema_rango[2];
-        //Se debe cambiar la manera en que se agregan las cantidades de pregunta
+        let tema_id = tema_rango[0];
+        let tema_desde = tema_rango[1];
+        let tema_hasta = tema_rango[2];
+        
+        tema_elemento_modal.value = tema_id;
+        desde_elemento_modal.value = tema_desde;
+        hasta_elemento_modal.value = tema_hasta;
+
+        agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, true, true);
     }
 }
