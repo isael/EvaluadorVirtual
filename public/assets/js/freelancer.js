@@ -134,17 +134,19 @@ function limpiaEliminar(e, botonBorrar, divBotonBorrar) {
     }
 }
 
-function limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento,desde_elemento_texto,hasta_elemento,hasta_elemento_texto,boton_cancelar_tema){
+function limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento,desde_elemento_texto,hasta_elemento,hasta_elemento_texto,boton_cancelar_tema,es_rellenado){
     tema_elemento.value = "";
     tema_elemento_texto.value = "";
     desde_elemento.value = "1";
     desde_elemento_texto.value = "1";
     hasta_elemento.value = "3";
     hasta_elemento_texto.value = "3";
-    boton_cancelar_tema.click();
+    if(!es_rellenado){
+        boton_cancelar_tema.click();
+    }
 }
 
-function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento,esRellenado) {
+function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento,es_rellenado) {
     let sufijo_modal = esModal ? "_modal" : "";
     const id = "examen_temas"+sufijo_modal;
     let input_escondido = document.getElementById(id);
@@ -152,7 +154,7 @@ function agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_el
     let regex = new RegExp("^"+tema_elemento.value);
     let tema_previo = false;
     if(input_escondido){
-        if(esRellenado){
+        if(es_rellenado){
             arreglo_valores = input_escondido.value.split(",");
         }else if(!input_escondido.value || input_escondido.value === ""){
             input_escondido.value = arreglo_valores;
@@ -261,7 +263,7 @@ function actualizarPreguntasAgregadas(esModal = false){
     cambia_preguntas_faltantes(esModal);
 }
 
-function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esModal = false, esRellenado = false){
+function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esModal = false, es_rellenado = false){
     let sufijo_modal = esModal ? "_modal" : "";
     let lista_preguntas_elemento = document.getElementById(listaPreguntas.id+sufijo_modal);
     let tema_elemento_texto = document.getElementById(tema.id+sufijo_modal);
@@ -281,7 +283,7 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
         return;        
     }
 
-    let arreglo_valores = agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento,esRellenado);
+    let arreglo_valores = agregarValoresAlInputEscondido(lista_preguntas_elemento,esModal,tema_elemento,desde_elemento,hasta_elemento,es_rellenado);
     const span_elemento = document.getElementById('span_'+tema_elemento.value+sufijo_modal);
     if(!span_elemento){
 
@@ -346,7 +348,7 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
         lista_preguntas_elemento.appendChild(divLabelPreguntas);
     }
     let boton_cancelar_tema = document.getElementById('mostrarAgregarPreguntasPorTema'+sufijo_modal);
-    limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento,desde_elemento_texto,hasta_elemento,hasta_elemento_texto,boton_cancelar_tema);
+    limpiaAgregarPreguntas(tema_elemento,tema_elemento_texto,desde_elemento,desde_elemento_texto,hasta_elemento,hasta_elemento_texto,boton_cancelar_tema,es_rellenado);
     actualizarPreguntasAgregadas(esModal);
 }
 
@@ -364,11 +366,14 @@ function rellenar_modal_examen_con_temas(inputOculto, listaPreguntas, tema, desd
         let tema_id = tema_rango[0];
         let tema_desde = tema_rango[1];
         let tema_hasta = tema_rango[2];
-        
+
         tema_elemento_modal.value = tema_id;
         desde_elemento_modal.value = tema_desde;
         hasta_elemento_modal.value = tema_hasta;
 
         agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, true, true);
     }
+    let lista_preguntas_elemento = document.getElementById(listaPreguntas.id+'_modal');
+    let br = document.createElement('br');
+    lista_preguntas_elemento.appendChild(br)
 }

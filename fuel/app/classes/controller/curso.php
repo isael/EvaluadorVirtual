@@ -226,8 +226,8 @@ class Controller_Curso extends Controller_Template
 	public function action_examenes()
 	{	
 		$id=SESSION::get('id_sesion');
-		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
-			$id_curso = SESSION::get('id_curso');
+		$id_curso = SESSION::get('id_curso');
+		if(isset($id) && isset($id_curso) && ($tipo_usuario = substr($id,0,1))=='p'){
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 			
 			$examenes = Model_Examen::find(function ($query) use ($id_curso){
@@ -342,30 +342,6 @@ class Controller_Curso extends Controller_Template
 		}else{
 			Response::redirect('sesion/index');
 		}
-	}
-
-	/**
-	 * Controlador que muestra las estadisticas del alumno
-	 *
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_crear_examen()
-	{	
-		$nombre_examen = trim(Input::post('nombre_examen'));
-		$id_curso = SESSION::get('id_curso');
-		if(isset($nombre_examen) && $nombre_examen!=""){			
-			$examen = new Model_Examen();
-			$examen->nombre = $nombre_examen;
-			$examen->save();
-
-			$evalua = new Model_Evalua();
-			$evalua->id_examen = $examen->id_examen;
-			$evalua->id_curso = $id_curso;
-			$evalua->save();
-		}
-		Response::redirect('curso/examenes');
-
 	}
 
 }

@@ -119,3 +119,9 @@ function duplicaPregunta(){
     elementoDuplicado.value = "duplicada";
     submit.click();
 }
+
+// function generarExamen(es_vista_previa) {
+//     if(es_vista_previa){
+//         alert("vista previa");
+//     }
+// }

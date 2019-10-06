@@ -27,8 +27,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 	public function before()
     {
-        parent::before(); 
-        $this->template->nav_bar = View::forge('nav_bar_sesion');
+        parent::before();
         $this->template->title = "Evaluador Virtual";
      
     }
@@ -123,6 +122,13 @@ class Controller_Curso_Examen extends Controller_Template
 			}
 		}
 
+		if(!$error){
+			if($examen_final<$examen_inicio){
+				$error=True;
+				$mensaje=$mensaje."El campo de Vigencia-Final no puede ser antes de la Vigencia-Inicio.<br>";
+			}
+		}
+
 		$tema=null;
 		if(isset($examen_temas_y_niveles) && $examen_temas_y_niveles!==""){
 			$examen_temas_y_niveles_arreglo = explode(",",$examen_temas_y_niveles);
@@ -133,7 +139,25 @@ class Controller_Curso_Examen extends Controller_Template
 
 		if(!$error){
 			if($modificar_examen){
+				$new_examen = Model_Examen::find_one_by('id_examen',$id_examen);
+				$new_examen->nombre = $examen_nombre;
+				$new_examen->fecha_inicio = $examen_inicio;
+				$new_examen->fecha_fin = $examen_final;
+				$new_examen->oportunidades = $examen_oportunidades_value;
+				$new_examen->vidas = $examen_vidas_value;
+				$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
+				$new_examen->preguntas_por_mezclar = $preguntas_agregadas;
+				$new_examen->save();
 
+				$length = sizeof($examen_temas_y_niveles_arreglo);
+				for ($i=0; $i < $length; $i++) {
+					$tema_niveles_array = explode("-",$examen_temas_y_niveles_arreglo[$i]);
+					$new_basado_en = Model_BasadoEn::find(array('id_examen' => $id_examen, 'id_tema' => $tema_niveles_array[0]));
+					$new_basado_en->desde_dificultad = $tema_niveles_array[1];
+					$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
+					$new_basado_en->save();
+				}
+				$mensaje=$mensaje."La pregunta fue actualizada con éxito.<br>";
 			}else{
 				$new_examen = new Model_Examen();
 				$new_examen->nombre = $examen_nombre;
@@ -819,6 +843,29 @@ class Controller_Curso_Examen extends Controller_Template
 			Response::redirect('curso/examenes');
 		}
 
+	}
+
+	/**
+	 * Controlador que llevará a la pantalla previa a presentar un examen.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_presentar()
+	{
+		$id_curso = SESSION::get('id_curso');
+		$id_examen = SESSION::get('id_examen');
+		if(!isset($id_examen)){
+			SESSION::set('pestania','edicion');
+			Response::redirect('curso/examenes');
+		}else{			
+			SESSION::delete('id_examen');
+			$mensaje = "";
+
+			$data = null;//array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas, 'tipos' => $tipos);
+				
+			$this->template->content = View::forge('curso/examen/presentar', $data);
+		}
 	}
 
 }

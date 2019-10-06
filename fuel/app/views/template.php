@@ -45,7 +45,11 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
         }
     ?>">
 <!-- Navigation -->
-	<?php echo $nav_bar;?>
+	<?php 
+        if(isset($nav_bar)){
+            echo $nav_bar;
+        }
+    ?>
 
 <!-- Content -->
     <?php echo $content;?>

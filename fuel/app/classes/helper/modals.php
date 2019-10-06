@@ -91,8 +91,8 @@ class Modals
 			$examen_inicio = substr($examen->fecha_inicio, 0, 10);
 			$examen_final = substr($examen->fecha_fin, 0, 10);
 			$examen_cantidad_preguntas = $examen->preguntas_por_mostrar;
-			$vidas = $examen->vidas;
-			$oportunidades = $examen->oportunidades;
+			$examen_vidas = $examen->vidas;
+			$examen_oportunidades = $examen->oportunidades;
 
 			$sufijo_modal = "_modal";
 			$result = 
@@ -250,6 +250,11 @@ class Modals
 					</div>
 					<div class="modal-footer">
                           <div class="row text-center">
+                          	<div class="col-xs-12">'.
+								Html::anchor('curso/examen/presentar','Probar vista previa del examen',array('class'=>'btn btn-primary btn-block btn-lg')).
+								Form::input('pregunta_duplicada','', array('type' => 'hidden')).'
+							</div>
+							<br>	
 							<div class="col-xs-6">
 								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 							</div>
@@ -260,6 +265,7 @@ class Modals
                       </div>
 				</div>
 			</div>';
+			SESSION::set('id_examen',$id_examen);
 		}else{
 			$result = $result.'<br>
 								<div class="col-xs-12 col-sm-12">'.
