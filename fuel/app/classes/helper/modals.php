@@ -251,7 +251,7 @@ class Modals
 					<div class="modal-footer">
                           <div class="row text-center">
                           	<div class="col-xs-12">'.
-								Html::anchor('curso/examen/presentar','Probar vista previa del examen',array('class'=>'btn btn-primary btn-block btn-lg')).
+								Html::anchor('curso/examen/presentar/'.$id_examen,'Probar vista previa del examen',array('class'=>'btn btn-primary btn-block btn-lg')).
 								Form::input('pregunta_duplicada','', array('type' => 'hidden')).'
 							</div>
 							<br>	
@@ -265,7 +265,6 @@ class Modals
                       </div>
 				</div>
 			</div>';
-			SESSION::set('id_examen',$id_examen);
 		}else{
 			$result = $result.'<br>
 								<div class="col-xs-12 col-sm-12">'.

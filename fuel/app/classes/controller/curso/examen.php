@@ -28,6 +28,7 @@ class Controller_Curso_Examen extends Controller_Template
 	public function before()
     {
         parent::before();
+        $this->template->nav_bar = View::forge('nav_bar_sesion');
         $this->template->title = "Evaluador Virtual";
      
     }
@@ -846,26 +847,130 @@ class Controller_Curso_Examen extends Controller_Template
 	}
 
 	/**
+	 * Controlador que crea la cookie de id_examen para no hacerla visible en la URL y se
+	 * redirije al método que si muestra la información.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_presentar($id_examen, $id_alumno = null)
+	{		
+			SESSION::set('id_examen',$id_examen);
+			SESSION::set('id_alumno',$id_alumno);
+			Response::redirect('curso/examen/presentar_inicio');
+	}
+
+	/**
 	 * Controlador que llevará a la pantalla previa a presentar un examen.
 	 *
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_presentar()
+	public function action_presentar_inicio()
 	{
 		$id_curso = SESSION::get('id_curso');
 		$id_examen = SESSION::get('id_examen');
-		if(!isset($id_examen)){
+		$id_alumno = SESSION::get('id_alumno');
+		$es_test = True;
+
+		if(isset($id_alumno)){
+			SESSION::delete('id_alumno');
+			$es_test = False;
+		}
+
+		if(isset($id_examen)){
+			SESSION::delete('id_examen');
+			$examen = Model_Examen::find_one_by('id_examen',$id_examen);
+
+			$temas = Model_Tema::find(function ($query) use ($id_examen){
+			    return $query->join('BasadoEn')
+							->on('Tema.id_tema', '=', 'BasadoEn.id_tema')
+							->where('BasadoEn.id_examen', $id_examen);
+			});
+
+			$temas_ids = [];
+
+			$preguntas = null;
+			if(isset($temas)){
+				foreach($temas as $tema) {
+					array_push($temas_ids, $tema->id_tema);
+				}
+				$preguntas = Model_Pregunta::find(function ($query) use ($temas,$id_examen){
+						$query->select('tiempo','Pregunta.id_pregunta')
+							->join('Genera')
+							->on('Pregunta.id_pregunta', '=', 'Genera.id_pregunta')
+							->where('Genera.id_tema','<', '0');
+						foreach($temas as $tema) {
+							$query->or_where_open();
+							$query->where('Genera.id_tema', $tema->id_tema);
+							$query->and_where("Pregunta.dificultad","BETWEEN",array($tema->desde_dificultad, $tema->hasta_dificultad ));
+							$query->or_where_close();
+						}
+					    return $query;
+				});
+				shuffle($preguntas);
+				$preguntas = array_slice($preguntas, 0, intval($examen->preguntas_por_mostrar));
+			}
+
+			$presenta = null;
+			if(!$es_test){
+				//se llena Presenta
+			}
+
+			$fuentes = Model_Fuente::find(function ($query) use ($temas_ids){
+			    return $query->select('nombre')
+							->join('TemaFuente')
+							->on('TemaFuente.id_fuente', '=', 'Fuente.id_fuente')
+							->where('TemaFuente.id_tema', 'IN', $temas_ids)
+							->order_by('nombre')
+							->group_by('nombre');
+			});
+
+			$data = array('examen' => $examen, 'temas' => $temas, 'preguntas' => $preguntas, 'presenta' => $presenta, 'fuentes' => $fuentes, 'id_alumno' => $id_alumno);
+			$mensaje = "";
+			if(isset($preguntas)){
+				$preguntas_ids = [];
+				foreach ($preguntas as $pregunta) {
+					array_push($preguntas_ids, $pregunta->id_pregunta);
+				}
+				SESSION::set('preguntas_ids',$preguntas_ids);
+			}
+
+				
+			$this->template->content = View::forge('curso/examen/presentar_inicio', $data);
+		}else{
 			SESSION::set('pestania','edicion');
 			Response::redirect('curso/examenes');
-		}else{			
-			SESSION::delete('id_examen');
-			$mensaje = "";
-
-			$data = null;//array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas, 'tipos' => $tipos);
-				
-			$this->template->content = View::forge('curso/examen/presentar', $data);
 		}
 	}
 
+	/**
+	 * Controlador que llevará a la pantalla previa a presentar un examen.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_presentando()
+	{
+		$id_curso = SESSION::get('id_curso');
+		$id_alumno = SESSION::get('id_alumno');
+		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
+		$preguntas = SESSION::get('preguntas_ids');
+		$es_test = True;
+
+		if(isset($id_alumno)){
+			SESSION::delete('id_alumno');
+			SESSION::delete('siguiente_posicion_pregunta');
+			SESSION::delete('preguntas_ids');
+			$es_test = False;
+		}
+		// Se deberá ir borrando del arreglo en dos casos: cuando le de siguiente o cuando se acabe el tiempo		
+			
+
+			$data = null;
+			$mensaje = "";
+				
+			$this->template->content = View::forge('curso/examen/presentando', $data);
+		// }
+	}
 }
