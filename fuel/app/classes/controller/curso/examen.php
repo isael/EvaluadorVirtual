@@ -955,10 +955,10 @@ class Controller_Curso_Examen extends Controller_Template
 		$id_curso = SESSION::get('id_curso');
 		$n_cuenta = SESSION::get('n_cuenta');
 		$id_examen = SESSION::get('id_examen');
-		$id_examen = 2;
+		$id_examen = 2; //Borrar
 		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
 		$preguntas = SESSION::get('preguntas_ids');
-		$preguntas = [8,9,10,11,12,13,14,15,16,17];
+		$preguntas = [8,9,10,11,12,13,14,15,16,17]; //Borrar
 
 		$respuesta_elegida = trim(Input::post('respuesta_elegida'));
 		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
@@ -986,16 +986,15 @@ class Controller_Curso_Examen extends Controller_Template
 				}else{
 					SESSION::delete('siguiente_posicion_pregunta');
 					$terminado = True;
+					 //Redireccionar al final
 				}
 			}else{
 				$siguiente_posicion_pregunta = '0';
 				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
 			}
 		}else{
-
+			 //En caso de no recibir respuesta.
 		}
-
-		// Se deberá ir borrando del arreglo en dos casos: cuando le de siguiente o cuando se acabe el tiempo
 
 		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
 		$id_pregunta = $pregunta->id_pregunta;

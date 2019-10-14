@@ -388,4 +388,5 @@ function agregaEstiloSelected(respuesta,otras_respuestas) {
     let input_respuesta = document.getElementById('respuesta_elegida') || document.getElementById('form_respuesta_elegida');
     let string = "respuesta_";
     input_respuesta.value = respuesta.id.substring(string.length);
+    //habilitar el boton de pregunta.
 }
