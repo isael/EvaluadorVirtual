@@ -377,3 +377,15 @@ function rellenar_modal_examen_con_temas(inputOculto, listaPreguntas, tema, desd
     let br = document.createElement('br');
     lista_preguntas_elemento.appendChild(br)
 }
+
+function agregaEstiloSelected(respuesta,otras_respuestas) {
+    let respuestas_arreglo = otras_respuestas.childNodes;
+    for (let i = 0; i < respuestas_arreglo.length ; i++) {
+        if(respuestas_arreglo[i].tagName === 'A')
+            respuestas_arreglo[i].classList.remove('seleccionada');
+    }
+    respuesta.classList.add('seleccionada');
+    let input_respuesta = document.getElementById('respuesta_elegida') || document.getElementById('form_respuesta_elegida');
+    let string = "respuesta_";
+    input_respuesta.value = respuesta.id.substring(string.length);
+}

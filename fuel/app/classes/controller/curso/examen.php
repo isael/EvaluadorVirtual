@@ -853,10 +853,10 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_presentar($id_examen, $id_alumno = null)
+	public function action_presentar($id_examen, $n_cuenta = null)
 	{		
 			SESSION::set('id_examen',$id_examen);
-			SESSION::set('id_alumno',$id_alumno);
+			SESSION::set('n_cuenta',$n_cuenta);
 			Response::redirect('curso/examen/presentar_inicio');
 	}
 
@@ -870,16 +870,16 @@ class Controller_Curso_Examen extends Controller_Template
 	{
 		$id_curso = SESSION::get('id_curso');
 		$id_examen = SESSION::get('id_examen');
-		$id_alumno = SESSION::get('id_alumno');
+		$n_cuenta = SESSION::get('n_cuenta');
 		$es_test = True;
 
-		if(isset($id_alumno)){
-			SESSION::delete('id_alumno');
+		if(isset($n_cuenta)){
+			SESSION::delete('n_cuenta');
 			$es_test = False;
 		}
 
 		if(isset($id_examen)){
-			SESSION::delete('id_examen');
+			// SESSION::delete('id_examen');
 			$examen = Model_Examen::find_one_by('id_examen',$id_examen);
 
 			$temas = Model_Tema::find(function ($query) use ($id_examen){
@@ -926,7 +926,7 @@ class Controller_Curso_Examen extends Controller_Template
 							->group_by('nombre');
 			});
 
-			$data = array('examen' => $examen, 'temas' => $temas, 'preguntas' => $preguntas, 'presenta' => $presenta, 'fuentes' => $fuentes, 'id_alumno' => $id_alumno);
+			$data = array('examen' => $examen, 'temas' => $temas, 'preguntas' => $preguntas, 'presenta' => $presenta, 'fuentes' => $fuentes, 'n_cuenta' => $n_cuenta);
 			$mensaje = "";
 			if(isset($preguntas)){
 				$preguntas_ids = [];
@@ -953,24 +953,82 @@ class Controller_Curso_Examen extends Controller_Template
 	public function action_presentando()
 	{
 		$id_curso = SESSION::get('id_curso');
-		$id_alumno = SESSION::get('id_alumno');
+		$n_cuenta = SESSION::get('n_cuenta');
+		$id_examen = SESSION::get('id_examen');
+		$id_examen = 2;
 		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
 		$preguntas = SESSION::get('preguntas_ids');
-		$es_test = True;
+		$preguntas = [8,9,10,11,12,13,14,15,16,17];
 
-		if(isset($id_alumno)){
-			SESSION::delete('id_alumno');
-			SESSION::delete('siguiente_posicion_pregunta');
-			SESSION::delete('preguntas_ids');
+		$respuesta_elegida = trim(Input::post('respuesta_elegida'));
+		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
+
+		$es_test = True;
+		$terminado = False;
+
+		if(isset($n_cuenta)){
+			SESSION::delete('n_cuenta');
 			$es_test = False;
 		}
-		// Se deberá ir borrando del arreglo en dos casos: cuando le de siguiente o cuando se acabe el tiempo		
-			
 
-			$data = null;
-			$mensaje = "";
-				
-			$this->template->content = View::forge('curso/examen/presentando', $data);
+		if(isset($respuestas_ids_actuales)){
+			SESSION::delete('respuestas_ids');
+		}
+		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
+
+		if($respuesta_elegida !== null && $respuesta_elegida !== ''){
+			if(isset($siguiente_posicion_pregunta)){
+				$siguiente_posicion_pregunta_entero = intval($siguiente_posicion_pregunta);
+				$siguiente_posicion_pregunta_entero++;
+				if($siguiente_posicion_pregunta < intval($examen->preguntas_por_mostrar)){
+					SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta_entero);
+					$siguiente_posicion_pregunta = ''.$siguiente_posicion_pregunta_entero;
+				}else{
+					SESSION::delete('siguiente_posicion_pregunta');
+					$terminado = True;
+				}
+			}else{
+				$siguiente_posicion_pregunta = '0';
+				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
+			}
+		}else{
+
+		}
+
+		// Se deberá ir borrando del arreglo en dos casos: cuando le de siguiente o cuando se acabe el tiempo
+
+		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
+		$id_pregunta = $pregunta->id_pregunta;
+		$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+			    return $query->join('Contiene')
+							->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+							->where('Contiene.id_pregunta', $id_pregunta);
+			});
+		shuffle($respuestas);
+		$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
+		    	return $query->join('FundamentadoEn')
+		                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('ReferenciaFuente')
+		                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('Fuente')
+		                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+		                 ->join('Edicion')
+		                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+		                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+			});
+		$referencia = reset($_referencias);
+		$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
+
+		$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia);
+
+		$respuestas_ids = [];
+		foreach ($respuestas as $respuesta) {
+			array_push($respuestas_ids, $respuesta->id_respuesta);
+		}
+		SESSION::set('respuestas_ids',$respuestas_ids);
+
+		$mensaje = "";
+		$this->template->content = View::forge('curso/examen/presentando', $data);
 		// }
 	}
 }
