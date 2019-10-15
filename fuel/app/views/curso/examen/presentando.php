@@ -49,7 +49,8 @@
 			    <!-- Informacion -->
 			    	<div class="col-xs-12">
 				    	<div class="col-xs-12">
-				    		<h4>Tiempo restante: <?php echo $pregunta->tiempo ?></h4>
+				    		<span>Tiempo restante: </span>
+				    		<span id="tiempo"> <?php echo $pregunta->tiempo ?></span>
 				    	</div>
 				    </div>
 				    <div class="col-xs-12">
@@ -97,87 +98,7 @@
 				    		?>
 				    	</div>
 				    </div>
-			    	<!-- <?php 
-			    		$vidas_restantes = 0;
-			    		$vidas_totales = 0;
-			    		$oportunidades_restantes = 0;
-			    		$oportunidades_totales = 0;
-			    		if(isset($examen)){
-			    			$vidas_totales = $examen->vidas;
-			    			$oportunidades_totales = $examen->oportunidades;
-
-			    			$vidas_restantes = $vidas_totales;
-			    			$oportunidades_restantes = $oportunidades_totales;
-			    		}
-			    		if(isset($presenta)){
-			    			$vidas_restantes = intval($vidas_totales) - intval($presenta->vidas);
-			    			$oportunidades_restantes = intval($oportunidades_totales) - intval($presenta->oportunidades);
-			    		}
-
-			    		$tiempo = 0;
-			    		if(isset($preguntas)){
-				    		foreach ($preguntas as $pregunta) {
-				    			$tiempo = $tiempo + intval($pregunta->tiempo);
-				    		}
-				    	}
-				    	$minutos = $tiempo / 60;
-				    	$segundos = ($tiempo % 60) < 10 ? '0'.($tiempo % 60) : ($tiempo % 60) ;
-
-			    	?> -->
 			    <!-- /Informacion -->
-
-			    <!-- Informacion de Examen -->
-			    <!-- <div class="row">
-				    <p>-*- Estudia antes de presentar el examen -*-</p>
-				    <div class="col-xs-12">
-				    	<div class="col-xs-6">
-				    		<h4>Vidas: <?php echo $vidas_restantes.'/'.$vidas_totales; ?></h4>
-				    	</div>
-				    	<div class="col-xs-6">
-				    		<h4>Oportunidades: <?php echo $oportunidades_restantes.'/'.$oportunidades_totales; ?></h4>
-				    	</div>
-				    </div>
-
-				    <div class="col-xs-12">
-				    	<h4>Tiempo máximo: <?php echo $minutos.':'.$segundos ?> minutos</h4>
-				    </div>
-				    <br>
-				    <div class="col-xs-12">
-				    	<h4>Temas</h4>
-				    	<?php
-					    	if(isset($temas)){
-					    		foreach ($temas as $tema) {
-					    			echo '<p>'.$tema->nombre.'</p>';
-					    		}
-					    	}
-				    	?>
-				    </div>
-				    <br>
-				    <div class="col-xs-12">
-				    	<h4>Bibliografía</h4>
-				    	<?php
-					    	if(isset($fuentes)){
-					    		foreach ($fuentes as $fuente) {
-					    			echo '<p>'.$fuente->nombre.'</p>';
-					    		}
-					    	}
-				    	?>
-				    </div>
-				    <br>
-				    <?php
-					    	if(isset($preguntas)){
-					    		foreach ($preguntas as $pregunta) {
-					    			echo '<p>'.$pregunta->texto.'</p>';
-					    		}
-					    		SESSION::set('preguntas',$preguntas);
-					    		SESSION::set('siguiente_posicion_pregunta',0);
-					    	}
-				    	?>
-				    <div class="col-xs-12">
-				    	<button class="btn btn-primary btn-block btn-lg">Comenzar Examen</button>
-				    </div>
-			    </div> -->
-			    <!-- /Informacion de Examen -->
 			    
 			    <!-- /Contenido -->
 			</div>
@@ -194,9 +115,22 @@
                 <?php echo Form::button('abandonar', 'Abandonar', array('class' => 'btn btn-primary btn-block', 'value' => 'abandonar', 'type' => 'button')); ?>
             </div>
             <div class="col-xs-6">
-                <?php echo Form::button('evaluar', 'Evaluar', array('class' => 'btn btn-danger btn-block', 'value' => 'evaluar')); ?>
+                <?php echo Form::button('evaluar', 'Evaluar', array('class' => 'btn btn-danger btn-block', 'value' => 'evaluar', 'id' => 'boton_evaluar')); ?>
             </div>
             <?php echo Form::close(); ?>
         </div>
     </div>
 </footer>
+<script type="text/javascript">
+	function loop() {
+		if(typeof waiting === 'function'){
+			waiting();
+		}else{
+			setTimeout(function(){
+				loop();
+			},100);
+		}
+	}
+	loop();
+	
+</script>

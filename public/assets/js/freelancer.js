@@ -390,3 +390,31 @@ function agregaEstiloSelected(respuesta,otras_respuestas) {
     input_respuesta.value = respuesta.id.substring(string.length);
     //habilitar el boton de pregunta.
 }
+
+function waiting() {
+    const span_elemento = document.getElementById('tiempo');
+    let tiempo = span_elemento.innerHTML;
+    let begin = new Date();
+    const final = begin.getTime()+(parseInt(tiempo)+5)*1000;
+    let diferencia = 0;
+    let cuenta_regresiva = function () {
+        begin = new Date();
+        diferencia = final - begin.getTime();
+        console.log(diferencia, final, begin.getTime());
+        if(diferencia < 0){
+            alert("intentaste hacer trampa");
+        }else{
+            span_elemento.innerHTML = tiempo;       
+            if(tiempo == 0){
+                let sumbit = document.getElementById('boton_evaluar') || document.getElementById('form_boton_evaluar');
+                sumbit.click();
+            }else{
+                setTimeout(function(){
+                    tiempo--;
+                    cuenta_regresiva();
+                },1000);
+            }           
+        }
+    }
+    cuenta_regresiva();
+}

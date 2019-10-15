@@ -958,7 +958,7 @@ class Controller_Curso_Examen extends Controller_Template
 		$id_examen = 2; //Borrar
 		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
 		$preguntas = SESSION::get('preguntas_ids');
-		$preguntas = [8,9,10,11,12,13,14,15,16,17]; //Borrar
+		$preguntas = [28,29,30,31,32,33,34,35,36,37]; //Borrar
 
 		$respuesta_elegida = trim(Input::post('respuesta_elegida'));
 		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
