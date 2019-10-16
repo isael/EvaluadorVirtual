@@ -1030,4 +1030,91 @@ class Controller_Curso_Examen extends Controller_Template
 		$this->template->content = View::forge('curso/examen/presentando', $data);
 		// }
 	}
+
+	/**
+	 * Controlador que llevará a la pantalla previa a presentar un examen.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_evalua()
+	{
+		$id_curso = SESSION::get('id_curso');
+		$n_cuenta = SESSION::get('n_cuenta');
+		$id_examen = SESSION::get('id_examen');
+		$id_examen = 2; //Borrar
+		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
+		$preguntas = SESSION::get('preguntas_ids');
+		$preguntas = [28,29,30,31,32,33,34,35,36,37]; //Borrar
+
+		$respuesta_elegida = trim(Input::post('respuesta_elegida'));
+		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
+
+		$es_test = True;
+		$terminado = False;
+
+		if(isset($n_cuenta)){
+			SESSION::delete('n_cuenta');
+			$es_test = False;
+		}
+
+		if(isset($respuestas_ids_actuales)){
+			SESSION::delete('respuestas_ids');
+		}
+		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
+
+		if($respuesta_elegida !== null && $respuesta_elegida !== ''){
+			if(isset($siguiente_posicion_pregunta)){
+				$siguiente_posicion_pregunta_entero = intval($siguiente_posicion_pregunta);
+				$siguiente_posicion_pregunta_entero++;
+				if($siguiente_posicion_pregunta < intval($examen->preguntas_por_mostrar)){
+					SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta_entero);
+					$siguiente_posicion_pregunta = ''.$siguiente_posicion_pregunta_entero;
+				}else{
+					SESSION::delete('siguiente_posicion_pregunta');
+					$terminado = True;
+					 //Redireccionar al final
+				}
+			}else{
+				$siguiente_posicion_pregunta = '0';
+				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
+			}
+		}else{
+			 //En caso de no recibir respuesta.
+		}
+
+		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
+		$id_pregunta = $pregunta->id_pregunta;
+		$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+			    return $query->join('Contiene')
+							->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+							->where('Contiene.id_pregunta', $id_pregunta);
+			});
+		shuffle($respuestas);
+		$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
+		    	return $query->join('FundamentadoEn')
+		                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('ReferenciaFuente')
+		                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('Fuente')
+		                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+		                 ->join('Edicion')
+		                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+		                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+			});
+		$referencia = reset($_referencias);
+		$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
+
+		$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia);
+
+		$respuestas_ids = [];
+		foreach ($respuestas as $respuesta) {
+			array_push($respuestas_ids, $respuesta->id_respuesta);
+		}
+		SESSION::set('respuestas_ids',$respuestas_ids);
+
+		$mensaje = "";
+		$this->template->content = View::forge('curso/examen/presentando', $data);
+		// }
+	}
 }
