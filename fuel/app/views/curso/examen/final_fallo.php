@@ -37,18 +37,9 @@
 				<!-- Informacion -->
 					<div class="col-xs-12">
 						<div class="col-xs-12">
-							<h4>Calificación:</h4>
-						</div>
-						<div class="col-xs-12">
-							<?php
-								$factor = intval($examen->preguntas_por_mostrar)*10;
-								$puntaje_obtenido = SESSION::get('puntaje_obtenido');
-								if(isset($puntaje_obtenido)){
-									SESSION::delete('puntaje_obtenido');
-								}
-								$puntaje_obtenido = intval($puntaje_obtenido)/$factor;
-								echo  $puntaje_obtenido.'/10';
-							?>
+							<span>
+								Ya no tienes más oportunidades. Se te restará una vida. Intenta presentar el examen nuevamente luego de haber estudiado mejor.
+							</span>
 						</div>
 					</div>
 				<!-- /Informacion -->
