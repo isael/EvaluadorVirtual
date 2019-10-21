@@ -71,7 +71,7 @@
 				    	<div class="col-xs-6">
 				    		<span>Pregunta: </span>
 				    		<span id="pregunta">
-					    		<?php echo $siguiente_posicion_pregunta; ?>
+					    		<?php echo $siguiente_posicion_pregunta+1; ?>
 					    			de 
 					    		<?php echo sizeof($preguntas); ?>
 				    		</span>

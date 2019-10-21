@@ -428,7 +428,7 @@ class Modals
 			});
 			$bibliografia = reset($_bibliografias);
 			$pregunta_bibliografia = $bibliografia->nombre." - ".$bibliografia->autores.". Edición: ".$bibliografia->numero;
-			$pregunta_bibliografia_id = $bibliografia->id_fuente;
+			$pregunta_bibliografia_id = $bibliografia->id_fuente.'.'.$bibliografia->numero;
 			$pregunta_capitulo = $bibliografia->capitulo;
 			$pregunta_pagina = $bibliografia->pagina;
 
@@ -489,7 +489,7 @@ class Modals
 		$lista_de_fuentes = [];
 		if(isset($bibliografias)){
 			foreach ($bibliografias as $fuente) {
-				array_push($lista_de_fuentes, array($fuente->id_fuente, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
+				array_push($lista_de_fuentes, array($fuente->id_fuente.'.'.$fuente->numero, $fuente->nombre." - ".$fuente->autores.". Edición: ".$fuente->numero));
 			}
 		}
 

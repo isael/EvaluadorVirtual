@@ -70,6 +70,102 @@
 							?>
 						</div>
 					</div>
+					<br>
+					<div class="col-xs-12">
+						<div class="col-xs-12">
+							<?php
+								if(isset($errores)){
+									echo '<h4>Errores:</h4>';
+								}
+							?>
+						</div>
+						<div class="col-xs-12">
+							<?php
+								if(isset($errores)){
+									foreach ($errores as $error) {										
+										echo '<button class="btn btn-primary btn-block btn-lg" data-toggle="modal" data-target="#modalError'.$error['id_pregunta'].'">';
+					                        echo $error['titulo'];
+					                    echo '</button>';
+										echo '<br>';
+					                    echo '<div class="modal fade" id="modalError'.$error['id_pregunta'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">';
+						                	echo '<div class="modal-dialog" role="document">';
+							                    echo '<div class="modal-content">';
+								                    echo '<div class="modal-header">';
+								                        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+								                          echo '<span aria-hidden="true">&times;</span>';
+								                        echo '</button>';
+								                        echo '<h4 class="modal-title" id="myModalLabel">'.$error['titulo'].'</h4>';
+								                    echo '</div>';
+							                        echo '<div class="modal-body">';
+							                        	echo Form::open('curso/examen/crear_examen');
+							                          	echo '<div class="form-group">
+																<div class="col-xs-12 col-sm-12 table">
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::label('Pregunta', $error['id_pregunta']).'
+																	</div>
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::input($error['id_pregunta'],$error['texto_pregunta'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																	</div>
+																</div>
+															</div>';
+														echo '<div class="form-group">
+																<div class="col-xs-12 col-sm-12 table">
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::label('Respuesta dada', $error['id_respuesta']).'
+																	</div>
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::input($error['id_respuesta'],$error['texto_respuesta'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																	</div>
+																</div>
+															</div>';
+														echo '<div class="form-group">
+																<div class="col-xs-12 col-sm-12 table">
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::label('Respuesta correcta', $error['id_respuesta_correcta']).'
+																	</div>
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::input($error['id_respuesta_correcta'],$error['texto_respuesta_correcta'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																	</div>
+																</div>
+															</div>';
+														echo '<div class="form-group">
+																<div class="col-xs-12 col-sm-12 table">
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::label('Justificación', 'justificacion_'.$error['id_pregunta']).'
+																	</div>
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::input('justificacion_'.$error['id_pregunta'],$error['justificacion'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																	</div>
+																</div>
+															</div>';
+														echo '<div class="form-group">
+																<div class="col-xs-12 col-sm-12 table">
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::label('Bibliografía', 'bibliografia_'.$error['id_pregunta']).'
+																	</div>
+																	<div class="col-xs-12 col-sm-12">'.
+																		Form::input('bibliografia_'.$error['id_pregunta'],$error['bibliografia'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																	</div>
+																</div>
+															</div>';
+														echo Form::close();
+							                        echo '</div>';
+							                        echo '<div class="modal-footer">';
+							                            echo '<div class="row text-center">';
+							                              echo '<div class="col-xs-12">';
+							                                  echo '<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cerrar</button>';
+							                              echo '</div>';
+							                            echo '</div>';
+							                        echo '</div>';
+							                    echo '</div>';
+						                	echo '</div>';
+						                echo '</div>';
+									}
+								}
+							?>
+						</div>
+					</div>
+
 				<!-- /Informacion -->
 				
 				<!-- /Contenido -->
