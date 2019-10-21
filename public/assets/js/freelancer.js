@@ -403,6 +403,10 @@ function waiting() {
         console.log(diferencia, final, begin.getTime());
         if(diferencia < 0){
             alert("intentaste hacer trampa");
+            let input_respuesta = document.getElementById('respuesta_elegida') || document.getElementById('form_respuesta_elegida');
+            input_respuesta.value = '-1';
+            let sumbit = document.getElementById('boton_evaluar') || document.getElementById('form_boton_evaluar');
+            sumbit.click();
         }else{
             span_elemento.innerHTML = tiempo;       
             if(tiempo == 0){

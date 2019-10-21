@@ -853,10 +853,14 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_presentar($id_examen, $n_cuenta = null)
+	public function action_presentar($id_examen)
 	{		
 			SESSION::set('id_examen',$id_examen);
-			SESSION::set('n_cuenta',$n_cuenta);
+			$id = SESSION::get('id_sesion');
+			if(isset($id) && substr($id,0,1)=='a'){
+				$n_cuenta = substr($id,1);
+				SESSION::set('n_cuenta',$n_cuenta);
+			}
 			Response::redirect('curso/examen/presentar_inicio');
 	}
 
@@ -879,7 +883,6 @@ class Controller_Curso_Examen extends Controller_Template
 		}
 
 		if(isset($id_examen)){
-			// SESSION::delete('id_examen');
 			$examen = Model_Examen::find_one_by('id_examen',$id_examen);
 
 			$temas = Model_Tema::find(function ($query) use ($id_examen){
@@ -955,16 +958,15 @@ class Controller_Curso_Examen extends Controller_Template
 		$id_curso = SESSION::get('id_curso');
 		$n_cuenta = SESSION::get('n_cuenta');
 		$id_examen = SESSION::get('id_examen');
-		$id_examen = 2; //Borrar
 		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
 		$preguntas = SESSION::get('preguntas_ids');
-		$preguntas = [28,29,30,31,32,33,34,35,36,37]; //Borrar
 
-		// $respuesta_elegida = trim(Input::post('respuesta_elegida'));
-		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
+		$evaluado = SESSION::get('evaluado');
+		$limite_tiempo_pregunta = SESSION::get('limite_tiempo_pregunta');
 
 		$es_test = True;
 		$terminado = False;
+		$tiempo = -1;
 		if(isset($n_cuenta)){
 			$es_test = False;
 		}
@@ -972,16 +974,15 @@ class Controller_Curso_Examen extends Controller_Template
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
 		$fallas = SESSION::get('fallas');
 		if(isset($fallas)){
-			if(intval($fallas) > intval($examen->vidas)){
+			if(intval($fallas) > intval($examen->oportunidades)){
+				SESSION::delete('siguiente_posicion_pregunta');
+				$terminado = True;
 				Response::redirect('curso/examen/final');
 			}
 		}
 
-		if(isset($respuestas_ids_actuales)){
-			SESSION::delete('respuestas_ids');
-		}
-
-		// if($respuesta_elegida !== null && $respuesta_elegida !== ''){
+		if(isset($evaluado) && $evaluado == True && !$terminado){
+			SESSION::delete('evaluado');
 			if(isset($siguiente_posicion_pregunta)){
 				$siguiente_posicion_pregunta_entero = intval($siguiente_posicion_pregunta);
 				$siguiente_posicion_pregunta_entero++;
@@ -997,12 +998,28 @@ class Controller_Curso_Examen extends Controller_Template
 				$siguiente_posicion_pregunta = '0';
 				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
 			}
-		// }else{
-			 //En caso de no recibir respuesta.
-		// }
+		}else{
+			 //En caso de recargar pregunta
+			if(isset($siguiente_posicion_pregunta)){
+				if(isset($limite_tiempo_pregunta)){
+					$tiempo = $limite_tiempo_pregunta - time();
+				}
+			}else{
+				$siguiente_posicion_pregunta = '0';
+				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
+			}
+		}
 
 		if(!$terminado){
 			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
+
+
+			if(!isset($limite_tiempo_pregunta)){
+				SESSION::set('limite_tiempo_pregunta',time()+(30));
+			}
+			$tiempo = $tiempo < 0 ? $pregunta->tiempo : $tiempo;
+
+
 			$id_pregunta = $pregunta->id_pregunta;
 			$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
 				    return $query->join('Contiene')
@@ -1024,7 +1041,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$referencia = reset($_referencias);
 			$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
 
-			$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia);
+			$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia, 'tiempo' => $tiempo);
 
 			$respuestas_ids = [];
 			foreach ($respuestas as $respuesta) {
@@ -1050,10 +1067,9 @@ class Controller_Curso_Examen extends Controller_Template
 		$n_cuenta = SESSION::get('n_cuenta');
 		$id_examen = SESSION::get('id_examen');
 		$puntaje_obtenido = SESSION::get('puntaje_obtenido');
-		$id_examen = 2; //Borrar
+		$limite_tiempo_pregunta = SESSION::get('limite_tiempo_pregunta');
 		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
 		$preguntas = SESSION::get('preguntas_ids');
-		$preguntas = [28,29,30,31,32,33,34,35,36,37]; //Borrar
 
 		$respuesta_elegida = trim(Input::post('respuesta_elegida'));
 		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
@@ -1064,6 +1080,9 @@ class Controller_Curso_Examen extends Controller_Template
 
 		if(isset($n_cuenta)){
 			$es_test = False;
+		}
+		if(isset($limite_tiempo_pregunta)){
+			SESSION::delete('limite_tiempo_pregunta');
 		}
 
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
@@ -1109,8 +1128,13 @@ class Controller_Curso_Examen extends Controller_Template
 			SESSION::set('respuestas_no_exitosas',$respuestas_no_exitosas);
 		}
 
-		$data = array('examen' => $examen, 'evaluacion' => $evaluacion);
 
+		if(isset($respuestas_ids_actuales)){
+			SESSION::delete('respuestas_ids');
+		}
+
+		$data = array('examen' => $examen, 'evaluacion' => $evaluacion);
+		SESSION::set('evaluado',True);
 		$mensaje = "";
 		$this->template->content = View::forge('curso/examen/evalua', $data);
 		// }
@@ -1127,13 +1151,9 @@ class Controller_Curso_Examen extends Controller_Template
 		$id_curso = SESSION::get('id_curso');
 		$n_cuenta = SESSION::get('n_cuenta');
 		$id_examen = SESSION::get('id_examen');
-		$id_examen = 2; //Borrar
-		$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
-		$preguntas = SESSION::get('preguntas_ids');
-		$preguntas = [28,29,30,31,32,33,34,35,36,37]; //Borrar
-
-		$respuesta_elegida = trim(Input::post('respuesta_elegida'));
-		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
+		$puntaje_obtenido = SESSION::get('puntaje_obtenido');
+		$respuestas_no_exitosas = SESSION::get('respuestas_no_exitosas');
+		$preguntas_ids = SESSION::get('preguntas_ids');
 
 		$es_test = True;
 		$terminado = False;
@@ -1144,12 +1164,15 @@ class Controller_Curso_Examen extends Controller_Template
 		}
 		if(isset($id_examen)){
 			SESSION::delete('id_examen');
+			SESSION::delete('preguntas_ids');
+			SESSION::delete('puntaje_obtenido');
+			SESSION::delete('respuestas_no_exitosas');
 		}
 
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
-		$data = array('examen' => $examen);
+		$data = array('examen' => $examen, 'puntaje_obtenido' => $puntaje_obtenido);
 		$fallas = SESSION::get('fallas');
-		if(isset($fallas) && intval($fallas) > intval($examen->vidas)){
+		if(isset($fallas) && intval($fallas) > intval($examen->oportunidades)){
 			$this->template->content = View::forge('curso/examen/final_fallo', $data);
 		}else{
 			$this->template->content = View::forge('curso/examen/final', $data);

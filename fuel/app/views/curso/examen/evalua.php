@@ -8,15 +8,10 @@
 					<div class="col-xs-4">
 						<?php echo "Vidas: "; ?>
 						<?php
-							$fallas = SESSION::get('fallas');
 							$vidas_posibles = intval($examen->vidas);
 							$vidas_usadas = 0;
 							if(isset($presenta)){
 								$vidas_usadas = intval($presenta->vidas);
-							}else{
-								if(isset($fallas)){
-									$vidas_usadas = $fallas;
-								}
 							}
 							$vidas_totales = $vidas_posibles - $vidas_usadas;
 							for ($i=0; $i < $vidas_totales; $i++) { 
@@ -33,17 +28,22 @@
 					<div class="col-xs-4">
 						<?php echo "Oportunidades: "; ?>
 						<?php
+							$fallas = SESSION::get('fallas');
 							$oportunidades_posibles = intval($examen->oportunidades);
 							$oportunidades_usadas = 0;
 							if(isset($presenta)){
 								$oportunidades_usadas = intval($presenta->oportunidades);
+							}else{
+								if(isset($fallas)){
+									$oportunidades_usadas = $fallas > $oportunidades_posibles ? $oportunidades_posibles : $fallas;
+								}
 							}
 							$oportunidades_totales = $oportunidades_posibles - $oportunidades_usadas;
 							for ($i=0; $i < $oportunidades_totales; $i++) { 
-								echo '<i class="fa fa-heart" aria-hidden="true"></i>';
+								echo '<i class="fa fa-star" aria-hidden="true"></i>';
 							}
 							for ($i=0; $i < $oportunidades_usadas; $i++) { 
-								echo '<i class="fa fa-heart-o" aria-hidden="true"></i>';
+								echo '<i class="fa fa-star-o" aria-hidden="true"></i>';
 							}
 						?>
 					</div>
@@ -85,7 +85,6 @@
         <div class="row">
         	<?php echo Form::open('curso/examen/presentando'); ?>           
             <div class="col-xs-6">
-				<?php echo Form::input('respuesta_elegida','',array('type' => 'hidden'));?>
                 <?php echo Form::button('abandonar', 'Abandonar', array('class' => 'btn btn-primary btn-block', 'value' => 'abandonar', 'type' => 'button')); ?>
             </div>
             <div class="col-xs-6">

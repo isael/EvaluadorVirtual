@@ -8,12 +8,16 @@
 					<div class="col-xs-4">
 						<?php echo "Vidas: "; ?>
 						<?php
-							$fallas = SESSION::get('fallas');
-							if(isset($fallas)){
-								SESSION::delete('fallas');
-							}
 							$vidas_posibles = intval($examen->vidas);
-							for ($i=0; $i < $vidas_posibles; $i++) { 
+							$vidas_usadas = 1;
+							if(isset($presenta)){
+								$vidas_usadas = intval($presenta->vidas);
+							}
+							$vidas_totales = $vidas_posibles - $vidas_usadas;
+							for ($i=0; $i < $vidas_totales; $i++) { 
+								echo '<i class="fa fa-heart" aria-hidden="true"></i>';
+							}
+							for ($i=0; $i < $vidas_usadas; $i++) { 
 								echo '<i class="fa fa-heart-o" aria-hidden="true"></i>';
 							}
 						?>
@@ -24,9 +28,13 @@
 					<div class="col-xs-4">
 						<?php echo "Oportunidades: "; ?>
 						<?php
+							$fallas = SESSION::get('fallas');
+							if(isset($fallas)){
+								SESSION::delete('fallas');
+							}
 							$oportunidades_posibles = intval($examen->oportunidades);
 							for ($i=0; $i < $oportunidades_posibles; $i++) { 
-								echo '<i class="fa fa-heart-o" aria-hidden="true"></i>';
+								echo '<i class="fa fa-star-o" aria-hidden="true"></i>';
 							}
 						?>
 					</div>

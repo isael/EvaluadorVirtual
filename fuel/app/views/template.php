@@ -44,6 +44,17 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
             echo $color;
         }
     ?>">
+    <noscript>
+        <h1>Se detectó un problema con Javascript</h1>
+        <div class="deshabilitado">
+            Parece que Javascript no está habilitado.Para un correcto funcionamiento,
+            <b><i>habilite javascript</i></b>.<br/>
+            <br/>
+            Accede en la siguiente liga y sigue las instrucciones para activarlo.<br/>
+            <a href="http://www.enable-javascript.com/es/" 
+            target="_blank">Instrucciones para habilitar javascript</a>.
+        </div>
+    </noscript>
 <!-- Navigation -->
 	<?php 
         if(isset($nav_bar)){

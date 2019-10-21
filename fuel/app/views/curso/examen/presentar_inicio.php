@@ -89,14 +89,6 @@
 				    	?>
 				    </div>
 				    <br>
-				    <?php
-				    		echo "BORRAME";
-					    	if(isset($preguntas)){
-					    		foreach ($preguntas as $pregunta) {
-					    			echo '<p>'.$pregunta->id_pregunta.'</p>';
-					    		}
-					    	}
-				    	?>
 				    <div class="col-xs-12">
 				    	<?php echo Html::anchor('curso/examen/presentando','Comenzar Examen',array('class'=>'btn btn-primary btn-block btn-lg')); ?>
 				    </div>
