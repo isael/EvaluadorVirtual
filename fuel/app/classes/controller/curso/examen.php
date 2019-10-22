@@ -1096,6 +1096,11 @@ class Controller_Curso_Examen extends Controller_Template
 		$hubo_respuesta = True;
 		$id_respuesta_elegida = $respuestas_ids_actuales[intval($respuesta_elegida)];
 
+		if(!isset($respuestas_ids_actuales)){
+			Response::redirect('curso/examen/presentando');
+			die();
+		}
+
 		if(isset($n_cuenta)){
 			$es_test = False;
 		}
@@ -1181,6 +1186,11 @@ class Controller_Curso_Examen extends Controller_Template
 		$terminado = False;
 		$evaluacion = 0;
 
+		if(!isset($id_examen)){
+			Response::redirect('curso/examenes');
+			die();
+		}
+
 		if(isset($n_cuenta)){
 			$es_test = False;
 		}
@@ -1237,7 +1247,7 @@ class Controller_Curso_Examen extends Controller_Template
 		$data = array('examen' => $examen, 'puntaje_obtenido' => $puntaje_obtenido, 'errores' => $errores);
 		$fallas = SESSION::get('fallas');
 
-		if(isset($id_examen)){
+		if(isset($id_examen)){// Comentar para crear los reclamos ISAEL
 			SESSION::delete('id_examen');
 			SESSION::delete('preguntas_ids');
 			SESSION::delete('puntaje_obtenido');
