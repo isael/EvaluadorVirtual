@@ -103,7 +103,9 @@ class Controller_Curso extends Controller_Template
 
 			$id_curso = SESSION::get('id_curso');
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
-			
+			if($curso == null){
+				Response::redirect('sesion/index');
+			}
 			$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
 			    return $query->join('Cursa')
 			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
@@ -224,8 +226,8 @@ class Controller_Curso extends Controller_Template
 	public function action_examenes()
 	{	
 		$id=SESSION::get('id_sesion');
-		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
-			$id_curso = SESSION::get('id_curso');
+		$id_curso = SESSION::get('id_curso');
+		if(isset($id) && isset($id_curso) && ($tipo_usuario = substr($id,0,1))=='p'){
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 			
 			$examenes = Model_Examen::find(function ($query) use ($id_curso){
@@ -233,25 +235,52 @@ class Controller_Curso extends Controller_Template
 			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
 			                 ->where('Evalua.id_curso', $id_curso)
 			                 ->order_by('Evalua.id_examen');
-			});			
-			if(isset($examenes)){
-				$id_examenes = array();
-				foreach ($examenes as $examen) {
-					$id_examenes[] = $examen->id_examen;
-				}
-				$temas = Model_Tema::find(function ($query) use ($id_examenes){
-			    return $query->join('BasadoEn')
-			                 ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			                 ->where('BasadoEn.id_examen', 'IN', $id_examenes)
-			                 ->order_by('BasadoEn.id_examen');
-				});
-			}else{
-				$temas = null;
-			}
+			});
+			// if(isset($examenes)){
+			// 	$id_examenes = array();
+			// 	foreach ($examenes as $examen) {
+			// 		$id_examenes[] = $examen->id_examen;
+			// 	}
+			// 	$temas = Model_Tema::find(function ($query) use ($id_examenes){
+			//     return $query->join('BasadoEn')
+			//                  ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
+			//                  ->where('BasadoEn.id_examen', 'IN', $id_examenes)
+			//                  ->order_by('BasadoEn.id_examen');
+			// 	});
+			// }else{
+			// 	$temas = null;
+			// }
 
-			
+			$temas = Model_Tema::find(function ($query) use ($id_curso){
+				return $query->join('CursoTema')
+			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+			                 ->where('CursoTema.id_curso', '=', $id_curso);
+			});
 
-			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes);
+			$tipos = Model_Tipo::find_all();
+
+			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso){
+			    return $query->join('Genera')
+			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->join('Tema')
+			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
+			                 ->join('CursoTema')
+			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+			                 ->where('CursoTema.id_curso', '=', $id_curso)
+			                 ->order_by('Tema.nombre')
+			                 ->order_by('Pregunta.id_pregunta');
+			});
+
+			$bibliografias = Model_Fuente::find(function ($query) use ($id_curso){
+			    return $query->join('Edicion')
+			                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+			                 ->join('CursoFuente')
+			                 ->on('CursoFuente.id_fuente', '=', 'Fuente.id_fuente')
+			                 ->where('CursoFuente.id_curso', $id_curso)
+			                 ->order_by('Fuente.nombre');
+			});
+
+			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas, 'tipos' => $tipos);
 			
 			$this->template->content = View::forge('curso/examenes', $data);
 		}else{
@@ -313,30 +342,6 @@ class Controller_Curso extends Controller_Template
 		}else{
 			Response::redirect('sesion/index');
 		}
-	}
-
-	/**
-	 * Controlador que muestra las estadisticas del alumno
-	 *
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_crear_examen()
-	{	
-		$nombre_examen = trim(Input::post('nombre_examen'));
-		$id_curso = SESSION::get('id_curso');
-		if(isset($nombre_examen) && $nombre_examen!=""){			
-			$examen = new Model_Examen();
-			$examen->nombre = $nombre_examen;
-			$examen->save();
-
-			$evalua = new Model_Evalua();
-			$evalua->id_examen = $examen->id_examen;
-			$evalua->id_curso = $id_curso;
-			$evalua->save();
-		}
-		Response::redirect('curso/examenes');
-
 	}
 
 }

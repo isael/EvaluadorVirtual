@@ -63,7 +63,6 @@ class Controller_Sesion extends Controller_Template
 	 */
 	public function action_cerrar()
 	{
-		SESSION::delete('id_sesion');
 		Response::redirect('principal/cerrar');
 	}
 

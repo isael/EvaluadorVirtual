@@ -6,9 +6,10 @@ class Model_Examen extends \Model_Crud{
 		'nombre',
 		'fecha_inicio',
 		'fecha_fin',
-		'tiempo',
 		'oportunidades',
-		'vidas'
+		'vidas',
+		'preguntas_por_mostrar',
+		'preguntas_por_mezclar',
 
 );
 
