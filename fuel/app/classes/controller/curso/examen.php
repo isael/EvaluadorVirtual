@@ -30,7 +30,7 @@ class Controller_Curso_Examen extends Controller_Template
         parent::before();
         $this->template->nav_bar = View::forge('nav_bar_sesion');
         $this->template->title = "Evaluador Virtual";
-     
+
     }
 
 	/**
@@ -235,7 +235,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$edicion = Model_Edicion::find(array($fuente->id_fuente, $numero ));
 			}
 		}
-			
+
 		if($edicion==null){
 			if($nombre==null||$nombre===""){
 				$error=True;
@@ -269,7 +269,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$error=True;
 				$mensaje=$mensaje."El campo de Enlace en línea no contiene el formato válido (i.e. http://servidor.com/archivo.pdf).<br>";
 			}
-		
+
 			if(!$error){
 				if($modificar_bibliografia){
 					$fuente = Model_Fuente::find_one_by('id_fuente',$id_fuente);
@@ -316,8 +316,8 @@ class Controller_Curso_Examen extends Controller_Template
 
 					$mensaje = "La bibliografía ".$fuente->nombre." número ".$nueva_edicion->numero." ha sido registrada con éxito.";
 				}
-				
-				
+
+
 			}
 
 		}else{
@@ -504,7 +504,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$error=True;
 			$mensaje=$mensaje."El campo de Justificación está vacío.<br>";
 		}
-	
+
 		if(!$error){
 			/* Bibliografías */
 
@@ -544,7 +544,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$fuente_iguales = ($new_referencia_fuente->id_fuente === $fuente->id_fuente);
 						if(!$fuente_iguales){
 							$new_referencia_fuente->delete();
-							$new_referencia_fuente = new Model_ReferenciaFuente();							
+							$new_referencia_fuente = new Model_ReferenciaFuente();
 							$new_referencia_fuente->id_fuente = $fuente->id_fuente;
 							$new_referencia_fuente->id_referencia = $id_referencia;
 							$new_referencia_fuente->numero_edicion = $fuente->numero;
@@ -869,7 +869,7 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @return  Response
 	 */
 	public function action_presentar($id_examen)
-	{		
+	{
 			SESSION::set('id_examen',$id_examen);
 			$id = SESSION::get('id_sesion');
 			if(isset($id) && substr($id,0,1)=='a'){
@@ -893,12 +893,34 @@ class Controller_Curso_Examen extends Controller_Template
 		$es_test = True;
 
 		if(isset($n_cuenta)){
-			SESSION::delete('n_cuenta');
 			$es_test = False;
 		}
 
 		if(isset($id_examen)){
 			$examen = Model_Examen::find_one_by('id_examen',$id_examen);
+
+			$presenta = null;
+			if(!$es_test){
+				$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
+				if(isset($presenta)){
+					if(!($presenta->vidas < $examen->vidas)){
+						Response::redirect('curso/examen/final/sin_vidas');
+						die();
+					}else{
+						$presenta->oportunidades = 0;
+						$presenta->save();
+					}
+				}else{
+					$presenta = new Model_Presenta();
+					$presenta->id_examen = $id_examen;
+					$presenta->n_cuenta = $n_cuenta;
+					$presenta->vidas = 0;
+					$presenta->oportunidades = 0;
+					$presenta->calificacion = 0;
+					$presenta->save();
+
+				}
+			}
 
 			$temas = Model_Tema::find(function ($query) use ($id_examen){
 			    return $query->join('BasadoEn')
@@ -930,11 +952,6 @@ class Controller_Curso_Examen extends Controller_Template
 				$preguntas = array_slice($preguntas, 0, intval($examen->preguntas_por_mostrar));
 			}
 
-			$presenta = null;
-			if(!$es_test){
-				//se llena Presenta
-			}
-
 			$fuentes = Model_Fuente::find(function ($query) use ($temas_ids){
 			    return $query->select('nombre')
 							->join('TemaFuente')
@@ -954,7 +971,7 @@ class Controller_Curso_Examen extends Controller_Template
 				SESSION::set('preguntas_ids',$preguntas_ids);
 			}
 
-				
+
 			$this->template->content = View::forge('curso/examen/presentar_inicio', $data);
 		}else{
 			SESSION::set('pestania','edicion');
@@ -980,23 +997,22 @@ class Controller_Curso_Examen extends Controller_Template
 		$limite_tiempo_pregunta = SESSION::get('limite_tiempo_pregunta');
 
 		$es_test = True;
-		$terminado = False;
 		$tiempo = -1;
 		if(isset($n_cuenta)){
 			$es_test = False;
 		}
 
+		$presenta = null;
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
 		$fallas = SESSION::get('fallas');
 		if(isset($fallas)){
 			if(intval($fallas) > intval($examen->oportunidades)){
 				SESSION::delete('siguiente_posicion_pregunta');
-				$terminado = True;
 				Response::redirect('curso/examen/final');
+				die();
 			}
 		}
-
-		if(isset($evaluado) && $evaluado == True && !$terminado){
+		if(isset($evaluado) && $evaluado == True){
 			SESSION::delete('evaluado');
 			if(isset($siguiente_posicion_pregunta)){
 				$siguiente_posicion_pregunta_entero = intval($siguiente_posicion_pregunta);
@@ -1006,12 +1022,12 @@ class Controller_Curso_Examen extends Controller_Template
 					$siguiente_posicion_pregunta = ''.$siguiente_posicion_pregunta_entero;
 				}else{
 					SESSION::delete('siguiente_posicion_pregunta');
-					$terminado = True;
 					Response::redirect('curso/examen/final');
+					die();
 				}
-			}else{
-				$siguiente_posicion_pregunta = '0';
-				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
+			}else{//No debería entrar a este caso ya que si fue evaluado, no podrá ser el siguiente cero
+				// $siguiente_posicion_pregunta = '0';
+				// SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
 			}
 		}else{
 			 //En caso de recargar pregunta
@@ -1019,55 +1035,61 @@ class Controller_Curso_Examen extends Controller_Template
 				if(isset($limite_tiempo_pregunta)){
 					$tiempo = $limite_tiempo_pregunta - time();
 				}
-			}else{
+			}else{//Entra por primera vez
 				$siguiente_posicion_pregunta = '0';
 				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
+				if(!$es_test){
+					$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
+					if(isset($presenta)){
+						$vidas_usadas = $presenta->vidas;
+						$presenta->vidas = $vidas_usadas+1;
+						$presenta->save();
+					}
+				}
 			}
 		}
 
-		if(!$terminado){
-			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
+
+		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
 
 
-			if(!isset($limite_tiempo_pregunta)){
-				SESSION::set('limite_tiempo_pregunta',time()+(30));
-			}
-			$tiempo = $tiempo < 0 ? $pregunta->tiempo : $tiempo;
-
-
-			$id_pregunta = $pregunta->id_pregunta;
-			$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-				    return $query->join('Contiene')
-								->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
-								->where('Contiene.id_pregunta', $id_pregunta);
-				});
-			shuffle($respuestas);
-			$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
-			    	return $query->join('FundamentadoEn')
-			                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
-			                 ->join('ReferenciaFuente')
-			                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-			                 ->join('Fuente')
-			                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
-			                 ->join('Edicion')
-			                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
-			                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
-			                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
-				});
-			$referencia = reset($_referencias);
-			$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
-
-			$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia, 'tiempo' => $tiempo);
-
-			$respuestas_ids = [];
-			foreach ($respuestas as $respuesta) {
-				array_push($respuestas_ids, $respuesta->id_respuesta);
-			}
-			SESSION::set('respuestas_ids',$respuestas_ids);
-
-			$mensaje = "";
-			$this->template->content = View::forge('curso/examen/presentando', $data);
+		if(!isset($limite_tiempo_pregunta)){
+			SESSION::set('limite_tiempo_pregunta',time()+(30));
 		}
+		$tiempo = $tiempo < 0 ? $pregunta->tiempo : $tiempo;
+
+
+		$id_pregunta = $pregunta->id_pregunta;
+		$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+			    return $query->join('Contiene')
+							->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+							->where('Contiene.id_pregunta', $id_pregunta);
+			});
+		shuffle($respuestas);
+		$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
+				return $query->join('FundamentadoEn')
+		                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('ReferenciaFuente')
+		                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('Fuente')
+		                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+		                 ->join('Edicion')
+		                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+		                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
+		                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+			});
+		$referencia = reset($_referencias);
+
+		$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia, 'tiempo' => $tiempo);
+
+		$respuestas_ids = [];
+		foreach ($respuestas as $respuesta) {
+			array_push($respuestas_ids, $respuesta->id_respuesta);
+		}
+		SESSION::set('respuestas_ids',$respuestas_ids);
+
+		$mensaje = "";
+		$this->template->content = View::forge('curso/examen/presentando', $data);
 		// }
 	}
 
@@ -1091,7 +1113,6 @@ class Controller_Curso_Examen extends Controller_Template
 		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
 
 		$es_test = True;
-		$terminado = False;
 		$evaluacion = 0;
 		$hubo_respuesta = True;
 		$id_respuesta_elegida = $respuestas_ids_actuales[intval($respuesta_elegida)];
@@ -1118,7 +1139,7 @@ class Controller_Curso_Examen extends Controller_Template
 		$id_pregunta = $pregunta->id_pregunta;
 		$respuesta = $hubo_respuesta ? Model_Respuesta::find_one_by('id_respuesta',$id_respuesta_elegida) : null ;
 
-		$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
+		$presenta = null;
 
 		$evaluacion = $hubo_respuesta ? intval($respuesta->porcentaje) : 0;
 		$fallas = 0;
@@ -1136,6 +1157,14 @@ class Controller_Curso_Examen extends Controller_Template
 
 		}else{
 			if($evaluacion == 0){
+				if(!$es_test){
+					$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
+					if(isset($presenta)){
+						$oportunidades_usadas = $presenta->oportunidades;
+						$presenta->oportunidades = $oportunidades_usadas + 1;
+						$presenta->save();
+					}
+				}
 				$fallas = SESSION::get('fallas');
 				if(isset($fallas)){
 					$fallas++;
@@ -1160,7 +1189,7 @@ class Controller_Curso_Examen extends Controller_Template
 			SESSION::delete('respuestas_ids');
 		}
 
-		$data = array('examen' => $examen, 'evaluacion' => $evaluacion);
+		$data = array('examen' => $examen, 'presenta' => $presenta, 'evaluacion' => $evaluacion);
 		SESSION::set('evaluado',True);
 		$mensaje = "";
 		$this->template->content = View::forge('curso/examen/evalua', $data);
@@ -1173,7 +1202,7 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_final()
+	public function action_final($ruta_especial = null)
 	{
 		$id_curso = SESSION::get('id_curso');
 		$n_cuenta = SESSION::get('n_cuenta');
@@ -1183,12 +1212,31 @@ class Controller_Curso_Examen extends Controller_Template
 		$preguntas_ids = SESSION::get('preguntas_ids');
 
 		$es_test = True;
-		$terminado = False;
 		$evaluacion = 0;
 
 		if(!isset($id_examen)){
 			Response::redirect('curso/examenes');
 			die();
+		}
+
+		if(isset($ruta_especial)){
+			switch ($ruta_especial) {
+				case 'sin_vidas':
+					SESSION::delete('id_examen');
+					SESSION::delete('preguntas_ids');
+					SESSION::delete('puntaje_obtenido');
+					SESSION::delete('respuestas_no_exitosas');
+					SESSION::delete('n_cuenta');
+					SESSION::delete('fallas');
+					$data = null;
+					$this->template->content = View::forge('curso/examen/final_sin_vidas', $data);
+					die();
+					break;
+
+				default:
+					# code...
+					break;
+			}
 		}
 
 		if(isset($n_cuenta)){

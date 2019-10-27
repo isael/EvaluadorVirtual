@@ -70,19 +70,28 @@ class Controller_Curso extends Controller_Template
 	public function action_alumno()
 	{
 		$id=SESSION::get('id_sesion');
+		if(isset($volver) && $volver === 'volver'){
+			SESSION::delete('id_examen');
+		}
 		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='a'){
 			$id_curso = SESSION::get('id_curso');
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+			$hoy = date('Y-m-d H:i:s');
 			
-			/*$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
-			    return $query->join('Cursa')
-			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
-			                 ->where('Cursa.id_curso', $id_curso)
-			                 ->order_by('Cursa.estado');
-			});*/
-			$alumnos=null;
+			$examenes = Model_Examen::find(function ($query) use ($id_curso, $hoy){
+			    return $query->join('Evalua')
+			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			                 ->where('Evalua.id_curso', $id_curso)
+			                 ->order_by('Examen.fecha_fin');
+			});
+			$examenes_disponibles=[];
+			foreach ($examenes as $examen) {
+				if($examen->fecha_fin >= $hoy && $examen->fecha_inicio <= $hoy){
+					array_push($examenes_disponibles, $examen->id_examen);
+				}
+			}
 
-			$data = array('curso' => $curso, 'alumnos' => $alumnos);
+			$data = array('curso' => $curso, 'examenes' => $examenes, 'examenes_disponibles' => $examenes_disponibles, 'hoy' => $hoy);
 			$this->template->content = View::forge('curso/alumno', $data);
 		}else{
 			Response::redirect('sesion/index');
@@ -223,9 +232,12 @@ class Controller_Curso extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_examenes()
+	public function action_examenes($volver = null)
 	{	
 		$id=SESSION::get('id_sesion');
+		if(isset($volver) && $volver === 'volver'){
+			SESSION::delete('id_examen');
+		}
 		$id_curso = SESSION::get('id_curso');
 		if(isset($id) && isset($id_curso) && ($tipo_usuario = substr($id,0,1))=='p'){
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
@@ -236,20 +248,6 @@ class Controller_Curso extends Controller_Template
 			                 ->where('Evalua.id_curso', $id_curso)
 			                 ->order_by('Evalua.id_examen');
 			});
-			// if(isset($examenes)){
-			// 	$id_examenes = array();
-			// 	foreach ($examenes as $examen) {
-			// 		$id_examenes[] = $examen->id_examen;
-			// 	}
-			// 	$temas = Model_Tema::find(function ($query) use ($id_examenes){
-			//     return $query->join('BasadoEn')
-			//                  ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			//                  ->where('BasadoEn.id_examen', 'IN', $id_examenes)
-			//                  ->order_by('BasadoEn.id_examen');
-			// 	});
-			// }else{
-			// 	$temas = null;
-			// }
 
 			$temas = Model_Tema::find(function ($query) use ($id_curso){
 				return $query->join('CursoTema')
