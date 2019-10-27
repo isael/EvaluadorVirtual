@@ -466,9 +466,9 @@
 			echo ",";
 		}
 		echo "}";
-	 ?>;
-	 <?php
-	 if(isset($idExamen)){
+	?>;
+	<?php
+	if(isset($idExamen)){
 		?>
 			let botonModalExamen = document.createElement('button');
 			botonModalExamen.setAttribute('data-toggle','modal');
@@ -484,10 +484,10 @@
 			},100);
 
 		<?php
-	 }
-	 ?>
-	 <?php
-	 if(isset($idPregunta)){
+	}
+	?>
+	<?php
+	if(isset($idPregunta)){
 		?>
 			let botonModalPregunta = document.createElement('button');
 			botonModalPregunta.setAttribute('data-toggle','modal');
@@ -501,10 +501,10 @@
 			},100);
 
 		<?php
-	 }
-	 ?>
-	 <?php
-	 if(isset($idFuente)){
+	}
+	?>
+	<?php
+	if(isset($idFuente)){
 		?>
 			let botonModalBibliografia = document.createElement('button');
 			botonModalBibliografia.setAttribute('data-toggle','modal');
@@ -518,6 +518,6 @@
 			},100);
 
 		<?php
-	 }
-	 ?>
+	}
+	?>
 </script>
