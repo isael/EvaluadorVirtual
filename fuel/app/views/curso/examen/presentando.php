@@ -124,6 +124,10 @@
 					</div>
 				<!-- /Informacion -->
 
+				<!-- Modal -->
+					<?php echo Modals::getModalAbandonar(); ?>
+				<!-- /Modal -->
+
 				<!-- /Contenido -->
 			</div>
 		</div>
@@ -136,14 +140,14 @@
 			<?php echo Form::open('curso/examen/evalua'); ?>
 			<div class="col-xs-6">
 				<?php echo Form::input('respuesta_elegida','',array('type' => 'hidden'));?>
-				<?php echo Form::button('abandonar', 'Abandonar', array('class' => 'btn btn-primary btn-block', 'value' => 'abandonar', 'type' => 'button')); ?>
-			</div>
-			<div class="col-xs-6">
-				<?php echo Form::button('evaluar', 'Evaluar', array('class' => 'btn btn-danger btn-block', 'value' => 'evaluar', 'id' => 'boton_evaluar')); ?>
-			</div>
-			<?php echo Form::close(); ?>
-		</div>
-	</div>
+                <?php echo Form::button('abandonar', 'Abandonar', array('class' => 'btn btn-primary btn-block', 'value' => 'abandonar', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalAbandonar')); ?>
+            </div>
+            <div class="col-xs-6">
+                <?php echo Form::button('evaluar', 'Evaluar', array('class' => 'btn btn-danger btn-block', 'value' => 'evaluar', 'id' => 'boton_evaluar')); ?>
+            </div>
+            <?php echo Form::close(); ?>
+        </div>
+    </div>
 </footer>
 <script type="text/javascript">
 	function loop() {

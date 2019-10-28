@@ -638,4 +638,39 @@ class Modals
 		$result = $result.Form::close();
 		return $result;
 	}
+
+	public static function getModalAbandonar($value='')
+	{
+		echo '<div class="modal fade" id="modalAbandonar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">';
+        	echo '<div class="modal-dialog" role="document">';
+                echo '<div class="modal-content">';
+                    echo '<div class="modal-header">';
+                        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+                          echo '<span aria-hidden="true">&times;</span>';
+                        echo '</button>';
+                        echo '<h4 class="modal-title" id="myModalLabel"> Abandonando Examen </h4>';
+                    echo '</div>';
+                    echo '<div class="modal-body">';
+                      	echo '<div class="form-group">
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-12 col-sm-12">
+										¿Estás seguro de salir del examen? Esto te restará una vida y afectará tu calificación
+									</div>
+								</div>
+							</div>';
+                    echo '</div>';
+                    echo '<div class="modal-footer">';
+                        echo '<div class="row text-center">';
+                          echo '<div class="col-xs-6">';
+                              echo '<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cerrar</button>';
+                          echo '</div>';
+                          echo '<div class="col-xs-6">';
+                              echo Html::anchor('curso/examen/final','Abandonar',array('class'=>'btn btn-primary btn-block btn-lg'));
+                          echo '</div>';
+                        echo '</div>';
+                    echo '</div>';
+                echo '</div>';
+        	echo '</div>';
+        echo '</div>';
+	}
 }

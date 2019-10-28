@@ -70,9 +70,17 @@
 							<?php
 								echo $evaluacion;
 							?>
-						</div>
+						</div>						
+						<div class="col-xs-12">
+				    		<span>Tiempo restante para comenzar la siguiente pregunta: </span>
+				    		<span id="tiempo"> 15</span>
+				    	</div>
 					</div>
 				<!-- /Informacion -->
+
+			    <!-- Modal -->
+			    	<?php echo Modals::getModalAbandonar(); ?>
+			    <!-- /Modal -->
 
 				<!-- /Contenido -->
 			</div>
@@ -94,3 +102,16 @@
 		</div>
 	</div>
 </footer>
+<script type="text/javascript">
+	function loop() {
+		if(typeof waiting === 'function'){
+			waiting();
+		}else{
+			setTimeout(function(){
+				loop();
+			},100);
+		}
+	}
+	loop();
+	
+</script>
