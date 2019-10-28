@@ -1249,7 +1249,13 @@ class Controller_Curso_Examen extends Controller_Template
 			$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
 		}
 
-		if(isset($ruta_especial)){
+		if(isset($ruta_especial)){			
+			SESSION::delete('id_examen');
+			SESSION::delete('preguntas_ids');
+			SESSION::delete('puntaje_obtenido');
+			SESSION::delete('respuestas_no_exitosas');
+			SESSION::delete('fallas');
+			SESSION::delete('evaluado');
 			switch ($ruta_especial) {
 				case 'sin_vidas':
 					if(!$es_test){
@@ -1258,16 +1264,23 @@ class Controller_Curso_Examen extends Controller_Template
 							$presenta->save();
 						}
 					}
-					SESSION::delete('id_examen');
-					SESSION::delete('preguntas_ids');
-					SESSION::delete('puntaje_obtenido');
-					SESSION::delete('respuestas_no_exitosas');
-					SESSION::delete('fallas');
-					SESSION::delete('evaluado');
 					$data = array('examen' => $examen);
 					$this->template->content = View::forge('curso/examen/final_sin_vidas', $data);
 					break;
-
+				case 'abandonado':
+					SESSION::delete('fallas');
+					if(!$es_test){
+						if(isset($presenta) && isset($examen)){
+							if(!($examen->vidas > $presenta->vidas)){
+								$presenta->terminado = 1;
+								$presenta->save();								
+							}
+						}
+						Response::redirect('curso/alumno');
+					}else{
+						Response::redirect('curso/examenes');
+					}
+					break;
 				default:
 					# code...
 					break;

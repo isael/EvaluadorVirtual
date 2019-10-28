@@ -132,8 +132,6 @@
 								?>
 									<div class="row">
 										<button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearExamen','agregarExamen','+ Crear nuevo examen','- Cancelar creación de examen')">+ Crear nuevo examen</button>
-
-										<!-- <button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" data-toggle="modal" data-target="#modalCrearExamen">+ Crear nuevo examen</button> -->
 									</div>
 									<br>
 									<div id="agregarExamen" class="row" style="display: none;">
@@ -346,38 +344,6 @@
 				<?php
 					}
 				?>
-
-				<div class="modal fade" id="modalCrearExamen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<div class="modal-dialog" role="document">
-						<div class="modal-content">
-							<!-- <div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-							<h4 class="modal-title" id="myModalLabel">Agregar nuevo tema</h4>
-							</div>
-
-							<div class="form-group">
-								<div class="modal-body">
-									<div class="input-group">
-										<?php echo Form::label('Escribe el nombre del nuevo tema. Este se agregará hasta que se haya guardado la pregunta correctamente.', 'modal_tema_input');?>
-										<input id="modal_tema_input" type="text" class="form-control" placeholder="Cuida la ortografía al escribir el tema">
-									</div>
-								</div>
-								<div class="modal-footer">
-									<div class="row text-center">
-										<div class="col-xs-6">
-											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
-										</div>
-										<div class="col-xs-6">
-											<?php echo Html::anchor('javascript:agregarNuevoElementoEnLista(modal_tema_input,results_tema,pregunta_tema,cancelarTema);','Guardar Cambios', array('class' => 'btn btn-primary btn-block')); ?>
-										</div>
-									</div>
-								</div>
-							</div> -->
-						</div>
-					</div>
-				</div>
 
 				<div class="modal fade" id="modalAgregarTema" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">

@@ -665,7 +665,7 @@ class Modals
                               echo '<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cerrar</button>';
                           echo '</div>';
                           echo '<div class="col-xs-6">';
-                              echo Html::anchor('curso/examen/final','Abandonar',array('class'=>'btn btn-primary btn-block btn-lg'));
+                              echo Html::anchor('curso/examen/final/abandonado','Abandonar',array('class'=>'btn btn-primary btn-block btn-lg'));
                           echo '</div>';
                         echo '</div>';
                     echo '</div>';
