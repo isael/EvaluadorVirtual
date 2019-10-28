@@ -32,7 +32,7 @@
 							$oportunidades_posibles = intval($examen->oportunidades);
 							$oportunidades_usadas = 0;
 							if(isset($presenta)){
-								$oportunidades_usadas = intval($presenta->oportunidades);
+								$oportunidades_usadas = intval($presenta->oportunidades) > $oportunidades_posibles ? $oportunidades_posibles : intval($presenta->oportunidades);
 							}else{
 								if(isset($fallas)){
 									$oportunidades_usadas = $fallas > $oportunidades_posibles ? $oportunidades_posibles : $fallas;

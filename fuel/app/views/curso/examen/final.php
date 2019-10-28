@@ -12,6 +12,7 @@
 							$vidas_posibles = intval($examen->vidas);
 							$vidas_usadas = 1;
 							if(isset($presenta)){
+								$es_test = False;
 								$vidas_usadas = intval($presenta->vidas);
 							}
 							$vidas_totales = $vidas_posibles - $vidas_usadas;
@@ -61,14 +62,22 @@
 						</div>
 						<div class="col-xs-12">
 							<?php
-								$factor = intval($examen->preguntas_por_mostrar)*10;
-								if(!isset($puntaje_obtenido)){
-									$puntaje_obtenido = '0';
+								if(!isset($calificacion)){
+									$calificacion = '0';
 								}
-								$puntaje_obtenido = intval($puntaje_obtenido)/$factor;
-								echo  $puntaje_obtenido.'/10';
+								echo  $calificacion.'/10';
 							?>
 						</div>
+					</div>					
+					<div class="col-xs-12">
+						<?php
+							echo "A pesar de que tu puntaje obtenido fue de ";
+							if(!isset($puntaje_obtenido)){
+								$puntaje_obtenido = '0';
+							}
+							echo  $puntaje_obtenido.'/10';
+							echo ", tu calificación final se ve afectada por las vidas y oportunidades que gastaste."
+						?>
 					</div>
 					<br>
 					<div class="col-xs-12">
@@ -177,7 +186,7 @@
 <footer class="text-center" style="padding-top: 33px;">
 	<div class="footer-above">
         <div class="row">
-        	<?php echo Form::open('curso/examenes'); ?>
+        	<?php echo $es_test ? Form::open('curso/examenes') : Form::open('curso/alumno'); ?>
             <div class="col-xs-12">
                 <?php echo Form::button('salir', 'Salir', array('class' => 'btn btn-danger btn-block')); ?>
             </div>
