@@ -65,6 +65,7 @@
 						foreach ($examenes as $examen) {
 							$vigente = False;
 							$hecho = False;
+							$fecha_limite = date_parse_from_format("Y-m-d H:i:s", $examen->fecha_fin);
 							if(isset($examenes_hechos) && in_array($examen->id_examen, $examenes_hechos)){
 								$hecho = True;
 							}
@@ -72,17 +73,18 @@
 								$vigente = True;
 							}
 							echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-								echo Html::anchor('curso/examen/presentar/'.$examen->id_examen,
+								echo Html::anchor(($vigente || $hecho ? 'curso/examen/presentar/'.$examen->id_examen : 'javascript:void()'),
 										'<div class="row">'.
 											'<div class="col-xs-3">'.
 												'<i i="" class="fa fa-file-text-o fav_icon"></i>'.
 											'</div>'.
 											'<div class="col-xs-6">'.
-												$examen->nombre.': '.
+												$examen->nombre.' '.
 												' <h5>'.$examen->preguntas_por_mostrar.' preguntas</h5>'.
 											'</div>'.
 											'<div class="col-xs-3">'.
 												'<h4>'.($hecho ? 'Hecho' : ( $vigente ? 'Vigente' : 'No vigente') ).'</h4>'.
+												($vigente ? 'Fecha límite '.$fecha_limite["day"].'/'.$fecha_limite["month"].'/'.$fecha_limite["year"] : '').
 											'</div>'.
 										'</div>'
 									, array('class' => ''));

@@ -143,7 +143,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$new_examen = Model_Examen::find_one_by('id_examen',$id_examen);
 				$new_examen->nombre = $examen_nombre;
 				$new_examen->fecha_inicio = $examen_inicio;
-				$new_examen->fecha_fin = $examen_final;
+				$new_examen->fecha_fin = $examen_final.' 23:59:59';
 				$new_examen->oportunidades = $examen_oportunidades_value;
 				$new_examen->vidas = $examen_vidas_value;
 				$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
