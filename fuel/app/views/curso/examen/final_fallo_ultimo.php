@@ -61,24 +61,12 @@
 							<h4>Calificación:</h4>
 						</div>
 						<div class="col-xs-12">
-							<?php
-								if(!isset($calificacion)){
-									$calificacion = '0';
-								}
-								echo  $calificacion.'/10';
-							?>
+							<h4>0</h4>
 						</div>
 					</div>					
 					<div class="col-xs-12">
 						<?php
-							if(intval($presenta->vidas)>1){
-								echo "A pesar de que tu puntaje obtenido fue de ";
-								if(!isset($puntaje_obtenido)){
-									$puntaje_obtenido = '0';
-								}
-								echo  $puntaje_obtenido.'/10';
-								echo ", tu calificación final se ve afectada por las vidas y oportunidades que gastaste.";
-							}
+							echo "Ya no podrás presentar de nuevo la prueba. Estudia más para el próximo examen.";
 						?>
 					</div>
 					<br>
@@ -161,7 +149,7 @@
 															</div>';
 														echo '<div class="form-group">
 																<div class="col-xs-12 col-sm-12 table">
-																	<div class="col-xs-12 col-sm-12">
+																	<div class="col-xs-12 col-sm-12 table-row">
 																		<span> Si crees que hubo un error en tu evaluación consulta directamente al profesor. </span>
 																	</div>
 																</div>

@@ -1360,13 +1360,18 @@ class Controller_Curso_Examen extends Controller_Template
 				SESSION::delete('evaluado');
 			}
 			if(isset($fallas) && intval($fallas) > intval($examen->oportunidades)){
+				$fue_ultima_vida = False;
 				if(!$es_test){
 					if(isset($presenta) && !($presenta->vidas < $examen->vidas)){
 						$presenta->terminado = 1;
 						$presenta->save();
+						$fue_ultima_vida = True;
 					}
 				}
-				$this->template->content = View::forge('curso/examen/final_fallo', $data);
+				if($fue_ultima_vida)
+					$this->template->content = View::forge('curso/examen/final_fallo_ultimo', $data);
+				else
+					$this->template->content = View::forge('curso/examen/final_fallo', $data);
 			}else{
 				if(!$es_test){
 					if(isset($presenta)){
