@@ -77,7 +77,9 @@ class Controller_Curso extends Controller_Template
 			$id_curso = SESSION::get('id_curso');
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 			$hoy = date('Y-m-d H:i:s');
-			
+
+			$n_cuenta = substr($id, 1);
+
 			$examenes = Model_Examen::find(function ($query) use ($id_curso, $hoy){
 			    return $query->join('Evalua')
 			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
@@ -85,13 +87,29 @@ class Controller_Curso extends Controller_Template
 			                 ->order_by('Examen.fecha_fin');
 			});
 			$examenes_disponibles=[];
-			foreach ($examenes as $examen) {
-				if($examen->fecha_fin >= $hoy && $examen->fecha_inicio <= $hoy){
-					array_push($examenes_disponibles, $examen->id_examen);
+			$examenes_hechos=[];
+			$cantidad_presentados = 0;
+			$suma_calificacion_presentados = 0;
+			$promedio = 0;
+			if(isset($examenes)){
+				foreach ($examenes as $examen) {
+					if($examen->fecha_fin >= $hoy && $examen->fecha_inicio <= $hoy){
+						array_push($examenes_disponibles, $examen->id_examen);
+					}
+					$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $examen->id_examen));
+					if(isset($presenta) && $presenta->terminado > 0){
+						array_push($examenes_hechos, $examen->id_examen);
+						$cantidad_presentados++;
+						$suma_calificacion_presentados = $suma_calificacion_presentados + intval($presenta->calificacion);
+					}
 				}
 			}
 
-			$data = array('curso' => $curso, 'examenes' => $examenes, 'examenes_disponibles' => $examenes_disponibles, 'hoy' => $hoy);
+			if($cantidad_presentados > 0){
+				$promedio = $suma_calificacion_presentados / $cantidad_presentados;
+			}
+
+			$data = array('curso' => $curso, 'examenes' => $examenes, 'examenes_disponibles' => $examenes_disponibles, 'examenes_hechos' => $examenes_hechos, 'promedio' => $promedio, 'hoy' => $hoy);
 			$this->template->content = View::forge('curso/alumno', $data);
 		}else{
 			Response::redirect('sesion/index');

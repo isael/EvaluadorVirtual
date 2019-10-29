@@ -903,8 +903,11 @@ class Controller_Curso_Examen extends Controller_Template
 			if(!$es_test){
 				$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
 				if(isset($presenta)){
-					if(!($presenta->vidas < $examen->vidas)){
+					if(!($presenta->vidas < $examen->vidas) && intval($presenta->calificacion) == 0){
 						Response::redirect('curso/examen/final/sin_vidas');
+						die();
+					}elseif($presenta->terminado > 0){
+						Response::redirect('curso/examen/final/terminado');
 						die();
 					}else{
 						$presenta->oportunidades = 0;
@@ -1257,6 +1260,10 @@ class Controller_Curso_Examen extends Controller_Template
 			SESSION::delete('fallas');
 			SESSION::delete('evaluado');
 			switch ($ruta_especial) {
+				case 'terminado':
+					$data = array('examen' => $examen, 'presenta' => $presenta);
+					$this->template->content = View::forge('curso/examen/final_terminado', $data);
+					break;
 				case 'sin_vidas':
 					if(!$es_test){
 						if(isset($presenta)){
@@ -1353,6 +1360,12 @@ class Controller_Curso_Examen extends Controller_Template
 				SESSION::delete('evaluado');
 			}
 			if(isset($fallas) && intval($fallas) > intval($examen->oportunidades)){
+				if(!$es_test){
+					if(isset($presenta) && !($presenta->vidas < $examen->vidas)){
+						$presenta->terminado = 1;
+						$presenta->save();
+					}
+				}
 				$this->template->content = View::forge('curso/examen/final_fallo', $data);
 			}else{
 				if(!$es_test){

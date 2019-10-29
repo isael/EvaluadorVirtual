@@ -34,7 +34,12 @@
 					<div class="col-xs-12">
 						<div class="col-xs-12">
 							<span>
-								Al agotar tus vidas y no pasar la prueba, tu calificación es 0.
+								<?php 
+									echo "Ya has presentado este examen con éxito. Tu calificación fue ";
+									if(isset($presenta)){
+										echo $presenta->calificacion;
+									}
+								?>
 							</span>
 						</div>
 					</div>
