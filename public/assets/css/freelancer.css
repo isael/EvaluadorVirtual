@@ -650,7 +650,7 @@ i.fav_icon {
   display: none;
 }
 .expuesto{
-  display: initial;
+  display: block;
 }
 .examen{
   background-color: #00997a;
