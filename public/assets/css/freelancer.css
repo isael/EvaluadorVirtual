@@ -670,3 +670,6 @@ i.fav_icon {
 .table-row{
   display: table-row;
 }
+.canvas_chart{
+  background-color: #ffffff;
+}
