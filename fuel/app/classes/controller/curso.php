@@ -322,9 +322,12 @@ class Controller_Curso extends Controller_Template
 			                 ->where('Cursa.id_curso', $id_curso)
 			                 ->order_by('Cursa.estado');
 			});*/
-			$alumnos=null;
+			$promedios = null;
+			$temasFallados = null;
+			$promediosAlumnos = null;
+			
 
-			$data = array('curso' => $curso, 'alumnos' => $alumnos);
+			$data = array('curso' => $curso, 'promedios' => $promedios, 'temasFallados' => $temasFallados, 'promediosAlumnos' => $promediosAlumnos);
 			
 			$this->template->content = View::forge('curso/estadisticas', $data);
 		}else{

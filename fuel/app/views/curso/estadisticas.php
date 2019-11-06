@@ -64,7 +64,7 @@
 								let calificaciones = [<?php echo implode(", ", $calificaciones); ?>];
 								let asistencia = [<?php echo implode(", ", $asistencia); ?>];
 								let numeroDeAlumnosTotal = <?php echo $numeroDeAlumnosTotal; ?>;
-								let ctx = document.getElementById('myChartGeneral').getContext('2d');
+								let ctxMyChartGeneral = document.getElementById('myChartGeneral').getContext('2d');
 								let barChartData = {
 									labels: nombresExamenes,
 									datasets: [{
@@ -83,7 +83,7 @@
 										data: asistencia
 									}]
 								};
-								let myChartGeneral = new Chart(ctx, {
+								let myChartGeneral = new Chart(ctxMyChartGeneral, {
 									type: 'bar',
 									data: barChartData,
 									options: {
@@ -122,6 +122,59 @@
 							<?php
 								echo "Tema más fallado: ".$temaMasFallado;	
 							?>
+						</div>
+						<br>
+						<div class="canvas_chart">
+							<canvas id="myChartTemas"></canvas>
+							<script type="text/javascript">
+								let ctxMyChartTemas = document.getElementById('myChartTemas');
+								let polarChartData =  {
+										datasets: [{
+											data: calificaciones,
+											backgroundColor: [
+												'rgba(54, 162, 235, 1)',
+												'rgba(75, 206, 86, 1)',
+												'rgba(255, 106, 86, 1)',
+												'rgba(215, 206, 186, 1)',
+												'rgba(205, 26, 186, 1)',
+											],
+											label: 'Los 10 temas más fallados' // for legend
+										}],
+										labels: [
+											'Red',
+											'Orange',
+											'Yellow',
+											'Green',
+											'Blue'
+										]};
+								let myChartTemas = Chart.PolarArea(ctxMyChartTemas, {
+									data: polarChartData,
+									options: {
+										responsive: true,
+										legend: {
+											position: 'right',
+										},
+										title: {
+											display: true,
+											text: 'Los 10 temas más fallados'
+										},
+										scale: {
+											ticks: {
+												beginAtZero: true
+											},
+											reverse: false
+										},
+										animation: {
+											animateRotate: false,
+											animateScale: true
+										}
+									}
+								});
+							</script>
+						</div>	
+						<hr>					
+						<div>
+							<h4>Listado completo de Temas</h4>
 						</div>
 						<br>
 						<div class="col-xs-12 table">
@@ -222,7 +275,9 @@
 
 								};
 								let type_chart = 'horizontalBar';
-								if(window.innerWidth && window.innerHeight && window.innerWidth > window.innerHeight){
+								if(window.innerWidth && window.innerHeight &&
+									window.innerWidth > window.innerHeight &&
+									<?php echo ($alumnosLength > 30 ? 'false' : 'true'); ?>){
 									type_chart = 'bar';
 									aspectoPantalla = null;
 								}
@@ -269,3 +324,14 @@
 		</div>
 	</div>
 </section>
+
+<!-- Footer -->
+<footer class="text-center" style="padding-top: 33px;">
+    <div class="footer-above">
+        <div class="row">
+            <div class="col-xs-12">
+                <?php echo Form::button('imprimir', '<i class="fa fa-print" aria-hidden="true"></i> Imprimir las estadísticas', array('class' => 'btn btn-primary btn-block')); ?>
+            </div>
+        </div>
+    </div>
+</footer>
