@@ -15,6 +15,9 @@
 					$asistencia = [12, 19, 29, 14, 22, 13];//ISAEL obtener desde controlador
 					$promedio = array_sum($calificaciones)/sizeof($calificaciones);
 					$numeroDeAlumnosTotal = 40;//ISAEL obtener desde controlador
+					$alumnos = ['Maria', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola'];
+					$alumnos_length = sizeof($alumnos);
+					$aspectRatio = $alumnos_length > 17 ? 1/(1+intval($alumnos_length/17)) : ($alumnos_length < 9 ? 2 : 1 ) ; 
 				?>
 				<!-- Barra -->
 				<div class="row">
@@ -133,10 +136,11 @@
 						<!-- /Seccion agregar pregunta -->
 						<br>
 						<div class="canvas_chart">
-							<canvas id="myChartAlumnos" height="200%"></canvas>
+							<canvas id="myChartAlumnos"></canvas>
 							<script type="text/javascript">
-								var horizontalBarChartData = {
-									labels: ['Maria', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola'],
+								let aspectoPantalla = <?php echo $aspectRatio;?>;
+								let horizontalBarChartData = {
+									labels: ['Maria', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola'],
 									datasets: [{
 										label: 'Examen 1',
 										backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -166,10 +170,14 @@
 									}]
 
 								};
-
+								let type_chart = 'horizontalBar';
+								if(window.innerWidth && window.innerHeight && window.innerWidth > window.innerHeight){
+									type_chart = 'bar';
+									aspectoPantalla = null;
+								}
 								let ctxMyChartAlumnos = document.getElementById('myChartAlumnos').getContext('2d');
 								let myChartAlumnos = new Chart(ctxMyChartAlumnos, {
-									type: 'horizontalBar',
+									type: type_chart,
 									data: horizontalBarChartData,
 									options: {
 										// Elements options apply to all of the options unless overridden in a dataset
@@ -180,6 +188,7 @@
 											}
 										},
 										responsive: true,
+										aspectRatio: aspectoPantalla,
 										legend: {
 											position: 'right',
 										},
