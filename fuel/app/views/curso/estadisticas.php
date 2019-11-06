@@ -16,8 +16,9 @@
 					$promedio = array_sum($calificaciones)/sizeof($calificaciones);
 					$numeroDeAlumnosTotal = 40;//ISAEL obtener desde controlador
 					$alumnos = ['Maria', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola'];
-					$alumnos_length = sizeof($alumnos);
-					$aspectRatio = $alumnos_length > 17 ? 1/(1+intval($alumnos_length/17)) : ($alumnos_length < 9 ? 2 : 1 ) ; 
+					$alumnosLength = sizeof($alumnos);
+					$aspectRatio = $alumnosLength > 17 ? 1/(1+intval($alumnosLength/17)) : ($alumnosLength < 9 ? 2 : 1 ) ; 
+					$temaMasFallado = "Usabilidad";
 				?>
 				<!-- Barra -->
 				<div class="row">
@@ -117,9 +118,59 @@
 					<div id="area_temas" class="area<?php echo $pestania == 'temas' ? " expuesto": " oculto"; ?>">
 						<!-- Seccion agregar pregunta -->
 						<br>
-						<?php
-							echo "Area Temas";	
-						?>
+						<div>
+							<?php
+								echo "Tema más fallado: ".$temaMasFallado;	
+							?>
+						</div>
+						<br>
+						<div class="col-xs-12 table">
+							<div class="col-xs-4 table-row">
+								Tema
+							</div>
+							<div class="col-xs-4 table-row">
+								Examen
+							</div>
+							<div class="col-xs-4 table-row">
+								Errores
+							</div>
+						</div>
+						<hr>
+						<div class="col-xs-12">
+							<div class="col-xs-12 table">
+								<div class="col-xs-4 table-row">
+									Tema 1
+								</div>
+								<div class="col-xs-4 table-row">
+									Examen 1
+								</div>
+								<div class="col-xs-4 table-row">
+									Errores 10
+								</div>
+							</div>
+							<div class="col-xs-12 table">
+								<div class="col-xs-4 table-row">
+									Tema 1
+								</div>
+								<div class="col-xs-4 table-row">
+									Examen 1
+								</div>
+								<div class="col-xs-4 table-row">
+									Errores 10
+								</div>
+							</div>
+							<div class="col-xs-12 table">
+								<div class="col-xs-4 table-row">
+									Tema 1
+								</div>
+								<div class="col-xs-4 table-row">
+									Examen 1
+								</div>
+								<div class="col-xs-4 table-row">
+									Errores 10
+								</div>
+							</div>
+						</div>
 						<!-- /Seccion agregar pregunta -->
 						<br>
 					</div>
@@ -127,7 +178,7 @@
 					<!-- Alumnos -->
 					<div id="area_alumnos" class="area<?php echo $pestania == 'alumnos' ? " expuesto": " oculto"; ?>">
 						<!-- Seccion agregar pregunta -->
-						<br>						
+						<br>
 						<div>
 							<?php
 								echo "Promedio de suma de calificaciones: ".round($promedio,2);
