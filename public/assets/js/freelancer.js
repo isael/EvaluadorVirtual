@@ -274,7 +274,6 @@ function agregarPreguntasPorTemaYNivel(listaPreguntas, tema, desde, hasta, esMod
     let hasta_elemento = document.getElementById(hasta.id+sufijo_modal+'_option_selected');
 
     if(!tema_elemento || tema_elemento.value === ''){
-        debugger;
         alert("Falta agregar tema");
         return;
     }

@@ -203,7 +203,7 @@ class Modals
 								Form::input("id_examen",$id_examen ? $id_examen : '', array('type' => 'hidden')).'
 								<div class="col-xs-1"></div>
 									<div class="col-xs-10">
-										<button type="button" id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas del tema y dificultad seleccionados\',\'- Cancelar nuevo tema\')">+ Agregar preguntas del tema y dificultad seleccionados</button>
+										<button type="button" id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas\',\'- Cancelar agregar preguntas\')">+ Agregar preguntas</button>
 										<div id="agregarPreguntasPorTema'.$sufijo_modal.'" class="row" style="display: none;">'.'
 											<div class="col-xs-12 col-sm-12">'.
 												Form::label('Tema', 'examen_tema'.$sufijo_modal).'
@@ -234,7 +234,7 @@ class Modals
 												</div>
 											</div>											
 											<div class="col-xs-12 col-sm-12 table">
-												<button type="button" id="agregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block" onclick="javascript:agregarPreguntasPorTemaYNivel(lista_de_preguntas_por_tema,examen_tema,examen_tema_nivel_desde,examen_tema_nivel_hasta,'.($is_modal ? 'true':'false').');">+ Agregar </button>
+												<button type="button" id="agregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block" onclick="javascript:agregarPreguntasPorTemaYNivel(lista_de_preguntas_por_tema,examen_tema,examen_tema_nivel_desde,examen_tema_nivel_hasta,'.($is_modal ? 'true':'false').');">+ Agregar preguntas del tema y dificultad seleccionados</button>
 											</div>
 										</div>
 									</div>								
