@@ -871,6 +871,7 @@ class Controller_Curso_Examen extends Controller_Template
 	public function action_presentar($id_examen)
 	{
 			SESSION::set('id_examen',$id_examen);
+			SESSION::delete('n_cuenta');
 			$id = SESSION::get('id_sesion');
 			if(isset($id) && substr($id,0,1)=='a'){
 				$n_cuenta = substr($id,1);
@@ -1190,22 +1191,24 @@ class Controller_Curso_Examen extends Controller_Template
 				$respuestas_no_exitosas = [array(intval($siguiente_posicion_pregunta), $id_pregunta_actual, $id_respuesta_elegida)];
 			}
 			SESSION::set('respuestas_no_exitosas',$respuestas_no_exitosas);
-
-			$id_respuesta = $id_respuesta_elegida < 0 ? (-1 * $id_pregunta_actual) : $id_respuesta_elegida;
-			$comete_error = Model_CometeErroresEn::find(array('id_respuesta' => $id_respuesta, 'n_cuenta' => $n_cuenta ));
-			$genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta_actual))));
-			$id_tema = null;
-			if(isset($genera_lista)){
-				$genera = reset($genera_lista);
-				$id_tema = $genera->id_tema;
-			}
-			if(!isset($comete_error) && isset($id_tema)){
-				$comete_error = new Model_CometeErroresEn();
-				$comete_error->id_respuesta = $id_respuesta;
-				$comete_error->id_pregunta = $id_pregunta_actual;
-				$comete_error->id_tema = $id_tema;
-				$comete_error->n_cuenta = $n_cuenta;
-				$comete_error->save();
+			if(!$es_test){
+				$id_respuesta = $id_respuesta_elegida < 0 ? (-1 * $id_pregunta_actual) : $id_respuesta_elegida;
+				$comete_error = Model_CometeErroresEn::find(array('id_respuesta' => $id_respuesta, 'n_cuenta' => $n_cuenta ));
+				$genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta_actual))));
+				$id_tema = null;
+				if(isset($genera_lista)){
+					$genera = reset($genera_lista);
+					$id_tema = $genera->id_tema;
+				}
+				if(!isset($comete_error) && isset($id_tema)){
+					$comete_error = new Model_CometeErroresEn();
+					$comete_error->id_respuesta = $id_respuesta;
+					$comete_error->id_pregunta = $id_pregunta_actual;
+					$comete_error->id_tema = $id_tema;
+					$comete_error->n_cuenta = $n_cuenta;
+					$comete_error->id_examen = $id_examen;
+					$comete_error->save();
+				}
 			}
 		}
 
@@ -1240,15 +1243,22 @@ class Controller_Curso_Examen extends Controller_Template
 		$evaluacion = 0;
 		$presenta = null;
 
+		if(isset($n_cuenta)){
+			$es_test = False;
+		}
+
 		if(!isset($id_examen)){
-			Response::redirect('curso/examenes');
+			if($es_test){				
+				Response::redirect('curso/examenes');
+			}else{
+				Response::redirect('curso/alumno');
+			}
 			die();
 		}
 
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
 
-		if(isset($n_cuenta)){
-			$es_test = False;
+		if(!$es_test){
 			$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
 		}
 
@@ -1261,8 +1271,13 @@ class Controller_Curso_Examen extends Controller_Template
 			SESSION::delete('evaluado');
 			switch ($ruta_especial) {
 				case 'terminado':
-					$data = array('examen' => $examen, 'presenta' => $presenta);
-					$this->template->content = View::forge('curso/examen/final_terminado', $data);
+					$respuestas_no_exitosas = [];
+					$numero_pregunta = 0;
+					$comete_error = Model_CometeErroresEn::find('all', array('where' => array(array('n_cuenta', $n_cuenta), 'or' => array(array('id_examen', $id_examen)) ) ) );
+					foreach ($comete_error as $error_cometido) {
+						array_push($respuestas_no_exitosas, array($numero_pregunta, $error_cometido->id_pregunta, $error_cometido->id_respuesta));
+						$numero_pregunta++;
+					}
 					break;
 				case 'sin_vidas':
 					if(!$es_test){
@@ -1292,7 +1307,8 @@ class Controller_Curso_Examen extends Controller_Template
 					# code...
 					break;
 			}
-		}else{
+		}
+		if(!isset($ruta_especial) || $ruta_especial=== 'terminado'){
 			$errores = [];
 			if(isset($respuestas_no_exitosas)){
 				foreach ($respuestas_no_exitosas as $respuesta) {
@@ -1344,10 +1360,9 @@ class Controller_Curso_Examen extends Controller_Template
 			$p = intval($puntaje_obtenido) / 100;
 			$op = intval($examen->oportunidades);
 			$tp = intval($examen->preguntas_por_mostrar);
-			$v = intval($presenta->vidas);
-			$calificacion = ($p * (($op / $tp) ** ($v - 1)) ) * (10 / $tp);
+			$v = $es_test ? 1 : intval($presenta->vidas);
+			$calificacion = ($p * ( (($tp-$op) / $tp) ** ($v - 1)) ) * (10 / $tp);
 			$puntaje_obtenido = $p * (10 / $tp);
-			// (p * (op / tp) ^ (v - 1) ) * (10 / tp) Comentar en documento ISAEL 
 
 			$data = array('examen' => $examen, 'puntaje_obtenido' => $puntaje_obtenido, 'calificacion' => $calificacion, 'errores' => $errores, 'presenta' => $presenta);
 			$fallas = SESSION::get('fallas');
@@ -1359,7 +1374,9 @@ class Controller_Curso_Examen extends Controller_Template
 				SESSION::delete('respuestas_no_exitosas');
 				SESSION::delete('evaluado');
 			}
-			if(isset($fallas) && intval($fallas) > intval($examen->oportunidades)){
+			if(isset($ruta_especial) && $ruta_especial=== 'terminado'){
+				$this->template->content = View::forge('curso/examen/final_terminado', $data);
+			}elseif(isset($fallas) && intval($fallas) > intval($examen->oportunidades)){
 				$fue_ultima_vida = False;
 				if(!$es_test){
 					if(isset($presenta) && !($presenta->vidas < $examen->vidas)){
@@ -1374,7 +1391,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$this->template->content = View::forge('curso/examen/final_fallo', $data);
 			}else{
 				if(!$es_test){
-					if(isset($presenta)){
+					if(isset($presenta) && $presenta->terminado != 1){
 						$presenta->terminado = 1;
 						$presenta->calificacion = $calificacion;
 						$presenta->save();

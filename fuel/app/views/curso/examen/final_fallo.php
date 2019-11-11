@@ -10,6 +10,7 @@
 						<?php
 							$vidas_posibles = intval($examen->vidas);
 							$vidas_usadas = 1;
+							$es_test = True;
 							if(isset($presenta)){
 								$es_test = False;
 								$vidas_usadas = intval($presenta->vidas);

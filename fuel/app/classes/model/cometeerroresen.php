@@ -6,6 +6,7 @@ class Model_CometeErroresEn extends \Orm\Model{
 		'n_cuenta',
 		'id_pregunta',
 		'id_tema',
+		'id_examen',
 	);
 	
 	protected static $_table_name = 'CometeErroresEn';
