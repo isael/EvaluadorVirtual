@@ -382,13 +382,14 @@ class Controller_Curso extends Controller_Template
 			$examenes_actuales = null;
 			$errores_actuales = 0;
 
+			$temas_arreglo_examenes_compuestos = [];
 			foreach ($temas as $tema) {
 				if(isset($tema_actual)){
 					if($tema_actual !== $tema->nombre){
 						// array_push($temas_arreglo_temas, $tema_actual);
-						// array_push($temas_arreglo_examenes, $examenes_actuales);
+						// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
 						$temas_arreglo_temas[$tema_actual] = $errores_actuales;
-						$temas_arreglo_examenes[$examenes_actuales] = $errores_actuales;
+						$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
 						array_push($temas_arreglo_errores, $errores_actuales);
 						$tema_actual = $tema->nombre;
 						$examenes_actuales = $tema->nombre_ex;
@@ -406,10 +407,16 @@ class Controller_Curso extends Controller_Template
 				}
 			}
 			$temas_arreglo_temas[$tema_actual] = $errores_actuales;
-			$temas_arreglo_examenes[$examenes_actuales] = $errores_actuales;
+			$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
 			array_push($temas_arreglo_errores, $errores_actuales);
-
-			$temasFallados = array('temas' => arsort($temas_arreglo_temas), 'examenes' => arsort($temas_arreglo_examenes), 'errores' => $temas_arreglo_errores );;
+			asort($temas_arreglo_errores);
+			arsort($temas_arreglo_temas);
+			arsort($temas_arreglo_examenes_compuestos);
+			foreach ($temas_arreglo_examenes_compuestos as $nombre_compuesto => $valor) {
+				$nombre_combinado_examen = explode("+++***+++", $nombre_compuesto);
+				array_push($temas_arreglo_examenes, $nombre_combinado_examen[1]);
+			}
+			$temasFallados = array('temas' => $temas_arreglo_temas, 'examenes' => $temas_arreglo_examenes, 'errores' => $temas_arreglo_errores );;
 
 			$calificacionesAlumnos = [];
 

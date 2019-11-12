@@ -4,19 +4,36 @@
 			<div class="col-lg-12 text-center">
 				<!-- Contenido -->
 				<?php 
-					$listaDeExamenes = ["Examen 1", "Examen 2", "Examen 3", "Examen 4", "Examen 5", "Examen 6"];//ISAEL obtener desde controlador
+					// $listaDeExamenes = ["Examen 1", "Examen 2", "Examen 3", "Examen 4", "Examen 5", "Examen 6"];//ISAEL obtener desde controlador
+					$listaDeExamenes = $promedios['examenes'];
 					$nombresExamenes = [];
 					foreach ($listaDeExamenes as $examen) {
 						// $nombreExamen = $examen->nombre; ISAEL cambiar por este valor
 						$nombreExamen = $examen;
 						array_push($nombresExamenes, "'".$nombreExamen."'");
 					}
-					$calificaciones = [10, 9, 8.3, 5, 2, 3];//ISAEL obtener desde controlador
-					$asistencia = [12, 19, 29, 14, 22, 13];//ISAEL obtener desde controlador
+					// $calificaciones = [10, 9, 8.3, 5, 2, 3];//ISAEL obtener desde controlador
+					$calificaciones = $promedios['promedios'];
+					// $asistencia = [12, 19, 29, 14, 22, 13];//ISAEL obtener desde controlador
+					$asistencia = $promedios['asistencia'];
 					$promedio = array_sum($calificaciones)/sizeof($calificaciones);
-					$numeroDeAlumnosTotal = 40;//ISAEL obtener desde controlador
-					$alumnos = ['Maria', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola'];
-					$alumnosLength = sizeof($alumnos);
+
+					$nombresTemasFallados = [];
+					$numeroDeFallas = [];
+					$listaDeTemasFallados = $temasFallados['temas'];
+					// echo var_dump($listaDeTemasFallados);
+					foreach ($listaDeTemasFallados as $nombre => $valor) {
+						array_push($nombresTemasFallados, "'".$nombre."'");
+						array_push($numeroDeFallas, $valor);
+					}
+					// $numeroDeAlumnosTotal = 40;//ISAEL obtener desde controlador
+					$numeroDeAlumnosTotal = sizeof($calificacionesAlumnos);
+					// $nombresAlumnos = ['Maria', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola'];
+					$nombresAlumnos = [];
+					foreach ($calificacionesAlumnos as $nombre => $datos) {
+						array_push($nombresAlumnos, "'".$nombre."'");
+					}
+					$alumnosLength = sizeof($nombresAlumnos);
 					$aspectRatio = $alumnosLength > 17 ? 1/(1+intval($alumnosLength/17)) : ($alumnosLength < 9 ? 2 : 1 ) ; 
 					$temaMasFallado = "Usabilidad";
 				?>
@@ -128,9 +145,11 @@
 							<canvas id="myChartTemas"></canvas>
 							<script type="text/javascript">
 								let ctxMyChartTemas = document.getElementById('myChartTemas');
+								let nombresTemasFallados = [<?php echo implode(", ", $nombresTemasFallados); ?>];
+								let numeroDeFallas = [<?php echo implode(", ", $numeroDeFallas); ?>];
 								let polarChartData =  {
 										datasets: [{
-											data: calificaciones,
+											data: numeroDeFallas,
 											backgroundColor: [
 												'rgba(54, 162, 235, 1)',
 												'rgba(75, 206, 86, 1)',
@@ -140,13 +159,8 @@
 											],
 											label: 'Los 10 temas más fallados' // for legend
 										}],
-										labels: [
-											'Red',
-											'Orange',
-											'Yellow',
-											'Green',
-											'Blue'
-										]};
+										labels: nombresTemasFallados
+									};
 								let myChartTemas = Chart.PolarArea(ctxMyChartTemas, {
 									data: polarChartData,
 									options: {
@@ -190,39 +204,25 @@
 						</div>
 						<hr>
 						<div class="col-xs-12">
-							<div class="col-xs-12 table">
-								<div class="col-xs-4 table-row">
-									Tema 1
-								</div>
-								<div class="col-xs-4 table-row">
-									Examen 1
-								</div>
-								<div class="col-xs-4 table-row">
-									Errores 10
-								</div>
-							</div>
-							<div class="col-xs-12 table">
-								<div class="col-xs-4 table-row">
-									Tema 1
-								</div>
-								<div class="col-xs-4 table-row">
-									Examen 1
-								</div>
-								<div class="col-xs-4 table-row">
-									Errores 10
-								</div>
-							</div>
-							<div class="col-xs-12 table">
-								<div class="col-xs-4 table-row">
-									Tema 1
-								</div>
-								<div class="col-xs-4 table-row">
-									Examen 1
-								</div>
-								<div class="col-xs-4 table-row">
-									Errores 10
-								</div>
-							</div>
+							<?php 
+								$listaDeExamenesFallados = $temasFallados['examenes'];
+								$listaDeFallos = $temasFallados['errores'];
+								$indice = 0;
+								foreach ($nombresTemasFallados as $nombresTemasFallados) {
+									echo '<div class="col-xs-12 table">
+										<div class="col-xs-4 table-row">'.
+											$nombresTemasFallados.'
+										</div>
+										<div class="col-xs-4 table-row">'.
+											$listaDeExamenesFallados[$indice].'
+										</div>
+										<div class="col-xs-4 table-row">'.
+											$listaDeFallos[$indice].'
+										</div>
+									</div>';
+									$indice++;
+								}
+							?>
 						</div>
 						<!-- /Seccion agregar pregunta -->
 						<br>
@@ -243,13 +243,13 @@
 							<canvas id="myChartAlumnos"></canvas>
 							<script type="text/javascript">
 								let aspectoPantalla = <?php echo $aspectRatio;?>;
+								let nombresAlumnos = [<?php echo implode(", ", $nombresAlumnos); ?>];
 								let horizontalBarChartData = {
-									labels: ['Maria', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola', 'Juan', 'Lalo', 'Abril', 'Jonas', 'Lola'],
+									labels: nombresAlumnos,
 									datasets: [{
 										label: 'Examen 1',
 										backgroundColor: 'rgba(54, 162, 235, 0.2)',
 										borderColor: 'rgba(54, 162, 235, 1)',
-										borderWidth: 1,
 										data: calificaciones
 									}, {
 										label: 'Examen 2',
@@ -263,8 +263,8 @@
 										data: asistencia
 									}, {
 										label: 'Examen 4',
-										backgroundColor: 'rgba(215, 206, 186, 0.2)',
-										borderColor: 'rgba(215, 206, 186, 1)',
+										backgroundColor: 'rgba(215, 206, 16, 0.2)',
+										borderColor: 'rgba(215, 206, 16, 1)',
 										data: asistencia
 									}, {
 										label: 'Examen 5',
