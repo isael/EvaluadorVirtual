@@ -103,7 +103,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$mensaje=$mensaje."El campo de Vigencia-Inicio no tiene el formato de fecha AAAA-MM-DD.<br>";
 		}else{
 			$arreglo_fecha = explode("-", $examen_inicio);
-			if(!checkdate(intval($arreglo_fecha[2]), intval($arreglo_fecha[1]), intval($arreglo_fecha[0]))){
+			if(!checkdate(intval($arreglo_fecha[1]), intval($arreglo_fecha[2]), intval($arreglo_fecha[0]))){
 				$error=True;
 				$mensaje=$mensaje."El campo de Vigencia-Inicio no tiene una fecha válida.<br>";
 			}
@@ -117,7 +117,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$mensaje=$mensaje."El campo de Vigencia-Final no tiene el formato de fecha AAAA-MM-DD.<br>";
 		}else{
 			$arreglo_fecha = explode("-", $examen_final);
-			if(!checkdate(intval($arreglo_fecha[2]), intval($arreglo_fecha[1]), intval($arreglo_fecha[0]))){
+			if(!checkdate(intval($arreglo_fecha[1]), intval($arreglo_fecha[2]), intval($arreglo_fecha[0]))){
 				$error=True;
 				$mensaje=$mensaje."El campo de Vigencia-Final no tiene una fecha válida.<br>";
 			}
@@ -158,7 +158,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
 					$new_basado_en->save();
 				}
-				$mensaje=$mensaje."La pregunta fue actualizada con éxito.<br>";
+				$mensaje=$mensaje."El examen fue actualizado con éxito.<br>";
 			}else{
 				$new_examen = new Model_Examen();
 				$new_examen->nombre = $examen_nombre;
@@ -186,6 +186,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
 					$new_basado_en->save();
 				}
+				$mensaje=$mensaje."El examen fue creado con éxito.<br>";
 
 			}
 		}

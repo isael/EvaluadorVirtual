@@ -157,7 +157,7 @@
 											echo '<i class="fa fa-book" aria-hidden="true"></i>';
 										echo '</div>';
 										echo '<div class="col-xs-9">';
-											echo Html::anchor('curso/examen/mostrar_bibliografia/'.$fuente->id_fuente.'/'.$fuente->numero,$fuente->nombre.' - '.$fuente->autores.'. '.$fuente->numero.'ª Edición: '.', '.$fuente->anio.'<br>', array('class' => ''));
+											echo Html::anchor('curso/examen/mostrar_bibliografia/'.$fuente->id_fuente.'/'.$fuente->numero,$fuente->nombre.' - '.$fuente->autores.'. '.$fuente->numero.'ª Edición, '.$fuente->anio.'<br>', array('class' => ''));
 											echo "<br>";
 										echo '</div>';
 										echo "</br>";
@@ -185,6 +185,20 @@
 
 					<!-- Preguntas -->
 					<div id="area_preguntas" class="area<?php echo $pestania == 'preguntas' ? " expuesto": " oculto"; ?>">
+						<!-- Lista Preguntas Vacia-->
+						<?php
+							$cual_boton = "preguntas";
+							if(!isset($preguntas)){
+								//Verificar si hay bibliografía
+								if(isset($bibliografias)){
+									echo "Las preguntas se separan por temas";
+								}else{
+									$cual_boton = "bibliografia";
+									echo "Para crear preguntas debe existir bibliografía";
+								}
+							}
+						?>
+						<!-- /Lista Preguntas Vacia-->
 						<!-- Seccion agregar pregunta -->
 						<br>
 						<?php
@@ -294,14 +308,6 @@
 								if($tema_actual !== "")
 									echo "</div>";
 								echo '</div>';
-							}else{
-								//Verificar si hay preguntas
-								if(isset($bibliografias)){
-									echo "Las preguntas se separan por temas";
-								}else{
-									$cual_boton = "bibliografia";
-									echo "Para crear preguntas debe existir bibliografía";
-								}
 							}
 						?>
 						<!-- /Lista Preguntas -->

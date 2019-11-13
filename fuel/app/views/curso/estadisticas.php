@@ -235,6 +235,8 @@
 						<div>
 							<?php
 								echo "Promedio de suma de calificaciones: ".round($promedio,2);
+								echo "<hr>";
+								echo "Lista de alumnos y examenes";
 							?>
 						</div>
 						<!-- /Seccion agregar pregunta -->
@@ -246,41 +248,43 @@
 								let nombresAlumnos = [<?php echo implode(", ", $nombresAlumnos); ?>];
 								let horizontalBarChartData = {
 									labels: nombresAlumnos,
-									datasets: [{
-										label: 'Examen 1',
-										backgroundColor: 'rgba(54, 162, 235, 0.2)',
-										borderColor: 'rgba(54, 162, 235, 1)',
-										data: calificaciones
-									}, {
-										label: 'Examen 2',
-										backgroundColor: 'rgba(75, 206, 86, 0.2)',
-										borderColor: 'rgba(75, 206, 86, 1)',
-										data: asistencia
-									}, {
-										label: 'Examen 3',
-										backgroundColor: 'rgba(255, 106, 86, 0.2)',
-										borderColor: 'rgba(255, 106, 86, 1)',
-										data: asistencia
-									}, {
-										label: 'Examen 4',
-										backgroundColor: 'rgba(215, 206, 16, 0.2)',
-										borderColor: 'rgba(215, 206, 16, 1)',
-										data: asistencia
-									}, {
-										label: 'Examen 5',
-										backgroundColor: 'rgba(205, 26, 186, 0.2)',
-										borderColor: 'rgba(205, 26, 186, 1)',
-										data: asistencia
-									}]
+									datasets: [
+									<?php
+										$array_examenes = [];
+										foreach ($calificacionesAlumnos as $nombre => $valores) {
+											foreach ($valores as $valor) {
+												$examen_nombre = $valor['examen'];
+												$examen_terminado = $valor['terminado'];
+												$examen_calificacion = isset($examen_terminado) ? ( $examen_terminado === '0' ? '0' : $valor['calificacion']) : '-1' ;
+												if(isset($array_examenes[$examen_nombre])){
+													$array_actual = $array_examenes[$examen_nombre];
+													array_push($array_actual, $examen_calificacion);
+													$array_examenes[$examen_nombre] = $array_actual;
+												}else{
+													$array_examenes[$examen_nombre] = [$examen_calificacion];
+												}
+											}
+										}
+										$background_color = ['rgba(54, 162, 235, 0.2)','rgba(75, 206, 86, 0.2)','rgba(255, 106, 86, 0.2)','rgba(215, 206, 16, 0.2)','rgba(205, 26, 186, 0.2)'];
+										$border_color = ['rgba(54, 162, 235, 1)','rgba(75, 206, 86, 1)','rgba(255, 106, 86, 1)','rgba(215, 206, 16, 1)','rgba(205, 26, 186, 1)'];
+										$indice_color = 0;
+										$num_examenes = sizeof($array_examenes);
+										foreach ($array_examenes as $examen => $valores) {
+											$calificaciones = implode(", ", $valores);
+											$calificaciones = "[".$calificaciones."]";
+											echo "{
+													label: '".$examen."',
+													backgroundColor: '".$background_color[$indice_color]."',
+													borderColor: '".$border_color[$indice_color]."',
+													data: ".$calificaciones."
+												},";
+											$indice_color = $indice_color < $num_examenes ? $indice_color+1 : 0;
+										}
+									?>
+									]
 
 								};
 								let type_chart = 'horizontalBar';
-								if(window.innerWidth && window.innerHeight &&
-									window.innerWidth > window.innerHeight &&
-									<?php echo ($alumnosLength > 30 ? 'false' : 'true'); ?>){
-									type_chart = 'bar';
-									aspectoPantalla = null;
-								}
 								let ctxMyChartAlumnos = document.getElementById('myChartAlumnos').getContext('2d');
 								let myChartAlumnos = new Chart(ctxMyChartAlumnos, {
 									type: type_chart,
@@ -296,11 +300,11 @@
 										responsive: true,
 										aspectRatio: aspectoPantalla,
 										legend: {
-											position: 'right',
+											position: 'top',
 										},
 										title: {
 											display: true,
-											text: 'Chart.js Horizontal Bar Chart'
+											text: 'Nota: La calificación de -1 significa que aun no se ha presentado el examen.'
 										},
 										scales: {
 											xAxes: [{
