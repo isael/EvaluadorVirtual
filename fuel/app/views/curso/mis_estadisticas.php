@@ -26,7 +26,7 @@
 						array_push($nombresTemasFallados, "'".$nombre."'");
 						array_push($numeroDeFallas, $valor);
 					}
-					$temaMasFallado = "Usabilidad";
+					$temaMasFallado = $nombresTemasFallados[0];
 				?>
 			    <!-- Barra -->
 			    <div class="row">
