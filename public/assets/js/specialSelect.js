@@ -120,8 +120,7 @@ function duplicaPregunta(){
     submit.click();
 }
 
-// function generarExamen(es_vista_previa) {
-//     if(es_vista_previa){
-//         alert("vista previa");
-//     }
-// }
+function imprimirEstadisticas(areaImpresion) {
+    alert("vista previa");
+    // areaImpresion.printThis();
+}

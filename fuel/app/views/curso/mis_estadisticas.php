@@ -208,3 +208,13 @@
 		</div>
 	</div>
 </section>
+<!-- Footer -->
+<footer class="text-center" style="padding-top: 33px;">
+    <div class="footer-above">
+        <div class="row">
+            <div class="col-xs-12">
+                <?php echo Form::button('imprimir', '<i class="fa fa-print" aria-hidden="true"></i> Imprimir las estadísticas', array('class' => 'btn btn-primary btn-block', 'onclick' => 'javascript:imprimirEstadisticas(area_pestanias);')); ?>
+            </div>
+        </div>
+    </div>
+</footer>
