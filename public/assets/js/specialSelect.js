@@ -120,7 +120,18 @@ function duplicaPregunta(){
     submit.click();
 }
 
-function imprimirEstadisticas(areaImpresion) {
-    alert("vista previa");
-    // areaImpresion.printThis();
+function imprimirEstadisticas(seccionesImpresion) {
+    let idSecciones = "";
+    let i = 0;
+    for ( ; i < (seccionesImpresion.length); i++) {
+        let element = document.getElementById(seccionesImpresion[i]);
+        if(element.classList.contains("expuesto")){
+            idSecciones = idSecciones + "#"+seccionesImpresion[i]+"";
+            i = seccionesImpresion.length;
+        }
+    }
+    $(idSecciones).printThis({
+        importCSS: true,
+        canvas: true,
+    });
 }

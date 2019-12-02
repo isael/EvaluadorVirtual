@@ -58,7 +58,7 @@
 					<div id="area_general" class="area<?php echo $pestania == 'general' || $pestania == '' ? " expuesto": " oculto"; ?>">
 						<!-- Seccion agregar pregunta -->
 						<br>
-						<div>
+						<div id="myChartGeneralTitulo">
 							<?php
 								echo "Promedio general: ".round($promedio,2);
 							?>
@@ -108,7 +108,7 @@
 					<div id="area_temas" class="area<?php echo $pestania == 'temas' ? " expuesto": " oculto"; ?>">
 						<!-- Seccion agregar pregunta -->
 						<br>
-						<div>
+						<div id="myChartTemasTitulo">
 							<?php
 								echo "Tema más fallado: ".$temaMasFallado;	
 							?>
@@ -213,7 +213,7 @@
     <div class="footer-above">
         <div class="row">
             <div class="col-xs-12">
-                <?php echo Form::button('imprimir', '<i class="fa fa-print" aria-hidden="true"></i> Imprimir las estadísticas', array('class' => 'btn btn-primary btn-block', 'onclick' => 'javascript:imprimirEstadisticas(area_pestanias);')); ?>
+                <?php echo Form::button('imprimir', '<i class="fa fa-print" aria-hidden="true"></i> Imprimir las estadísticas', array('class' => 'btn btn-primary btn-block', 'onclick' => 'javascript:imprimirEstadisticas(["area_general","area_temas"]);')); ?>
             </div>
         </div>
     </div>
