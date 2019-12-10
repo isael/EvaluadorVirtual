@@ -8,6 +8,7 @@ class Model_Pregunta extends \Model_Crud{
 		'tiene_subpreguntas',
 		'justificacion',
 		'tiempo',
+		'compartida',
 	);
 	
 	protected static $_table_name = 'Pregunta';

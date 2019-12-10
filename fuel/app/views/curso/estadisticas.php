@@ -16,7 +16,7 @@
 					$calificaciones = $promedios['promedios'];
 					// $asistencia = [12, 19, 29, 14, 22, 13];//ISAEL obtener desde controlador
 					$asistencia = $promedios['asistencia'];
-					$promedio = array_sum($calificaciones)/sizeof($calificaciones);
+					$promedio = sizeof($calificaciones) > 0 ? array_sum($calificaciones)/sizeof($calificaciones) : 0;
 
 					$nombresTemasFallados = [];
 					$numeroDeFallas = [];

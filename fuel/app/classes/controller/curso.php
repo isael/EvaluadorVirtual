@@ -244,10 +244,11 @@ class Controller_Curso extends Controller_Template
 
 			$promedios_arreglo_examenes = [];
 			$promedios_arreglo_promedios = [];
-
-			foreach ($calificaciones as $calificacion) {
-				array_push($promedios_arreglo_examenes, $calificacion->nombre);
-				array_push($promedios_arreglo_promedios, intval($calificacion->calificacion));
+			if(isset($calificaciones)){
+				foreach ($calificaciones as $calificacion) {
+					array_push($promedios_arreglo_examenes, $calificacion->nombre);
+					array_push($promedios_arreglo_promedios, intval($calificacion->calificacion));
+				}
 			}
 
 			$promedios = array('examenes' => $promedios_arreglo_examenes, 'promedios' => $promedios_arreglo_promedios);
@@ -277,27 +278,29 @@ class Controller_Curso extends Controller_Template
 			$errores_actuales = 0;
 
 			$temas_arreglo_examenes_compuestos = [];
-			foreach ($temas as $tema) {
-				if(isset($tema_actual)){
-					if($tema_actual !== $tema->nombre){
-						// array_push($temas_arreglo_temas, $tema_actual);
-						// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
-						$temas_arreglo_temas[$tema_actual] = $errores_actuales;
-						$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
-						array_push($temas_arreglo_errores, $errores_actuales);
+			if(isset($temas)){
+				foreach ($temas as $tema) {
+					if(isset($tema_actual)){
+						if($tema_actual !== $tema->nombre){
+							// array_push($temas_arreglo_temas, $tema_actual);
+							// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
+							$temas_arreglo_temas[$tema_actual] = $errores_actuales;
+							$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+							array_push($temas_arreglo_errores, $errores_actuales);
+							$tema_actual = $tema->nombre;
+							$examenes_actuales = $tema->nombre_ex;
+							$errores_actuales = 1;
+						}else{
+							if(strpos($examenes_actuales, $tema->nombre_ex) === False){
+								$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
+							}
+							$errores_actuales = $errores_actuales + 1;
+						}
+					}else{
 						$tema_actual = $tema->nombre;
 						$examenes_actuales = $tema->nombre_ex;
 						$errores_actuales = 1;
-					}else{
-						if(strpos($examenes_actuales, $tema->nombre_ex) === False){
-							$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
-						}
-						$errores_actuales = $errores_actuales + 1;
 					}
-				}else{
-					$tema_actual = $tema->nombre;
-					$examenes_actuales = $tema->nombre_ex;
-					$errores_actuales = 1;
 				}
 			}
 			$temas_arreglo_temas[$tema_actual] = $errores_actuales;
@@ -409,29 +412,30 @@ class Controller_Curso extends Controller_Template
 			$examen_actual = null;
 			$suma_calificaciones = 0;
 			$asistencia_actual = 0;
-
-			foreach ($calificaciones as $calificacion) {
-				if(isset($examen_actual)){
-					if($examen_actual !== $calificacion->nombre){						
-						array_push($promedios_arreglo_examenes, $examen_actual);
-						array_push($promedios_arreglo_asistencia, $asistencia_actual);
-						array_push($promedios_arreglo_promedios, intval($suma_calificaciones / $asistencia_actual));
+			if(isset($calificaciones)){
+				foreach ($calificaciones as $calificacion) {
+					if(isset($examen_actual)){
+						if($examen_actual !== $calificacion->nombre){
+							array_push($promedios_arreglo_examenes, $examen_actual);
+							array_push($promedios_arreglo_asistencia, $asistencia_actual);
+							array_push($promedios_arreglo_promedios, intval($suma_calificaciones / $asistencia_actual));
+							$examen_actual = $calificacion->nombre;
+							$suma_calificaciones = intval($calificacion->calificacion);
+							$asistencia_actual = 1;
+						}else{
+							$suma_calificaciones = $suma_calificaciones + intval($calificacion->calificacion);
+							$asistencia_actual = $asistencia_actual + 1;
+						}
+					}else{
 						$examen_actual = $calificacion->nombre;
 						$suma_calificaciones = intval($calificacion->calificacion);
 						$asistencia_actual = 1;
-					}else{
-						$suma_calificaciones = $suma_calificaciones + intval($calificacion->calificacion);
-						$asistencia_actual = $asistencia_actual + 1;
 					}
-				}else{
-					$examen_actual = $calificacion->nombre;
-					$suma_calificaciones = intval($calificacion->calificacion);
-					$asistencia_actual = 1;
 				}
+				array_push($promedios_arreglo_examenes, $examen_actual);
+				array_push($promedios_arreglo_asistencia, $asistencia_actual);
+				array_push($promedios_arreglo_promedios, intval($suma_calificaciones / $asistencia_actual));
 			}
-			array_push($promedios_arreglo_examenes, $examen_actual);
-			array_push($promedios_arreglo_asistencia, $asistencia_actual);
-			array_push($promedios_arreglo_promedios, intval($suma_calificaciones / $asistencia_actual));
 
 			$promedios = array('examenes' => $promedios_arreglo_examenes, 'promedios' => $promedios_arreglo_promedios, 'asistencia' => $promedios_arreglo_asistencia);
 
@@ -459,27 +463,29 @@ class Controller_Curso extends Controller_Template
 			$errores_actuales = 0;
 
 			$temas_arreglo_examenes_compuestos = [];
-			foreach ($temas as $tema) {
-				if(isset($tema_actual)){
-					if($tema_actual !== $tema->nombre){
-						// array_push($temas_arreglo_temas, $tema_actual);
-						// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
-						$temas_arreglo_temas[$tema_actual] = $errores_actuales;
-						$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
-						array_push($temas_arreglo_errores, $errores_actuales);
+			if(isset($temas)){
+				foreach ($temas as $tema) {
+					if(isset($tema_actual)){
+						if($tema_actual !== $tema->nombre){
+							// array_push($temas_arreglo_temas, $tema_actual);
+							// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
+							$temas_arreglo_temas[$tema_actual] = $errores_actuales;
+							$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+							array_push($temas_arreglo_errores, $errores_actuales);
+							$tema_actual = $tema->nombre;
+							$examenes_actuales = $tema->nombre_ex;
+							$errores_actuales = 1;
+						}else{
+							if(strpos($examenes_actuales, $tema->nombre_ex) === False){
+								$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
+							}
+							$errores_actuales = $errores_actuales + 1;
+						}
+					}else{
 						$tema_actual = $tema->nombre;
 						$examenes_actuales = $tema->nombre_ex;
 						$errores_actuales = 1;
-					}else{
-						if(strpos($examenes_actuales, $tema->nombre_ex) === False){
-							$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
-						}
-						$errores_actuales = $errores_actuales + 1;
 					}
-				}else{
-					$tema_actual = $tema->nombre;
-					$examenes_actuales = $tema->nombre_ex;
-					$errores_actuales = 1;
 				}
 			}
 			$temas_arreglo_temas[$tema_actual] = $errores_actuales;
@@ -519,23 +525,22 @@ class Controller_Curso extends Controller_Template
 			//                  // ->where('Evalua.id_curso', $id_curso)
 			//                  ->order_by('Alumnos.apellidos');
 			// });
-
-			foreach ($calificaciones as $calificacion) {
-				$calificacion_apellidos = $calificacion['apellidos'];
-				$calificacion_nombres = $calificacion['nombres'];
-				$calificacion_nombre = $calificacion['nombre'];
-				$calificacion_terminado = $calificacion['terminado'];
-				$calificacion_calificacion = $calificacion['calificacion'];
-				if(isset($calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres])){
-					$arreglo_actual = $calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres];
-					array_push($arreglo_actual, array('examen' => $calificacion_nombre, 'calificacion' => $calificacion_calificacion, 'terminado' => $calificacion_terminado ));
-					$calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres] = $arreglo_actual;
-				}else{
-					$calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres] = [array('examen' => $calificacion_nombre, 'calificacion' => $calificacion_calificacion, 'terminado' => $calificacion_terminado )];
+			if(isset($calificaciones)){
+				foreach ($calificaciones as $calificacion) {
+					$calificacion_apellidos = $calificacion['apellidos'];
+					$calificacion_nombres = $calificacion['nombres'];
+					$calificacion_nombre = $calificacion['nombre'];
+					$calificacion_terminado = $calificacion['terminado'];
+					$calificacion_calificacion = $calificacion['calificacion'];
+					if(isset($calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres])){
+						$arreglo_actual = $calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres];
+						array_push($arreglo_actual, array('examen' => $calificacion_nombre, 'calificacion' => $calificacion_calificacion, 'terminado' => $calificacion_terminado ));
+						$calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres] = $arreglo_actual;
+					}else{
+						$calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres] = [array('examen' => $calificacion_nombre, 'calificacion' => $calificacion_calificacion, 'terminado' => $calificacion_terminado )];
+					}
 				}
 			}
-// $this->template->content = var_dump($calificacionesAlumnos);
-// die();
 
 			$data = array('curso' => $curso, 'promedios' => $promedios, 'temasFallados' => $temasFallados, 'calificacionesAlumnos' => $calificacionesAlumnos);
 
