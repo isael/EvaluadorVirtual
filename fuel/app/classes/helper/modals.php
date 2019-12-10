@@ -639,6 +639,50 @@ class Modals
 		return $result;
 	}
 
+	public static function getModalPreguntaCompartida($profesores){
+		$result = '';
+		$lista_de_profesores = [];
+		if(isset($tipos)){
+			foreach ($tipos as $tipo) {
+				array_push($lista_de_profesores, array($tipo->id_tipo, $tipo->nombre));
+			}
+		}
+		$lista_de_temas = [];
+		if(isset($tipos)){
+			foreach ($tipos as $tipo) {
+				array_push($lista_de_temas, array($tipo->id_tipo, $tipo->nombre));
+			}
+		}
+		$boton_extra=null;
+		$result = '';
+		$default_id_profesor = '';
+		$default_id_tema = '';
+		$result = $result.Form::open('curso/examen/preguntas_compartidas');
+		$result = $result.'<div class="form-group">
+							<div class="table">
+								<br>
+								<div class="col-xs-12 col-sm-12 table-row">'.
+									Form::label('Nombre del profesor', 'pregunta_compartida_profesor').'
+								</div>
+								<div class="col-xs-12 col-sm-12 table-row">'.
+									Special_Selector::createSpecialSelector("pregunta_compartida_profesor", "results_compartida_nombre_profesor", $lista_de_profesores,"Seleccionar un profesor",$boton_extra,null,$default_id_profesor).'
+								</div>
+								<div class="col-xs-12 col-sm-12 table-row">'.
+									Form::label('Tema', 'pregunta_compartida_tema').'
+								</div>
+								<div class="col-xs-12 col-sm-12 table-row">'.
+									Special_Selector::createSpecialSelector("pregunta_compartida_tema", "results_compartida_tema", $lista_de_temas,"Selecciona un tema",$boton_extra,null,$default_id_tema).'
+								</div>
+								<br>
+								<div class="col-xs-12 col-sm-12 table-row">'.
+									Form::button('boton_buscar_preguntas', 'Buscar', array('class' => 'btn btn-primary btn-block')).'
+								</div>
+							</div>
+						</div>';
+		$result = $result.Form::close();
+		return $result;
+	}
+
 	public static function getModalAbandonar($value='')
 	{
 		echo '<div class="modal fade" id="modalAbandonar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">';

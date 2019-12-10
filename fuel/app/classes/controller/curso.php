@@ -374,7 +374,9 @@ class Controller_Curso extends Controller_Template
 			                 ->order_by('Fuente.nombre');
 			});
 
-			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas, 'tipos' => $tipos);
+			$profesores = null;
+
+			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas, 'tipos' => $tipos, 'profesores' => $profesores);
 			
 			$this->template->content = View::forge('curso/examenes', $data);
 		}else{
@@ -577,5 +579,4 @@ class Controller_Curso extends Controller_Template
 			Response::redirect('sesion/index');
 		}
 	}
-
 }

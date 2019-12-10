@@ -1402,4 +1402,38 @@ class Controller_Curso_Examen extends Controller_Template
 			}
 		}
 	}
+
+	/**
+	 * Controlador que llevará a la pantalla previa a presentar un examen.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_compartir_pregunta($id_pregunta){
+		if(isset($id_pregunta)){
+			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
+			if(isset($pregunta)){
+				if($pregunta->compartida === '0')
+					$pregunta->compartida = '1';
+				else
+					$pregunta->compartida = '0';
+				$pregunta->save();
+			}
+		}
+		SESSION::set('pestania','preguntas');
+		Response::redirect('curso/examenes');
+	}
+
+	/**
+	 * Controlador que llevará a la pantalla previa a presentar un examen.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_preguntas_compartidas(){
+		$id_profesor = trim(Input::post('pregunta_compartida_profesor_option_selected'));
+		$id_tema = trim(Input::post('pregunta_compartida_tema_option_selected'));
+		SESSION::set('pestania','preguntas');
+		Response::redirect('curso/examenes');
+	}
 }

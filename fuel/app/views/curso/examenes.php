@@ -226,53 +226,9 @@
 										<button id="mostrarCrearPreguntaCompartida" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPreguntaCompartida','agregarPreguntaCompartida','+ Agrega preguntas compartidas','- Cancelar preguntas compartidas')">+ Agrega preguntas compartidas</button>
 									</div>
 									<div id="agregarPreguntaCompartida" class="row" style="display: none;">
-										<?php echo Form::open('curso/examen/crear_pregunta');?>
-										<div class="form-group">
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Nombre', 'nombre_bibliografia');?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::input('nombre_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de la fuente'));?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Autor(es)', 'autor_bibliografia');?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::input('autor_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nombre de los autores'));?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Edición', 'edicion_bibliografia');?>
-											</div>
-											<div class="col-xs-12 col-sm-12 table">
-												<div class="col-xs-4 col-sm-4 table-row">
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::label('#', 'numero_edicion_bibliografia');?>
-													</div>
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('numero_edicion_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Número'));?>
-													</div>
-												</div>
-												<div class="col-xs-8 col-sm-8 table-row">
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::label('Año', 'anio_bibliografia');?>
-													</div>
-													<div class="col-xs-12 col-sm-12">
-														<?php echo Form::input('anio_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Año'));?>
-													</div>
-												</div>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::label('Enlace en línea (si existe)', 'link_bibliografia');?>
-											</div>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::input('link_bibliografia','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Enlace o link a la fuente'));?>
-											</div>
-											<br>
-											<div class="col-xs-12 col-sm-12">
-												<?php echo Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block'));?>
-											</div>
-										</div>
-										<?php echo Form::close();?>
+										<?php
+											echo Modals::getModalPreguntaCompartida($profesores);
+										?>
 									</div>
 
 								<?php
@@ -300,7 +256,8 @@
 											echo "<br>";
 										echo '</div>';
 										echo '<div class="col-xs-3">';
-											echo '<button id="compartir" class="btn btn-primary btn-block" onclick="">Compartir</button>';
+											$texto = $pregunta->compartida === '1' ? 'Dejar de compartir' : 'Compartir';
+											echo Html::anchor('curso/examen/compartir_pregunta/'.$pregunta->id_pregunta,$texto, array('class' => 'btn btn-primary btn-block'));
 										echo '</div>';
 										echo "</br>";
 									echo '</div>';
