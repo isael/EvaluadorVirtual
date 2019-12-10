@@ -203,7 +203,7 @@ class Modals
 								Form::input("id_examen",$id_examen ? $id_examen : '', array('type' => 'hidden')).'
 								<div class="col-xs-1"></div>
 									<div class="col-xs-10">
-										<button type="button" id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas del tema y dificultad seleccionados\',\'- Cancelar nuevo tema\')">+ Agregar preguntas del tema y dificultad seleccionados</button>
+										<button type="button" id="mostrarAgregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario(\'mostrarAgregarPreguntasPorTema'.$sufijo_modal.'\',\'agregarPreguntasPorTema'.$sufijo_modal.'\',\'+ Agregar preguntas\',\'- Cancelar agregar preguntas\')">+ Agregar preguntas</button>
 										<div id="agregarPreguntasPorTema'.$sufijo_modal.'" class="row" style="display: none;">'.'
 											<div class="col-xs-12 col-sm-12">'.
 												Form::label('Tema', 'examen_tema'.$sufijo_modal).'
@@ -234,7 +234,7 @@ class Modals
 												</div>
 											</div>											
 											<div class="col-xs-12 col-sm-12 table">
-												<button type="button" id="agregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block" onclick="javascript:agregarPreguntasPorTemaYNivel(lista_de_preguntas_por_tema,examen_tema,examen_tema_nivel_desde,examen_tema_nivel_hasta,'.($is_modal ? 'true':'false').');">+ Agregar </button>
+												<button type="button" id="agregarPreguntasPorTema'.$sufijo_modal.'" class="btn btn-primary btn-block" onclick="javascript:agregarPreguntasPorTemaYNivel(lista_de_preguntas_por_tema,examen_tema,examen_tema_nivel_desde,examen_tema_nivel_hasta,'.($is_modal ? 'true':'false').');">+ Agregar preguntas del tema y dificultad seleccionados</button>
 											</div>
 										</div>
 									</div>								
@@ -637,5 +637,40 @@ class Modals
 		}
 		$result = $result.Form::close();
 		return $result;
+	}
+
+	public static function getModalAbandonar($value='')
+	{
+		echo '<div class="modal fade" id="modalAbandonar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">';
+        	echo '<div class="modal-dialog" role="document">';
+                echo '<div class="modal-content">';
+                    echo '<div class="modal-header">';
+                        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+                          echo '<span aria-hidden="true">&times;</span>';
+                        echo '</button>';
+                        echo '<h4 class="modal-title" id="myModalLabel"> Abandonando Examen </h4>';
+                    echo '</div>';
+                    echo '<div class="modal-body">';
+                      	echo '<div class="form-group">
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-12 col-sm-12">
+										¿Estás seguro de salir del examen? Esto te restará una vida y afectará tu calificación
+									</div>
+								</div>
+							</div>';
+                    echo '</div>';
+                    echo '<div class="modal-footer">';
+                        echo '<div class="row text-center">';
+                          echo '<div class="col-xs-6">';
+                              echo '<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cerrar</button>';
+                          echo '</div>';
+                          echo '<div class="col-xs-6">';
+                              echo Html::anchor('curso/examen/final/abandonado','Abandonar',array('class'=>'btn btn-primary btn-block btn-lg'));
+                          echo '</div>';
+                        echo '</div>';
+                    echo '</div>';
+                echo '</div>';
+        	echo '</div>';
+        echo '</div>';
 	}
 }

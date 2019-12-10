@@ -33,7 +33,7 @@
 				?>
 				<!-- /SESSION -->
 
-				<!-- EXTRA -->				
+				<!-- EXTRA -->
 				<?php
 					$lista_de_tipos_min_max_resp = [];
 					if(isset($tipos)){
@@ -80,9 +80,7 @@
 							if(isset($examenes)){
 								echo '<div class="row">';
 								foreach ($examenes as $examen) {
-									
 									echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-										// echo '<a href="curso/examen/mostrar_examen/'.$examen->id_examen.'">';
 										echo Html::anchor('curso/examen/mostrar_examen/'.$examen->id_examen,
 												'<div class="row">'.
 													'<div class="col-xs-3">'.
@@ -94,16 +92,6 @@
 													'</div>'.
 												'</div>'
 											, array('class' => ''));
-										// echo '<div class="row">';
-										// 	echo '<div class="col-xs-3">';
-										// 		echo '<i i="" class="fa fa-file-text-o fav_icon"></i>';
-										// 	echo '</div>';
-										// 	echo '<div class="col-xs-9">';
-										// 		echo $examen->nombre.': ';
-										// 		echo ' '.$examen->preguntas_por_mostrar.' preguntas';
-										// 	echo '</div>';
-										// echo '</div>';
-										// echo '</a>';
 									echo '</div>';
 								}
 								echo '</div>';
@@ -123,36 +111,34 @@
 						<!-- /Lista Examenes -->
 						<br>
 						<!-- Seccion agregar examenes -->
-						<?php 
+						<?php
 							switch($cual_boton){
 								case "preguntas":
 								?>
 									<div class="row">
 										<a class="btn btn-primary btn-block btn-lg" href="javascript:cambiarPestania(pestanias, preguntas);">Crear Preguntas</a>
 									</div>
-								<?php 
+								<?php
 									break;
 								case "bibliografia":
 								?>
 									<div class="row">
 										<a class="btn btn-primary btn-block btn-lg" href="javascript:cambiarPestania(pestanias, bibliografia);">Crear Bibliografía</a>
 									</div>
-								<?php 
+								<?php
 									break;
 								case "examen":
 								default:
 								?>
 									<div class="row">
 										<button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearExamen','agregarExamen','+ Crear nuevo examen','- Cancelar creación de examen')">+ Crear nuevo examen</button>
-										
-										<!-- <button id="mostrarCrearExamen" class="btn btn-primary btn-block btn-lg" data-toggle="modal" data-target="#modalCrearExamen">+ Crear nuevo examen</button> -->
 									</div>
 									<br>
 									<div id="agregarExamen" class="row" style="display: none;">
 										<?php echo Modals::getModalExamen($temas); ?>
 									</div>
 
-								<?php 
+								<?php
 							}
 							?>
 						<!-- /Seccion agregar examenes -->
@@ -171,7 +157,7 @@
 											echo '<i class="fa fa-book" aria-hidden="true"></i>';
 										echo '</div>';
 										echo '<div class="col-xs-9">';
-											echo Html::anchor('curso/examen/mostrar_bibliografia/'.$fuente->id_fuente.'/'.$fuente->numero,$fuente->nombre.' - '.$fuente->autores.'. '.$fuente->numero.'ª Edición: '.', '.$fuente->anio.'<br>', array('class' => ''));
+											echo Html::anchor('curso/examen/mostrar_bibliografia/'.$fuente->id_fuente.'/'.$fuente->numero,$fuente->nombre.' - '.$fuente->autores.'. '.$fuente->numero.'ª Edición, '.$fuente->anio.'<br>', array('class' => ''));
 											echo "<br>";
 										echo '</div>';
 										echo "</br>";
@@ -199,16 +185,30 @@
 
 					<!-- Preguntas -->
 					<div id="area_preguntas" class="area<?php echo $pestania == 'preguntas' ? " expuesto": " oculto"; ?>">
+						<!-- Lista Preguntas Vacia-->
+						<?php
+							$cual_boton = "preguntas";
+							if(!isset($preguntas)){
+								//Verificar si hay bibliografía
+								if(isset($bibliografias)){
+									echo "Las preguntas se separan por temas";
+								}else{
+									$cual_boton = "bibliografia";
+									echo "Para crear preguntas debe existir bibliografía";
+								}
+							}
+						?>
+						<!-- /Lista Preguntas Vacia-->
 						<!-- Seccion agregar pregunta -->
 						<br>
-						<?php 
+						<?php
 							switch($cual_boton){
 								case "bibliografia":
 								?>
 									<div class="row">
 										<a class="btn btn-primary btn-block btn-lg" href="javascript:cambiarPestania(pestanias, bibliografia);">Crear Bibliografía</a>
 									</div>
-								<?php 
+								<?php
 									break;
 								case "preguntas":
 								default:
@@ -275,7 +275,7 @@
 										<?php echo Form::close();?>
 									</div>
 
-								<?php 
+								<?php
 							}
 							?>
 						<!-- /Seccion agregar pregunta -->
@@ -308,14 +308,6 @@
 								if($tema_actual !== "")
 									echo "</div>";
 								echo '</div>';
-							}else{
-								//Verificar si hay preguntas
-								if(isset($bibliografias)){									
-									echo "Las preguntas se separan por temas";
-								}else{
-									$cual_boton = "bibliografia";
-									echo "Para crear preguntas debe existir bibliografía";
-								}
 							}
 						?>
 						<!-- /Lista Preguntas -->
@@ -335,9 +327,9 @@
 				<div class="modal fade" id="modalExamen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<?php echo Modals::getModalExamen($temas, True, $idExamen); ?>
 				</div>
-				<?php 
+				<?php
 					}
-				?>	
+				?>
 
 				<?php
 					if(isset($idFuente)){
@@ -345,9 +337,9 @@
 				<div class="modal fade" id="modalBibliografia" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<?php echo Modals::getModalBibliografia(True, $idFuente, $numeroFuente); ?>
 				</div>
-				<?php 
+				<?php
 					}
-				?>	
+				?>
 
 				<?php
 					if(isset($idPregunta)){
@@ -355,41 +347,9 @@
 				<div class="modal fade" id="modalPregunta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<?php echo Modals::getModalPregunta($temas, $bibliografias, $tipos, True, $idPregunta); ?>
 				</div>
-				<?php 
+				<?php
 					}
-				?>	
-
-				<div class="modal fade" id="modalCrearExamen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<div class="modal-dialog" role="document">
-						<div class="modal-content">
-							<!-- <div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-							<h4 class="modal-title" id="myModalLabel">Agregar nuevo tema</h4>
-							</div>
-
-							<div class="form-group">
-								<div class="modal-body">
-									<div class="input-group">
-										<?php echo Form::label('Escribe el nombre del nuevo tema. Este se agregará hasta que se haya guardado la pregunta correctamente.', 'modal_tema_input');?>
-										<input id="modal_tema_input" type="text" class="form-control" placeholder="Cuida la ortografía al escribir el tema">
-									</div>
-								</div>
-								<div class="modal-footer">
-									<div class="row text-center">
-										<div class="col-xs-6">
-											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
-										</div>
-										<div class="col-xs-6">
-											<?php echo Html::anchor('javascript:agregarNuevoElementoEnLista(modal_tema_input,results_tema,pregunta_tema,cancelarTema);','Guardar Cambios', array('class' => 'btn btn-primary btn-block')); ?>
-										</div>
-									</div>
-								</div>
-							</div> -->
-						</div>
-					</div>
-				</div>
+				?>
 
 				<div class="modal fade" id="modalAgregarTema" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">
@@ -455,7 +415,7 @@
 				</div>
 
 				<!-- /Modales -->
-				
+
 				<!-- /Contenido -->
 			</div>
 		</div>
@@ -478,58 +438,58 @@
 			echo ",";
 		}
 		echo "}";
-	 ?>;
-	 <?php
-	 if(isset($idExamen)){
-	 	?>
-	 		let botonModalExamen = document.createElement('button');
-	 		botonModalExamen.setAttribute('data-toggle','modal');
-	 		botonModalExamen.setAttribute('data-target','#modalExamen');
-	 		botonModalExamen.style.visibility = "hidden";
-	 		let padre = document.getElementById('botonModal');
-	 		padre.appendChild(botonModalExamen);
-	 		setTimeout(function(){
-	 			botonModalExamen.click();
-	 			padre.removeChild(botonModalExamen);
-	 			let input_oculto = document.getElementById('examen_temas_modal');
-	 			input_oculto.click();
-	 		},100);
-	 		
-	 	<?php
-	 }
-	 ?>
-	 <?php
-	 if(isset($idPregunta)){
-	 	?>
-	 		let botonModalPregunta = document.createElement('button');
-	 		botonModalPregunta.setAttribute('data-toggle','modal');
-	 		botonModalPregunta.setAttribute('data-target','#modalPregunta');
-	 		botonModalPregunta.style.visibility = "hidden";
-	 		let padre = document.getElementById('botonModal');
-	 		padre.appendChild(botonModalPregunta);
-	 		setTimeout(function(){
-	 			botonModalPregunta.click();
-	 			padre.removeChild(botonModalPregunta);
-	 		},100);
-	 		
-	 	<?php
-	 }
-	 ?>
-	 <?php
-	 if(isset($idFuente)){
-	 	?>
-	 		let botonModalBibliografia = document.createElement('button');
-	 		botonModalBibliografia.setAttribute('data-toggle','modal');
-	 		botonModalBibliografia.setAttribute('data-target','#modalBibliografia');
-	 		botonModalBibliografia.style.visibility = "hidden";
-	 		let padre = document.getElementById('botonModal');
-	 		padre.appendChild(botonModalBibliografia);
-	 		setTimeout(function(){
-	 			botonModalBibliografia.click();
-	 			padre.removeChild(botonModalBibliografia);
-	 		},100);
-	 		
-	 	<?php
-	 }
-	 ?>
+	?>;
+	<?php
+	if(isset($idExamen)){
+		?>
+			let botonModalExamen = document.createElement('button');
+			botonModalExamen.setAttribute('data-toggle','modal');
+			botonModalExamen.setAttribute('data-target','#modalExamen');
+			botonModalExamen.style.visibility = "hidden";
+			let padre = document.getElementById('botonModal');
+			padre.appendChild(botonModalExamen);
+			setTimeout(function(){
+				botonModalExamen.click();
+				padre.removeChild(botonModalExamen);
+				let input_oculto = document.getElementById('examen_temas_modal');
+				input_oculto.click();
+			},100);
+
+		<?php
+	}
+	?>
+	<?php
+	if(isset($idPregunta)){
+		?>
+			let botonModalPregunta = document.createElement('button');
+			botonModalPregunta.setAttribute('data-toggle','modal');
+			botonModalPregunta.setAttribute('data-target','#modalPregunta');
+			botonModalPregunta.style.visibility = "hidden";
+			let padre = document.getElementById('botonModal');
+			padre.appendChild(botonModalPregunta);
+			setTimeout(function(){
+				botonModalPregunta.click();
+				padre.removeChild(botonModalPregunta);
+			},100);
+
+		<?php
+	}
+	?>
+	<?php
+	if(isset($idFuente)){
+		?>
+			let botonModalBibliografia = document.createElement('button');
+			botonModalBibliografia.setAttribute('data-toggle','modal');
+			botonModalBibliografia.setAttribute('data-target','#modalBibliografia');
+			botonModalBibliografia.style.visibility = "hidden";
+			let padre = document.getElementById('botonModal');
+			padre.appendChild(botonModalBibliografia);
+			setTimeout(function(){
+				botonModalBibliografia.click();
+				padre.removeChild(botonModalBibliografia);
+			},100);
+
+		<?php
+	}
+	?>
 </script>

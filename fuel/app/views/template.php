@@ -22,6 +22,10 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
     <!-- Theme CSS -->
     <?php echo Asset::css('freelancer.css'); ?>
 
+    <!-- Chart -->
+    <?php echo Asset::js('Chart.js'); ?>
+    <?php echo Asset::css('Chart.css'); ?>
+
     <!-- Extra-Styles -->
     <?php echo Asset::css('specialSelect.css'); ?>
 
@@ -87,6 +91,9 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 <!-- Theme JavaScript -->
     <?php echo Asset::js('freelancer.js'); ?>
+
+<!-- PrintThis -->
+    <?php echo Asset::js('printThis.js'); ?>
 
 <!-- Extra-functionality -->
     <?php echo Asset::js('specialSelect.js'); ?>

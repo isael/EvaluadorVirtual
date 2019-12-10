@@ -8,18 +8,8 @@
 					<div class="col-xs-4">
 						<?php echo "Vidas: "; ?>
 						<?php
-							$fallas = SESSION::get('fallas');							
 							$vidas_posibles = intval($examen->vidas);
-							$vidas_usadas = 1;
-							if(isset($presenta)){
-								$es_test = False;
-								$vidas_usadas = intval($presenta->vidas);
-							}
-							$vidas_totales = $vidas_posibles - $vidas_usadas;
-							for ($i=0; $i < $vidas_totales; $i++) { 
-								echo '<i class="fa fa-heart" aria-hidden="true"></i>';
-							}
-							for ($i=0; $i < $vidas_usadas; $i++) { 
+							for ($i=0; $i < $vidas_posibles; $i++) { 
 								echo '<i class="fa fa-heart-o" aria-hidden="true"></i>';
 							}
 						?>
@@ -31,22 +21,7 @@
 						<?php echo "Oportunidades: "; ?>
 						<?php
 							$oportunidades_posibles = intval($examen->oportunidades);
-							$oportunidades_usadas = 0;
-							if(isset($fallas)){
-								SESSION::delete('fallas');
-							}
-							if(isset($presenta)){
-								$oportunidades_usadas = intval($presenta->oportunidades);
-							}else{
-								if(isset($fallas)){
-									$oportunidades_usadas = $fallas;
-								}
-							}
-							$oportunidades_totales = $oportunidades_posibles - $oportunidades_usadas;
-							for ($i=0; $i < $oportunidades_totales; $i++) { 
-								echo '<i class="fa fa-star" aria-hidden="true"></i>';
-							}
-							for ($i=0; $i < $oportunidades_usadas; $i++) { 
+							for ($i=0; $i < $oportunidades_posibles; $i++) { 
 								echo '<i class="fa fa-star-o" aria-hidden="true"></i>';
 							}
 						?>
@@ -58,28 +33,15 @@
 				<!-- Informacion -->
 					<div class="col-xs-12">
 						<div class="col-xs-12">
-							<h4>Calificación:</h4>
+							<span>
+								<?php 
+									echo "Ya has presentado este examen con éxito. Tu calificación fue ";
+									if(isset($presenta)){
+										echo $presenta->calificacion;
+									}
+								?>
+							</span>
 						</div>
-						<div class="col-xs-12">
-							<?php
-								if(!isset($calificacion)){
-									$calificacion = '0';
-								}
-								echo  $calificacion.'/10';
-							?>
-						</div>
-					</div>					
-					<div class="col-xs-12">
-						<?php
-							if(intval($presenta->vidas)>1){
-								echo "A pesar de que tu puntaje obtenido fue de ";
-								if(!isset($puntaje_obtenido)){
-									$puntaje_obtenido = '0';
-								}
-								echo  $puntaje_obtenido.'/10';
-								echo ", tu calificación final se ve afectada por las vidas y oportunidades que gastaste.";
-							}
-						?>
 					</div>
 					<br>
 					<div class="col-xs-12">
@@ -183,7 +145,6 @@
 							?>
 						</div>
 					</div>
-
 				<!-- /Informacion -->
 				
 				<!-- /Contenido -->
@@ -195,7 +156,7 @@
 <footer class="text-center" style="padding-top: 33px;">
 	<div class="footer-above">
         <div class="row">
-        	<?php echo $es_test ? Form::open('curso/examenes') : Form::open('curso/alumno'); ?>
+        	<?php echo Form::open('curso/alumno'); ?>
             <div class="col-xs-12">
                 <?php echo Form::button('salir', 'Salir', array('class' => 'btn btn-danger btn-block')); ?>
             </div>

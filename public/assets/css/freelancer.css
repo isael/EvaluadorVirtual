@@ -650,7 +650,7 @@ i.fav_icon {
   display: none;
 }
 .expuesto{
-  display: initial;
+  display: block;
 }
 .examen{
   background-color: #00997a;
@@ -669,4 +669,7 @@ i.fav_icon {
 }
 .table-row{
   display: table-row;
+}
+.canvas_chart{
+  background-color: #ffffff;
 }

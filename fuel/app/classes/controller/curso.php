@@ -70,19 +70,46 @@ class Controller_Curso extends Controller_Template
 	public function action_alumno()
 	{
 		$id=SESSION::get('id_sesion');
+		if(isset($volver) && $volver === 'volver'){
+			SESSION::delete('id_examen');
+		}
 		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='a'){
 			$id_curso = SESSION::get('id_curso');
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
-			
-			/*$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
-			    return $query->join('Cursa')
-			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
-			                 ->where('Cursa.id_curso', $id_curso)
-			                 ->order_by('Cursa.estado');
-			});*/
-			$alumnos=null;
+			$hoy = date('Y-m-d H:i:s');
 
-			$data = array('curso' => $curso, 'alumnos' => $alumnos);
+			$n_cuenta = substr($id, 1);
+
+			$examenes = Model_Examen::find(function ($query) use ($id_curso, $hoy){
+			    return $query->join('Evalua')
+			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			                 ->where('Evalua.id_curso', $id_curso)
+			                 ->order_by('Examen.fecha_fin');
+			});
+			$examenes_disponibles=[];
+			$examenes_hechos=[];
+			$cantidad_presentados = 0;
+			$suma_calificacion_presentados = 0;
+			$promedio = 0;
+			if(isset($examenes)){
+				foreach ($examenes as $examen) {
+					if($examen->fecha_fin >= $hoy && $examen->fecha_inicio <= $hoy){
+						array_push($examenes_disponibles, $examen->id_examen);
+					}
+					$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $examen->id_examen));
+					if(isset($presenta) && $presenta->terminado > 0){
+						array_push($examenes_hechos, $examen->id_examen);
+						$cantidad_presentados++;
+						$suma_calificacion_presentados = $suma_calificacion_presentados + intval($presenta->calificacion);
+					}
+				}
+			}
+
+			if($cantidad_presentados > 0){
+				$promedio = $suma_calificacion_presentados / $cantidad_presentados;
+			}
+
+			$data = array('curso' => $curso, 'examenes' => $examenes, 'examenes_disponibles' => $examenes_disponibles, 'examenes_hechos' => $examenes_hechos, 'promedio' => $promedio, 'hoy' => $hoy);
 			$this->template->content = View::forge('curso/alumno', $data);
 		}else{
 			Response::redirect('sesion/index');
@@ -201,17 +228,92 @@ class Controller_Curso extends Controller_Template
 		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='a'){
 			$id_curso = SESSION::get('id_curso');
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+			$n_cuenta = substr($id, 1);
 			
-			/*$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
-			    return $query->join('Cursa')
-			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
-			                 ->where('Cursa.id_curso', $id_curso)
-			                 ->order_by('Cursa.estado');
-			});*/
-			$alumnos=null;
+			$calificaciones = Model_Examen::find(function ($query) use ($id_curso,$n_cuenta){
+			    return $query->select('Examen.nombre','Presenta.calificacion')
+			                 ->join('Evalua')
+			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			                 ->join('Presenta')
+			                 ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+			                 ->where('Evalua.id_curso', $id_curso)
+			                 ->where('Presenta.n_cuenta', $n_cuenta)
+			                 ->where('Presenta.terminado', '=', '1')
+			                 ->order_by('Examen.id_examen');
+			});
 
-			$data = array('curso' => $curso, 'alumnos' => $alumnos);
-			
+			$promedios_arreglo_examenes = [];
+			$promedios_arreglo_promedios = [];
+
+			foreach ($calificaciones as $calificacion) {
+				array_push($promedios_arreglo_examenes, $calificacion->nombre);
+				array_push($promedios_arreglo_promedios, intval($calificacion->calificacion));
+			}
+
+			$promedios = array('examenes' => $promedios_arreglo_examenes, 'promedios' => $promedios_arreglo_promedios);
+
+			$temas = Model_Tema::find(function ($query) use ($id_curso,$n_cuenta){
+			    return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
+			                 ->join('CometeErroresEn')
+			                 ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
+			                 ->join('BasadoEn')
+			                 ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
+			                 ->join('Examen')
+			                 ->on('Examen.id_examen', '=', 'BasadoEn.id_examen')
+			                 ->join('Evalua')
+			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			                 ->where('Evalua.id_curso', $id_curso)
+			                 ->where('CometeErroresEn.n_cuenta', $n_cuenta)
+			                 ->order_by('nombre_ex')
+			                 ->order_by('Tema.nombre');
+			});
+
+			$temas_arreglo_temas = [];
+			$temas_arreglo_examenes = [];
+			$temas_arreglo_errores = [];
+
+			$tema_actual = null;
+			$examenes_actuales = null;
+			$errores_actuales = 0;
+
+			$temas_arreglo_examenes_compuestos = [];
+			foreach ($temas as $tema) {
+				if(isset($tema_actual)){
+					if($tema_actual !== $tema->nombre){
+						// array_push($temas_arreglo_temas, $tema_actual);
+						// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
+						$temas_arreglo_temas[$tema_actual] = $errores_actuales;
+						$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+						array_push($temas_arreglo_errores, $errores_actuales);
+						$tema_actual = $tema->nombre;
+						$examenes_actuales = $tema->nombre_ex;
+						$errores_actuales = 1;
+					}else{
+						if(strpos($examenes_actuales, $tema->nombre_ex) === False){
+							$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
+						}
+						$errores_actuales = $errores_actuales + 1;
+					}
+				}else{
+					$tema_actual = $tema->nombre;
+					$examenes_actuales = $tema->nombre_ex;
+					$errores_actuales = 1;
+				}
+			}
+			$temas_arreglo_temas[$tema_actual] = $errores_actuales;
+			$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+			array_push($temas_arreglo_errores, $errores_actuales);
+			asort($temas_arreglo_errores);
+			arsort($temas_arreglo_temas);
+			arsort($temas_arreglo_examenes_compuestos);
+			foreach ($temas_arreglo_examenes_compuestos as $nombre_compuesto => $valor) {
+				$nombre_combinado_examen = explode("+++***+++", $nombre_compuesto);
+				array_push($temas_arreglo_examenes, $nombre_combinado_examen[1]);
+			}
+			$temasFallados = array('temas' => $temas_arreglo_temas, 'examenes' => $temas_arreglo_examenes, 'errores' => $temas_arreglo_errores );;
+
+			$data = array('curso' => $curso, 'promedios' => $promedios, 'temasFallados' => $temasFallados);
+
 			$this->template->content = View::forge('curso/mis_estadisticas', $data);
 		}else{
 			Response::redirect('sesion/index');
@@ -223,9 +325,12 @@ class Controller_Curso extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_examenes()
+	public function action_examenes($volver = null)
 	{	
 		$id=SESSION::get('id_sesion');
+		if(isset($volver) && $volver === 'volver'){
+			SESSION::delete('id_examen');
+		}
 		$id_curso = SESSION::get('id_curso');
 		if(isset($id) && isset($id_curso) && ($tipo_usuario = substr($id,0,1))=='p'){
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
@@ -236,20 +341,6 @@ class Controller_Curso extends Controller_Template
 			                 ->where('Evalua.id_curso', $id_curso)
 			                 ->order_by('Evalua.id_examen');
 			});
-			// if(isset($examenes)){
-			// 	$id_examenes = array();
-			// 	foreach ($examenes as $examen) {
-			// 		$id_examenes[] = $examen->id_examen;
-			// 	}
-			// 	$temas = Model_Tema::find(function ($query) use ($id_examenes){
-			//     return $query->join('BasadoEn')
-			//                  ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			//                  ->where('BasadoEn.id_examen', 'IN', $id_examenes)
-			//                  ->order_by('BasadoEn.id_examen');
-			// 	});
-			// }else{
-			// 	$temas = null;
-			// }
 
 			$temas = Model_Tema::find(function ($query) use ($id_curso){
 				return $query->join('CursoTema')
@@ -300,16 +391,154 @@ class Controller_Curso extends Controller_Template
 			$id_curso = SESSION::get('id_curso');
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 			
-			/*$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
-			    return $query->join('Cursa')
-			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
-			                 ->where('Cursa.id_curso', $id_curso)
-			                 ->order_by('Cursa.estado');
-			});*/
-			$alumnos=null;
+			$calificaciones = Model_Examen::find(function ($query) use ($id_curso){
+			    return $query->select('Examen.nombre','Presenta.calificacion')
+			                 ->join('Evalua')
+			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			                 ->join('Presenta')
+			                 ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+			                 ->where('Evalua.id_curso', $id_curso)
+			                 ->where('Presenta.terminado', '=', '1')
+			                 ->order_by('Examen.id_examen');
+			});
 
-			$data = array('curso' => $curso, 'alumnos' => $alumnos);
-			
+			$promedios_arreglo_examenes = [];
+			$promedios_arreglo_promedios = [];
+			$promedios_arreglo_asistencia = [];
+
+			$examen_actual = null;
+			$suma_calificaciones = 0;
+			$asistencia_actual = 0;
+
+			foreach ($calificaciones as $calificacion) {
+				if(isset($examen_actual)){
+					if($examen_actual !== $calificacion->nombre){						
+						array_push($promedios_arreglo_examenes, $examen_actual);
+						array_push($promedios_arreglo_asistencia, $asistencia_actual);
+						array_push($promedios_arreglo_promedios, intval($suma_calificaciones / $asistencia_actual));
+						$examen_actual = $calificacion->nombre;
+						$suma_calificaciones = intval($calificacion->calificacion);
+						$asistencia_actual = 1;
+					}else{
+						$suma_calificaciones = $suma_calificaciones + intval($calificacion->calificacion);
+						$asistencia_actual = $asistencia_actual + 1;
+					}
+				}else{
+					$examen_actual = $calificacion->nombre;
+					$suma_calificaciones = intval($calificacion->calificacion);
+					$asistencia_actual = 1;
+				}
+			}
+			array_push($promedios_arreglo_examenes, $examen_actual);
+			array_push($promedios_arreglo_asistencia, $asistencia_actual);
+			array_push($promedios_arreglo_promedios, intval($suma_calificaciones / $asistencia_actual));
+
+			$promedios = array('examenes' => $promedios_arreglo_examenes, 'promedios' => $promedios_arreglo_promedios, 'asistencia' => $promedios_arreglo_asistencia);
+
+			$temas = Model_Tema::find(function ($query) use ($id_curso){
+			    return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
+			                 ->join('CometeErroresEn')
+			                 ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
+			                 ->join('BasadoEn')
+			                 ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
+			                 ->join('Examen')
+			                 ->on('Examen.id_examen', '=', 'BasadoEn.id_examen')
+			                 ->join('Evalua')
+			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			                 ->where('Evalua.id_curso', $id_curso)
+			                 ->order_by('nombre_ex')
+			                 ->order_by('Tema.nombre');
+			});
+
+			$temas_arreglo_temas = [];
+			$temas_arreglo_examenes = [];
+			$temas_arreglo_errores = [];
+
+			$tema_actual = null;
+			$examenes_actuales = null;
+			$errores_actuales = 0;
+
+			$temas_arreglo_examenes_compuestos = [];
+			foreach ($temas as $tema) {
+				if(isset($tema_actual)){
+					if($tema_actual !== $tema->nombre){
+						// array_push($temas_arreglo_temas, $tema_actual);
+						// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
+						$temas_arreglo_temas[$tema_actual] = $errores_actuales;
+						$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+						array_push($temas_arreglo_errores, $errores_actuales);
+						$tema_actual = $tema->nombre;
+						$examenes_actuales = $tema->nombre_ex;
+						$errores_actuales = 1;
+					}else{
+						if(strpos($examenes_actuales, $tema->nombre_ex) === False){
+							$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
+						}
+						$errores_actuales = $errores_actuales + 1;
+					}
+				}else{
+					$tema_actual = $tema->nombre;
+					$examenes_actuales = $tema->nombre_ex;
+					$errores_actuales = 1;
+				}
+			}
+			$temas_arreglo_temas[$tema_actual] = $errores_actuales;
+			$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+			array_push($temas_arreglo_errores, $errores_actuales);
+			asort($temas_arreglo_errores);
+			arsort($temas_arreglo_temas);
+			arsort($temas_arreglo_examenes_compuestos);
+			foreach ($temas_arreglo_examenes_compuestos as $nombre_compuesto => $valor) {
+				$nombre_combinado_examen = explode("+++***+++", $nombre_compuesto);
+				array_push($temas_arreglo_examenes, $nombre_combinado_examen[1]);
+			}
+			$temasFallados = array('temas' => $temas_arreglo_temas, 'examenes' => $temas_arreglo_examenes, 'errores' => $temas_arreglo_errores );;
+
+			$calificacionesAlumnos = [];
+			$sql = "SELECT `Alumno`.`nombres`, `Alumno`.`apellidos`, `Examen`.`nombre`, `Presenta`.`calificacion`, `Presenta`.`terminado` FROM `Alumno` JOIN `Presenta` ON (`Presenta`.`n_cuenta` = `Alumno`.`n_cuenta`) JOIN `Examen` ON (`Presenta`.`id_examen` = `Examen`.`id_examen`) JOIN `Evalua` ON (`Evalua`.`id_examen` = `Examen`.`id_examen`) WHERE `Evalua`.`id_curso` = '".$id_curso."' UNION (SELECT `Alumno`.`nombres`, `Alumno`.`apellidos`, `Examen`.`nombre`, 0 as calificacion, NULL as terminado FROM `Alumno` JOIN `Cursa` ON `Alumno`.`n_cuenta` = `Cursa`.`n_cuenta`, `Examen` JOIN `Evalua` ON (`Evalua`.`id_examen` = `Examen`.`id_examen`) WHERE `Evalua`.`id_curso` = '".$id_curso."' AND `Cursa`.`id_curso` = '".$id_curso."' AND `Cursa`.`estado` = 'a' AND (`Alumno`.`n_cuenta`, `Examen`.`id_examen`) NOT IN (SELECT `n_cuenta`, `id_examen` FROM Presenta)) ORDER BY `apellidos`,`nombres`, `nombre`";
+			$calificaciones = DB::query($sql)->execute();
+
+			// $calificaciones = Model_Alumno::find(function ($query) use ($id_curso){
+			//     return $query->select('Alumno.nombres', 'Alumno.apellidos', 'Examen.nombre', 'Presenta.calificacion', 'Presenta.terminado')
+			//                  ->join('Presenta')
+			//                  ->on('Presenta.n_cuenta', '=', 'Alumno.n_cuenta')
+			//                  ->join('Examen')
+			//                  ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+			//                  ->join('Evalua')
+			//                  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			//                  ->where('Evalua.id_curso', $id_curso)
+			//                  ->order_by('Alumno.apellidos');
+			// });
+			// $calificaciones_complemento = Model_Alumno::find(function ($query) use ($id_curso){
+			//     return $query->select('Alumno.nombres', 'Alumno.apellidos', 'jajaja', '0', 'NUL')
+			//     			->union($calificaciones, False)
+			//                  // ->join('Examen')
+			//                  // ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+			//                  // ->join('Evalua')
+			//                  // ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			//                  // ->where('Evalua.id_curso', $id_curso)
+			//                  ->order_by('Alumnos.apellidos');
+			// });
+
+			foreach ($calificaciones as $calificacion) {
+				$calificacion_apellidos = $calificacion['apellidos'];
+				$calificacion_nombres = $calificacion['nombres'];
+				$calificacion_nombre = $calificacion['nombre'];
+				$calificacion_terminado = $calificacion['terminado'];
+				$calificacion_calificacion = $calificacion['calificacion'];
+				if(isset($calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres])){
+					$arreglo_actual = $calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres];
+					array_push($arreglo_actual, array('examen' => $calificacion_nombre, 'calificacion' => $calificacion_calificacion, 'terminado' => $calificacion_terminado ));
+					$calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres] = $arreglo_actual;
+				}else{
+					$calificacionesAlumnos[$calificacion_apellidos.' '.$calificacion_nombres] = [array('examen' => $calificacion_nombre, 'calificacion' => $calificacion_calificacion, 'terminado' => $calificacion_terminado )];
+				}
+			}
+// $this->template->content = var_dump($calificacionesAlumnos);
+// die();
+
+			$data = array('curso' => $curso, 'promedios' => $promedios, 'temasFallados' => $temasFallados, 'calificacionesAlumnos' => $calificacionesAlumnos);
+
 			$this->template->content = View::forge('curso/estadisticas', $data);
 		}else{
 			Response::redirect('sesion/index');

@@ -30,7 +30,7 @@ class Controller_Curso_Examen extends Controller_Template
         parent::before();
         $this->template->nav_bar = View::forge('nav_bar_sesion');
         $this->template->title = "Evaluador Virtual";
-     
+
     }
 
 	/**
@@ -103,7 +103,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$mensaje=$mensaje."El campo de Vigencia-Inicio no tiene el formato de fecha AAAA-MM-DD.<br>";
 		}else{
 			$arreglo_fecha = explode("-", $examen_inicio);
-			if(!checkdate(intval($arreglo_fecha[2]), intval($arreglo_fecha[1]), intval($arreglo_fecha[0]))){
+			if(!checkdate(intval($arreglo_fecha[1]), intval($arreglo_fecha[2]), intval($arreglo_fecha[0]))){
 				$error=True;
 				$mensaje=$mensaje."El campo de Vigencia-Inicio no tiene una fecha válida.<br>";
 			}
@@ -117,7 +117,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$mensaje=$mensaje."El campo de Vigencia-Final no tiene el formato de fecha AAAA-MM-DD.<br>";
 		}else{
 			$arreglo_fecha = explode("-", $examen_final);
-			if(!checkdate(intval($arreglo_fecha[2]), intval($arreglo_fecha[1]), intval($arreglo_fecha[0]))){
+			if(!checkdate(intval($arreglo_fecha[1]), intval($arreglo_fecha[2]), intval($arreglo_fecha[0]))){
 				$error=True;
 				$mensaje=$mensaje."El campo de Vigencia-Final no tiene una fecha válida.<br>";
 			}
@@ -143,7 +143,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$new_examen = Model_Examen::find_one_by('id_examen',$id_examen);
 				$new_examen->nombre = $examen_nombre;
 				$new_examen->fecha_inicio = $examen_inicio;
-				$new_examen->fecha_fin = $examen_final;
+				$new_examen->fecha_fin = $examen_final.' 23:59:59';
 				$new_examen->oportunidades = $examen_oportunidades_value;
 				$new_examen->vidas = $examen_vidas_value;
 				$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
@@ -158,7 +158,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
 					$new_basado_en->save();
 				}
-				$mensaje=$mensaje."La pregunta fue actualizada con éxito.<br>";
+				$mensaje=$mensaje."El examen fue actualizado con éxito.<br>";
 			}else{
 				$new_examen = new Model_Examen();
 				$new_examen->nombre = $examen_nombre;
@@ -186,6 +186,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
 					$new_basado_en->save();
 				}
+				$mensaje=$mensaje."El examen fue creado con éxito.<br>";
 
 			}
 		}
@@ -235,7 +236,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$edicion = Model_Edicion::find(array($fuente->id_fuente, $numero ));
 			}
 		}
-			
+
 		if($edicion==null){
 			if($nombre==null||$nombre===""){
 				$error=True;
@@ -269,7 +270,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$error=True;
 				$mensaje=$mensaje."El campo de Enlace en línea no contiene el formato válido (i.e. http://servidor.com/archivo.pdf).<br>";
 			}
-		
+
 			if(!$error){
 				if($modificar_bibliografia){
 					$fuente = Model_Fuente::find_one_by('id_fuente',$id_fuente);
@@ -316,8 +317,8 @@ class Controller_Curso_Examen extends Controller_Template
 
 					$mensaje = "La bibliografía ".$fuente->nombre." número ".$nueva_edicion->numero." ha sido registrada con éxito.";
 				}
-				
-				
+
+
 			}
 
 		}else{
@@ -504,7 +505,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$error=True;
 			$mensaje=$mensaje."El campo de Justificación está vacío.<br>";
 		}
-	
+
 		if(!$error){
 			/* Bibliografías */
 
@@ -544,7 +545,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$fuente_iguales = ($new_referencia_fuente->id_fuente === $fuente->id_fuente);
 						if(!$fuente_iguales){
 							$new_referencia_fuente->delete();
-							$new_referencia_fuente = new Model_ReferenciaFuente();							
+							$new_referencia_fuente = new Model_ReferenciaFuente();
 							$new_referencia_fuente->id_fuente = $fuente->id_fuente;
 							$new_referencia_fuente->id_referencia = $id_referencia;
 							$new_referencia_fuente->numero_edicion = $fuente->numero;
@@ -869,8 +870,9 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @return  Response
 	 */
 	public function action_presentar($id_examen)
-	{		
+	{
 			SESSION::set('id_examen',$id_examen);
+			SESSION::delete('n_cuenta');
 			$id = SESSION::get('id_sesion');
 			if(isset($id) && substr($id,0,1)=='a'){
 				$n_cuenta = substr($id,1);
@@ -893,12 +895,37 @@ class Controller_Curso_Examen extends Controller_Template
 		$es_test = True;
 
 		if(isset($n_cuenta)){
-			SESSION::delete('n_cuenta');
 			$es_test = False;
 		}
 
 		if(isset($id_examen)){
 			$examen = Model_Examen::find_one_by('id_examen',$id_examen);
+
+			$presenta = null;
+			if(!$es_test){
+				$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
+				if(isset($presenta)){
+					if(!($presenta->vidas < $examen->vidas) && intval($presenta->calificacion) == 0){
+						Response::redirect('curso/examen/final/sin_vidas');
+						die();
+					}elseif($presenta->terminado > 0){
+						Response::redirect('curso/examen/final/terminado');
+						die();
+					}else{
+						$presenta->oportunidades = 0;
+						$presenta->save();
+					}
+				}else{
+					$presenta = new Model_Presenta();
+					$presenta->id_examen = $id_examen;
+					$presenta->n_cuenta = $n_cuenta;
+					$presenta->vidas = 0;
+					$presenta->oportunidades = 0;
+					$presenta->calificacion = 0;
+					$presenta->terminado = 0;
+					$presenta->save();
+				}
+			}
 
 			$temas = Model_Tema::find(function ($query) use ($id_examen){
 			    return $query->join('BasadoEn')
@@ -930,11 +957,6 @@ class Controller_Curso_Examen extends Controller_Template
 				$preguntas = array_slice($preguntas, 0, intval($examen->preguntas_por_mostrar));
 			}
 
-			$presenta = null;
-			if(!$es_test){
-				//se llena Presenta
-			}
-
 			$fuentes = Model_Fuente::find(function ($query) use ($temas_ids){
 			    return $query->select('nombre')
 							->join('TemaFuente')
@@ -954,7 +976,7 @@ class Controller_Curso_Examen extends Controller_Template
 				SESSION::set('preguntas_ids',$preguntas_ids);
 			}
 
-				
+
 			$this->template->content = View::forge('curso/examen/presentar_inicio', $data);
 		}else{
 			SESSION::set('pestania','edicion');
@@ -980,23 +1002,22 @@ class Controller_Curso_Examen extends Controller_Template
 		$limite_tiempo_pregunta = SESSION::get('limite_tiempo_pregunta');
 
 		$es_test = True;
-		$terminado = False;
 		$tiempo = -1;
 		if(isset($n_cuenta)){
 			$es_test = False;
 		}
 
+		$presenta = null;
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
 		$fallas = SESSION::get('fallas');
 		if(isset($fallas)){
 			if(intval($fallas) > intval($examen->oportunidades)){
 				SESSION::delete('siguiente_posicion_pregunta');
-				$terminado = True;
 				Response::redirect('curso/examen/final');
+				die();
 			}
 		}
-
-		if(isset($evaluado) && $evaluado == True && !$terminado){
+		if(isset($evaluado) && $evaluado == True){
 			SESSION::delete('evaluado');
 			if(isset($siguiente_posicion_pregunta)){
 				$siguiente_posicion_pregunta_entero = intval($siguiente_posicion_pregunta);
@@ -1006,12 +1027,12 @@ class Controller_Curso_Examen extends Controller_Template
 					$siguiente_posicion_pregunta = ''.$siguiente_posicion_pregunta_entero;
 				}else{
 					SESSION::delete('siguiente_posicion_pregunta');
-					$terminado = True;
 					Response::redirect('curso/examen/final');
+					die();
 				}
-			}else{
-				$siguiente_posicion_pregunta = '0';
-				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
+			}else{//No debería entrar a este caso ya que si fue evaluado, no podrá ser el siguiente cero
+				// $siguiente_posicion_pregunta = '0';
+				// SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
 			}
 		}else{
 			 //En caso de recargar pregunta
@@ -1019,55 +1040,60 @@ class Controller_Curso_Examen extends Controller_Template
 				if(isset($limite_tiempo_pregunta)){
 					$tiempo = $limite_tiempo_pregunta - time();
 				}
-			}else{
+			}else{//Entra por primera vez
 				$siguiente_posicion_pregunta = '0';
 				SESSION::set('siguiente_posicion_pregunta', $siguiente_posicion_pregunta);
+				if(!$es_test){
+					$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
+					if(isset($presenta)){
+						$vidas_usadas = $presenta->vidas;
+						$presenta->vidas = $vidas_usadas+1;
+						$presenta->save();
+					}
+				}
 			}
 		}
 
-		if(!$terminado){
-			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
+		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
 
 
-			if(!isset($limite_tiempo_pregunta)){
-				SESSION::set('limite_tiempo_pregunta',time()+(30));
-			}
-			$tiempo = $tiempo < 0 ? $pregunta->tiempo : $tiempo;
-
-
-			$id_pregunta = $pregunta->id_pregunta;
-			$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-				    return $query->join('Contiene')
-								->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
-								->where('Contiene.id_pregunta', $id_pregunta);
-				});
-			shuffle($respuestas);
-			$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
-			    	return $query->join('FundamentadoEn')
-			                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
-			                 ->join('ReferenciaFuente')
-			                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-			                 ->join('Fuente')
-			                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
-			                 ->join('Edicion')
-			                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
-			                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
-			                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
-				});
-			$referencia = reset($_referencias);
-			$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
-
-			$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia, 'tiempo' => $tiempo);
-
-			$respuestas_ids = [];
-			foreach ($respuestas as $respuesta) {
-				array_push($respuestas_ids, $respuesta->id_respuesta);
-			}
-			SESSION::set('respuestas_ids',$respuestas_ids);
-
-			$mensaje = "";
-			$this->template->content = View::forge('curso/examen/presentando', $data);
+		if(!isset($limite_tiempo_pregunta)){
+			SESSION::set('limite_tiempo_pregunta',time()+(30));
 		}
+		$tiempo = $tiempo < 0 ? $pregunta->tiempo : $tiempo;
+
+
+		$id_pregunta = $pregunta->id_pregunta;
+		$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+			    return $query->join('Contiene')
+							->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+							->where('Contiene.id_pregunta', $id_pregunta);
+			});
+		shuffle($respuestas);
+		$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
+				return $query->join('FundamentadoEn')
+		                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('ReferenciaFuente')
+		                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+		                 ->join('Fuente')
+		                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+		                 ->join('Edicion')
+		                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+		                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
+		                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+			});
+		$referencia = reset($_referencias);
+
+		$data = array('examen' => $examen, 'presenta' => $presenta, 'pregunta' => $pregunta, 'respuestas' => $respuestas, 'referencia' => $referencia, 'tiempo' => $tiempo);
+
+		$respuestas_ids = [];
+		foreach ($respuestas as $respuesta) {
+			array_push($respuestas_ids, $respuesta->id_respuesta);
+		}
+		SESSION::set('respuestas_ids',$respuestas_ids);
+
+		$mensaje = "";
+		$this->template->content = View::forge('curso/examen/presentando', $data);
 		// }
 	}
 
@@ -1091,10 +1117,11 @@ class Controller_Curso_Examen extends Controller_Template
 		$respuestas_ids_actuales = SESSION::get('respuestas_ids');
 
 		$es_test = True;
-		$terminado = False;
 		$evaluacion = 0;
 		$hubo_respuesta = True;
-		$id_respuesta_elegida = $respuestas_ids_actuales[intval($respuesta_elegida)];
+		$hizo_trampa = False;
+		$id_respuesta_elegida = $respuesta_elegida < 0 ? $respuesta_elegida : $respuestas_ids_actuales[intval($respuesta_elegida)];
+		$id_pregunta_actual = $preguntas[intval($siguiente_posicion_pregunta)];
 
 		if(!isset($respuestas_ids_actuales)){
 			Response::redirect('curso/examen/presentando');
@@ -1107,6 +1134,10 @@ class Controller_Curso_Examen extends Controller_Template
 		if(isset($limite_tiempo_pregunta)){
 			SESSION::delete('limite_tiempo_pregunta');
 		}
+		if($id_respuesta_elegida < 0){
+			$hubo_respuesta = False;
+			$hizo_trampa = True;
+		}
 		if(!isset($respuesta_elegida) || $respuesta_elegida === ''){
 			$hubo_respuesta = False;
 			$id_respuesta_elegida = -1;
@@ -1114,11 +1145,11 @@ class Controller_Curso_Examen extends Controller_Template
 
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
 
-		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
+		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_actual);
 		$id_pregunta = $pregunta->id_pregunta;
 		$respuesta = $hubo_respuesta ? Model_Respuesta::find_one_by('id_respuesta',$id_respuesta_elegida) : null ;
 
-		$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
+		$presenta = null;
 
 		$evaluacion = $hubo_respuesta ? intval($respuesta->porcentaje) : 0;
 		$fallas = 0;
@@ -1133,9 +1164,17 @@ class Controller_Curso_Examen extends Controller_Template
 		}
 
 		if($evaluacion == 100){
-
+			//Si lo hace bien
 		}else{
 			if($evaluacion == 0){
+				if(!$es_test){
+					$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
+					if(isset($presenta)){
+						$oportunidades_usadas = $presenta->oportunidades;
+						$presenta->oportunidades = $oportunidades_usadas + 1;
+						$presenta->save();
+					}
+				}
 				$fallas = SESSION::get('fallas');
 				if(isset($fallas)){
 					$fallas++;
@@ -1147,12 +1186,31 @@ class Controller_Curso_Examen extends Controller_Template
 			}
 			$respuestas_no_exitosas = SESSION::get('respuestas_no_exitosas');
 			if(isset($respuestas_no_exitosas)){
-				array_push($respuestas_no_exitosas, array(intval($siguiente_posicion_pregunta), $preguntas[intval($siguiente_posicion_pregunta)], $id_respuesta_elegida) );
+				array_push($respuestas_no_exitosas, array(intval($siguiente_posicion_pregunta), $id_pregunta_actual, $id_respuesta_elegida) );
 				SESSION::delete('respuestas_no_exitosas');
 			}else{
-				$respuestas_no_exitosas = [array(intval($siguiente_posicion_pregunta), $preguntas[intval($siguiente_posicion_pregunta)], $id_respuesta_elegida)];
+				$respuestas_no_exitosas = [array(intval($siguiente_posicion_pregunta), $id_pregunta_actual, $id_respuesta_elegida)];
 			}
 			SESSION::set('respuestas_no_exitosas',$respuestas_no_exitosas);
+			if(!$es_test){
+				$id_respuesta = $id_respuesta_elegida < 0 ? (-1 * $id_pregunta_actual) : $id_respuesta_elegida;
+				$comete_error = Model_CometeErroresEn::find(array('id_respuesta' => $id_respuesta, 'n_cuenta' => $n_cuenta ));
+				$genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta_actual))));
+				$id_tema = null;
+				if(isset($genera_lista)){
+					$genera = reset($genera_lista);
+					$id_tema = $genera->id_tema;
+				}
+				if(!isset($comete_error) && isset($id_tema)){
+					$comete_error = new Model_CometeErroresEn();
+					$comete_error->id_respuesta = $id_respuesta;
+					$comete_error->id_pregunta = $id_pregunta_actual;
+					$comete_error->id_tema = $id_tema;
+					$comete_error->n_cuenta = $n_cuenta;
+					$comete_error->id_examen = $id_examen;
+					$comete_error->save();
+				}
+			}
 		}
 
 
@@ -1160,7 +1218,7 @@ class Controller_Curso_Examen extends Controller_Template
 			SESSION::delete('respuestas_ids');
 		}
 
-		$data = array('examen' => $examen, 'evaluacion' => $evaluacion);
+		$data = array('examen' => $examen, 'presenta' => $presenta, 'evaluacion' => $evaluacion, 'hizo_trampa' => $hizo_trampa);
 		SESSION::set('evaluado',True);
 		$mensaje = "";
 		$this->template->content = View::forge('curso/examen/evalua', $data);
@@ -1173,7 +1231,7 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_final()
+	public function action_final($ruta_especial = null)
 	{
 		$id_curso = SESSION::get('id_curso');
 		$n_cuenta = SESSION::get('n_cuenta');
@@ -1183,118 +1241,165 @@ class Controller_Curso_Examen extends Controller_Template
 		$preguntas_ids = SESSION::get('preguntas_ids');
 
 		$es_test = True;
-		$terminado = False;
 		$evaluacion = 0;
-
-		if(!isset($id_examen)){
-			Response::redirect('curso/examenes');
-			die();
-		}
+		$presenta = null;
 
 		if(isset($n_cuenta)){
 			$es_test = False;
 		}
 
-		$errores = [];
-		if(isset($respuestas_no_exitosas)){
-			foreach ($respuestas_no_exitosas as $respuesta) {
-				$numero_pregunta = $respuesta[0];
-				$id_pregunta = $respuesta[1];
-				$id_respuesta = $respuesta[2];
-				$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
-				$respuesta = ($id_respuesta >= 0) ? Model_Respuesta::find_one_by('id_respuesta',$id_respuesta) : null;
-				$_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-				    return $query->join('Contiene')
-								->on('Respuesta.id_respuesta', '=', 'Contiene.id_respuesta')
-								->where('Contiene.id_pregunta', '=', $id_pregunta)
-								->where('Respuesta.porcentaje','=','100');
-				});
-				$respuesta_correcta = reset($_respuestas);
-
-				$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
-				    	return $query->join('FundamentadoEn')
-				                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
-				                 ->join('ReferenciaFuente')
-				                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-				                 ->join('Fuente')
-				                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
-				                 ->join('Edicion')
-				                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
-				                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
-				                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
-					});
-				$referencia = reset($_referencias);
-
-				$respuesta_porcentaje = isset($respuesta) ? $respuesta->porcentaje : 0;
-				if($respuesta_porcentaje > 0){
-					$titulo = "Mejora en pregunta";
-				}else{
-					$titulo = "Error en pregunta";
-				}
-				$titulo = $titulo.' '.($numero_pregunta+1);
-				$texto_pregunta = $pregunta->texto;
-				$texto_respuesta = isset($respuesta) ? $respuesta->contenido : 'Sin respuesta';
-				$texto_respuesta_correcta = $respuesta_correcta->contenido;
-				$justificacion = $pregunta->justificacion;
-				$bibliografia = $referencia->nombre.', '.$referencia->numero.'ª edición: página '.$referencia->pagina.', capítulo '.$referencia->capitulo;
-
-				array_push($errores, array('n_cuenta' => $n_cuenta, 'titulo' => $titulo, 'id_pregunta' => $id_pregunta, 'texto_pregunta' => $texto_pregunta, 'id_respuesta' => $id_respuesta, 'texto_respuesta' => $texto_respuesta, 'id_respuesta_correcta' => $respuesta_correcta->id_respuesta, 'texto_respuesta_correcta' => $texto_respuesta_correcta, 'justificacion' => $justificacion, 'bibliografia' => $bibliografia ) );
-
+		if(!isset($id_examen)){
+			if($es_test){				
+				Response::redirect('curso/examenes');
+			}else{
+				Response::redirect('curso/alumno');
 			}
+			die();
 		}
 
 		$examen = Model_Examen::find_one_by('id_examen', $id_examen);
-		$data = array('examen' => $examen, 'puntaje_obtenido' => $puntaje_obtenido, 'errores' => $errores);
-		$fallas = SESSION::get('fallas');
 
-		if(isset($id_examen)){// Comentar para crear los reclamos ISAEL
+		if(!$es_test){
+			$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
+		}
+
+		if(isset($ruta_especial)){			
 			SESSION::delete('id_examen');
 			SESSION::delete('preguntas_ids');
 			SESSION::delete('puntaje_obtenido');
 			SESSION::delete('respuestas_no_exitosas');
-		}
-		if(isset($fallas) && intval($fallas) > intval($examen->oportunidades)){
-			$this->template->content = View::forge('curso/examen/final_fallo', $data);
-		}else{
-			$this->template->content = View::forge('curso/examen/final', $data);
-		}
-/*
-		$pregunta = Model_Pregunta::find_one_by('id_pregunta',$preguntas[intval($siguiente_posicion_pregunta)]);
-		$id_pregunta = $pregunta->id_pregunta;
-		$respuesta = Model_Respuesta::find_one_by('id_respuesta',$respuestas_ids_actuales[intval($respuesta_elegida)]);
-
-		$presenta = Model_Presenta::find(array('id_examen' => $id_examen, 'n_cuenta' => $n_cuenta));
-
-		$evaluacion = intval($respuesta->porcentaje);
-		$fallas = 0;
-		$respuestas_no_exitosas = null;
-		if($evaluacion == 100){
-
-		}else{
-			if($evaluacion == 0){
-				$fallas = SESSION::get('fallas');
-				if(isset($fallas)){
-					$fallas++;
+			SESSION::delete('fallas');
+			SESSION::delete('evaluado');
+			switch ($ruta_especial) {
+				case 'terminado':
+					$respuestas_no_exitosas = [];
+					$numero_pregunta = 0;
+					$comete_error = Model_CometeErroresEn::find('all', array('where' => array(array('n_cuenta', $n_cuenta), 'or' => array(array('id_examen', $id_examen)) ) ) );
+					foreach ($comete_error as $error_cometido) {
+						array_push($respuestas_no_exitosas, array($numero_pregunta, $error_cometido->id_pregunta, $error_cometido->id_respuesta));
+						$numero_pregunta++;
+					}
+					break;
+				case 'sin_vidas':
+					if(!$es_test){
+						if(isset($presenta)){
+							$presenta->terminado = 1;
+							$presenta->save();
+						}
+					}
+					$data = array('examen' => $examen);
+					$this->template->content = View::forge('curso/examen/final_sin_vidas', $data);
+					break;
+				case 'abandonado':
 					SESSION::delete('fallas');
-				}else{
-					$fallas = 1;
-				}
-				SESSION::set('fallas',$fallas);
+					if(!$es_test){
+						if(isset($presenta) && isset($examen)){
+							if(!($examen->vidas > $presenta->vidas)){
+								$presenta->terminado = 1;
+								$presenta->save();								
+							}
+						}
+						Response::redirect('curso/alumno');
+					}else{
+						Response::redirect('curso/examenes');
+					}
+					break;
+				default:
+					# code...
+					break;
 			}
-			$respuestas_no_exitosas = SESSION::get('respuestas_no_exitosas');
-			if(isset($respuestas_no_exitosas)){
-				array_push($respuestas_no_exitosas, array($preguntas[intval($siguiente_posicion_pregunta)], $respuestas_ids_actuales[intval($respuesta_elegida)]) );
-				SESSION::delete('respuestas_no_exitosas');
-			}else{
-				$respuestas_no_exitosas = [array($preguntas[intval($siguiente_posicion_pregunta)], $respuestas_ids_actuales[intval($respuesta_elegida)])];
-			}
-			SESSION::set('respuestas_no_exitosas',$respuestas_no_exitosas);
 		}
+		if(!isset($ruta_especial) || $ruta_especial=== 'terminado'){
+			$errores = [];
+			if(isset($respuestas_no_exitosas)){
+				foreach ($respuestas_no_exitosas as $respuesta) {
+					$numero_pregunta = $respuesta[0];
+					$id_pregunta = $respuesta[1];
+					$id_respuesta = $respuesta[2];
+					$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
+					$respuesta = ($id_respuesta >= 0) ? Model_Respuesta::find_one_by('id_respuesta',$id_respuesta) : null;
+					$_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+					    return $query->join('Contiene')
+									->on('Respuesta.id_respuesta', '=', 'Contiene.id_respuesta')
+									->where('Contiene.id_pregunta', '=', $id_pregunta)
+									->where('Respuesta.porcentaje','=','100');
+					});
+					$respuesta_correcta = reset($_respuestas);
 
-		$data = array('examen' => $examen, 'evaluacion' => $evaluacion);
+					$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
+					    	return $query->join('FundamentadoEn')
+					                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+					                 ->join('ReferenciaFuente')
+					                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+					                 ->join('Fuente')
+					                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+					                 ->join('Edicion')
+					                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+					                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
+					                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+						});
+					$referencia = reset($_referencias);
 
-		$mensaje = "";
-		$this->template->content = View::forge('curso/examen/final', $data);*/
-		// }
+					$respuesta_porcentaje = isset($respuesta) ? $respuesta->porcentaje : 0;
+					if($respuesta_porcentaje > 0){
+						$titulo = "Mejora en pregunta";
+					}else{
+						$titulo = "Error en pregunta";
+					}
+					$titulo = $titulo.' '.($numero_pregunta+1);
+					$texto_pregunta = $pregunta->texto;
+					$texto_respuesta = isset($respuesta) ? $respuesta->contenido : 'Sin respuesta';
+					$texto_respuesta_correcta = $respuesta_correcta->contenido;
+					$justificacion = $pregunta->justificacion;
+					$bibliografia = $referencia->nombre.', '.$referencia->numero.'ª edición: página '.$referencia->pagina.', capítulo '.$referencia->capitulo;
+
+					array_push($errores, array('n_cuenta' => $n_cuenta, 'titulo' => $titulo, 'id_pregunta' => $id_pregunta, 'texto_pregunta' => $texto_pregunta, 'id_respuesta' => $id_respuesta, 'texto_respuesta' => $texto_respuesta, 'id_respuesta_correcta' => $respuesta_correcta->id_respuesta, 'texto_respuesta_correcta' => $texto_respuesta_correcta, 'justificacion' => $justificacion, 'bibliografia' => $bibliografia ) );
+
+				}
+			}
+
+			$p = intval($puntaje_obtenido) / 100;
+			$op = intval($examen->oportunidades);
+			$tp = intval($examen->preguntas_por_mostrar);
+			$v = $es_test ? 1 : intval($presenta->vidas);
+			$calificacion = ($p * ( (($tp-$op) / $tp) ** ($v - 1)) ) * (10 / $tp);
+			$puntaje_obtenido = $p * (10 / $tp);
+
+			$data = array('examen' => $examen, 'puntaje_obtenido' => $puntaje_obtenido, 'calificacion' => $calificacion, 'errores' => $errores, 'presenta' => $presenta);
+			$fallas = SESSION::get('fallas');
+
+			if(isset($id_examen)){
+				SESSION::delete('id_examen');
+				SESSION::delete('preguntas_ids');
+				SESSION::delete('puntaje_obtenido');
+				SESSION::delete('respuestas_no_exitosas');
+				SESSION::delete('evaluado');
+			}
+			if(isset($ruta_especial) && $ruta_especial=== 'terminado'){
+				$this->template->content = View::forge('curso/examen/final_terminado', $data);
+			}elseif(isset($fallas) && intval($fallas) > intval($examen->oportunidades)){
+				$fue_ultima_vida = False;
+				if(!$es_test){
+					if(isset($presenta) && !($presenta->vidas < $examen->vidas)){
+						$presenta->terminado = 1;
+						$presenta->save();
+						$fue_ultima_vida = True;
+					}
+				}
+				if($fue_ultima_vida)
+					$this->template->content = View::forge('curso/examen/final_fallo_ultimo', $data);
+				else
+					$this->template->content = View::forge('curso/examen/final_fallo', $data);
+			}else{
+				if(!$es_test){
+					if(isset($presenta) && $presenta->terminado != 1){
+						$presenta->terminado = 1;
+						$presenta->calificacion = $calificacion;
+						$presenta->save();
+					}
+				}
+				$this->template->content = View::forge('curso/examen/final', $data);
+			}
+		}
 	}
 }
