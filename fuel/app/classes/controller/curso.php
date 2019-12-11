@@ -579,4 +579,143 @@ class Controller_Curso extends Controller_Template
 			Response::redirect('sesion/index');
 		}
 	}
+
+	/**
+	 * Controlador que muestra las estadisticas del alumno
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_cursos_preguntas_compartidas(){
+		$id=SESSION::get('id_sesion');
+		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
+			$data = null;
+			$materia = SESSION::get('materia');
+			if(isset($materia)){
+				SESSION::delete('materia');
+			}else{
+				Response::redirect('curso/examenes');
+				die();
+			}
+			//busqueda de todos los cursos, id_curso, nombre y nombre del profesor que lo imparte.
+			$cursos = Model_Curso::find(function ($query){
+			    return $query->select('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres')
+			                 ->join('Imparte')
+			                 ->on('Imparte.id_curso', '=', 'Curso.id_curso')
+			                 ->join('Profesor')
+			                 ->on('Profesor.n_trabajador', '=', 'Imparte.n_trabajador');
+			});
+			//Comparar los cursos con la palabra de $materia que más se acerquen
+			//Seleccionar los que contengan la o las palabras en un %80 y guardarlos en un arreglo
+			$cursos_similares = [];
+			if(isset($cursos)){
+				foreach ($cursos as $curso) {
+					$menor_texto = sizeof($materia) > sizeof($curso->nombre) ? $curso->nombre : $materia;
+					$mayor_texto = sizeof($materia) <= sizeof($curso->nombre) ? $curso->nombre : $materia;
+					$letras_iguales = similar_text($menor_texto, $mayor_texto);
+					$similitud = 100 * ($letras_iguales / sizeof($menor_texto));
+					if($similitud < 70){
+						$letras_iguales = similar_text($mayor_texto, $menor_texto);
+						$similitud = 100 * ($letras_iguales / sizeof($menor_texto));
+					}
+					if($similitud >= 70){
+						array_push($cursos_similares, $curso);
+					}
+				}
+			}
+
+			//De cada curso, obtener los temas e irlos guardando en un arreglo, con key = id_curso.
+			$temas_cursos =[];
+			if(isset($cursos)){
+				foreach ($cursos as $curso) {
+					$id_curso_actual = $curso->id_curso;
+					$temas = Model_Tema::find(function ($query) use ($id_curso_actual){
+					    return $query->join('CursoTema')
+					                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+					                 ->where('CursoTema.id_curso', '=', $id_curso_actual);
+					});
+					if(isset($temas)){
+						$temas_cursos[$id_curso_actual] = $temas;
+					}
+				}
+			}
+
+			$data = array('cursos' => $cursos_similares, 'temas_cursos' => $temas_cursos, 'materia' => $materia);
+			
+			$this->template->content = View::forge('curso/cursos_preguntas_compartidas', $data);
+		}else{
+			Response::redirect('sesion/index');
+		}
+	}
+
+	/**
+	 * Controlador que muestra las estadisticas del alumno
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_cursos_preguntas_compartidas(){
+		$id=SESSION::get('id_sesion');
+		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
+			$data = null;
+			$materia = SESSION::get('materia');
+			$id_curso_compartido = SESSION::get('id_curso_compartido');
+			if(isset($materia) || isset($id_curso_compartido)){
+				SESSION::delete('materia');
+				SESSION::delete('id_curso_compartido');
+			}else{
+				Response::redirect('curso/examenes');
+				die();
+			}
+
+			/*//busqueda de todos los cursos, id_curso, nombre y nombre del profesor que lo imparte.
+			$cursos = Model_Curso::find(function ($query){
+			    return $query->select('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres')
+			                 ->join('Imparte')
+			                 ->on('Imparte.id_curso', '=', 'Curso.id_curso')
+			                 ->join('Profesor')
+			                 ->on('Profesor.n_trabajador', '=', 'Imparte.n_trabajador');
+			});
+			//Comparar los cursos con la palabra de $materia que más se acerquen
+			//Seleccionar los que contengan la o las palabras en un %80 y guardarlos en un arreglo
+			$cursos_similares = [];
+			if(isset($cursos)){
+				foreach ($cursos as $curso) {
+					$menor_texto = sizeof($materia) > sizeof($curso->nombre) ? $curso->nombre : $materia;
+					$mayor_texto = sizeof($materia) <= sizeof($curso->nombre) ? $curso->nombre : $materia;
+					$letras_iguales = similar_text($menor_texto, $mayor_texto);
+					$similitud = 100 * ($letras_iguales / sizeof($menor_texto));
+					if($similitud < 70){
+						$letras_iguales = similar_text($mayor_texto, $menor_texto);
+						$similitud = 100 * ($letras_iguales / sizeof($menor_texto));
+					}
+					if($similitud >= 70){
+						array_push($cursos_similares, $curso);
+					}
+				}
+			}
+
+			//De cada curso, obtener los temas e irlos guardando en un arreglo, con key = id_curso.
+			$temas_cursos =[];
+			if(isset($cursos)){
+				foreach ($cursos as $curso) {
+					$id_curso_actual = $curso->id_curso;
+					$temas = Model_Tema::find(function ($query) use ($id_curso_actual){
+					    return $query->join('CursoTema')
+					                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+					                 ->where('CursoTema.id_curso', '=', $id_curso_actual);
+					});
+					if(isset($temas)){
+						$temas_cursos[$id_curso_actual] = $temas;
+					}
+				}
+			}
+
+			$data = array('cursos' => $cursos_similares, 'temas_cursos' => $temas_cursos, 'materia' => $materia);
+			
+			$this->template->content = View::forge('curso/preguntas_compartidas', $data);*/
+		}else{
+			Response::redirect('sesion/index');
+		}
+	}
 }

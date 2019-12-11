@@ -657,21 +657,15 @@ class Modals
 		$result = '';
 		$default_id_profesor = '';
 		$default_id_tema = '';
-		$result = $result.Form::open('curso/examen/preguntas_compartidas');
+		$result = $result.Form::open('curso/examen/materias_preguntas_compartidas');
 		$result = $result.'<div class="form-group">
 							<div class="table">
 								<br>
 								<div class="col-xs-12 col-sm-12 table-row">'.
-									Form::label('Nombre del profesor', 'pregunta_compartida_profesor').'
+									Form::label('Nombre del curso', 'pregunta_compartida_materia').'
 								</div>
 								<div class="col-xs-12 col-sm-12 table-row">'.
-									Special_Selector::createSpecialSelector("pregunta_compartida_profesor", "results_compartida_nombre_profesor", $lista_de_profesores,"Seleccionar un profesor",$boton_extra,null,$default_id_profesor).'
-								</div>
-								<div class="col-xs-12 col-sm-12 table-row">'.
-									Form::label('Tema', 'pregunta_compartida_tema').'
-								</div>
-								<div class="col-xs-12 col-sm-12 table-row">'.
-									Special_Selector::createSpecialSelector("pregunta_compartida_tema", "results_compartida_tema", $lista_de_temas,"Selecciona un tema",$boton_extra,null,$default_id_tema).'
+									Form::input('pregunta_compartida_materia','', array('class'=>'form-control','type' => 'text', 'placeholder'=>'Escribe el nombre del curso lo más parecido a como está en la tira de materias')).'
 								</div>
 								<br>
 								<div class="col-xs-12 col-sm-12 table-row">'.

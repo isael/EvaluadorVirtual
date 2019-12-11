@@ -1430,10 +1430,24 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_preguntas_compartidas(){
-		$id_profesor = trim(Input::post('pregunta_compartida_profesor_option_selected'));
-		$id_tema = trim(Input::post('pregunta_compartida_tema_option_selected'));
+	public function action_materias_preguntas_compartidas(){
+		$materia = trim(Input::post('pregunta_compartida_materia'));
+
+		SESSION::set('materia',$materia);
 		SESSION::set('pestania','preguntas');
-		Response::redirect('curso/examenes');
+		Response::redirect('curso/cursos_preguntas_compartidas');
+	}
+
+	/**
+	 * Controlador que llevará a la pantalla previa a presentar un examen.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_preguntas_compartidas($materia,$id_curso_compartido){
+		SESSION::set('id_curso_compartido',$id_curso_compartido);
+		SESSION::set('materia',$materia);
+		SESSION::set('pestania','preguntas');
+		Response::redirect('curso/preguntas_compartidas');
 	}
 }
