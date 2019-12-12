@@ -227,7 +227,7 @@
 									</div>
 									<div id="agregarPreguntaCompartida" class="row" style="display: none;">
 										<?php
-											echo Modals::getModalPreguntaCompartida($profesores);
+											echo Modals::getModalPreguntaCompartidaFormulario($profesores);
 										?>
 									</div>
 

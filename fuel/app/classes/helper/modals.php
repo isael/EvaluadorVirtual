@@ -2,12 +2,12 @@
 /**
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
- * @package    Fuel
- * @version    1.8
- * @author     Fuel Development Team
- * @license    MIT License
+ * @package	Fuel
+ * @version	1.8
+ * @author	 Fuel Development Team
+ * @license	MIT License
  * @copyright  2010 - 2016 Fuel Development Team
- * @link       http://fuelphp.com
+ * @link	   http://fuelphp.com
  */
 
 /**
@@ -49,22 +49,22 @@ class Modals
 			foreach ($temas as $tema) {
 				$id_tema = $tema->id_tema;
 				$cantidad_preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
-			    return $query->join('Genera')
-			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->where('Genera.id_tema', '=', $id_tema)
-			                 ->where('Pregunta.dificultad', '=', '1');
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('Genera.id_tema', '=', $id_tema)
+							 ->where('Pregunta.dificultad', '=', '1');
 				});
 				$cantidad_preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
-			    return $query->join('Genera')
-			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->where('Genera.id_tema', '=', $id_tema)
-			                 ->where('Pregunta.dificultad', '=', '2');
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('Genera.id_tema', '=', $id_tema)
+							 ->where('Pregunta.dificultad', '=', '2');
 				});
 				$cantidad_preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
-			    return $query->join('Genera')
-			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->where('Genera.id_tema', '=', $id_tema)
-			                 ->where('Pregunta.dificultad', '=', '3');
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('Genera.id_tema', '=', $id_tema)
+							 ->where('Pregunta.dificultad', '=', '3');
 				});
 				//Es super importante no modificar la manera en que se muestran las preguntas ($texto_tema) para el funcionamiento actual, es decir con la cantidad de preguntas por nivel.
 				//En caso de querer modificarlo, la manera de obtener el número de preguntas por cada tema y nivel deberá ser acorde a lo que necesiten los metodos para conteo de preguntas.
@@ -95,7 +95,7 @@ class Modals
 			$examen_oportunidades = $examen->oportunidades;
 
 			$sufijo_modal = "_modal";
-			$result = 
+			$result =
 			'<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -249,8 +249,8 @@ class Modals
 			$result = $result.'
 					</div>
 					<div class="modal-footer">
-                          <div class="row text-center">
-                          	<div class="col-xs-12">'.
+						  <div class="row text-center">
+							<div class="col-xs-12">'.
 								Html::anchor('curso/examen/presentar/'.$id_examen,'Probar vista previa del examen',array('class'=>'btn btn-primary btn-block btn-lg')).
 								Form::input('pregunta_duplicada','', array('type' => 'hidden')).'
 							</div>
@@ -261,8 +261,8 @@ class Modals
 							<div class="col-xs-6">'.
 								Form::submit('guardar_examen','Guardar',array('class' => 'btn btn-danger btn-block')).'
 							</div>
-                          </div>
-                      </div>
+						  </div>
+					  </div>
 				</div>
 			</div>';
 		}else{
@@ -295,7 +295,7 @@ class Modals
 				$link_bibliografia = $edicion->liga;
 			}
 			$sufijo_modal = "_modal";
-			$result = 
+			$result =
 			'<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -361,15 +361,15 @@ class Modals
 			$result = $result.'
 					</div>
 					<div class="modal-footer">
-                          <div class="row text-center">
+						  <div class="row text-center">
 							<div class="col-xs-6">
 								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 							</div>
 							<div class="col-xs-6">'.
 								Form::submit('guardar_bibliografia','Guardar',array('class' => 'btn btn-danger btn-block')).'
 							</div>
-                          </div>
-                      </div>
+						  </div>
+					  </div>
 				</div>
 			</div>';
 		}else{
@@ -407,24 +407,24 @@ class Modals
 			$pregunta_tiempo=$pregunta->tiempo;
 
 			$tipos = Model_Tipo::find(function ($query) use ($id_pregunta){
-		    	return $query->join('DeTipo')
-		                 ->on('DeTipo.id_tipo', '=', 'Tipo.id_tipo')
-		                 ->where('DeTipo.id_pregunta', '=', $id_pregunta);
+				return $query->join('DeTipo')
+						 ->on('DeTipo.id_tipo', '=', 'Tipo.id_tipo')
+						 ->where('DeTipo.id_pregunta', '=', $id_pregunta);
 			});
 			$tipo = reset($tipos);
 			$pregunta_tipo = $tipo->nombre;
 			$pregunta_tipo_id = $tipo->id_tipo;
 
 			$_bibliografias = Model_Referencia::find(function ($query) use ($id_pregunta){
-		    	return $query->join('FundamentadoEn')
-		                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
-		                 ->join('ReferenciaFuente')
-		                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-		                 ->join('Fuente')
-		                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
-		                 ->join('Edicion')
-		                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
-		                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+				return $query->join('FundamentadoEn')
+						 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('ReferenciaFuente')
+						 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('Fuente')
+						 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+						 ->join('Edicion')
+						 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+						 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
 			});
 			$bibliografia = reset($_bibliografias);
 			$pregunta_bibliografia = $bibliografia->nombre." - ".$bibliografia->autores.". Edición: ".$bibliografia->numero;
@@ -433,19 +433,19 @@ class Modals
 			$pregunta_pagina = $bibliografia->pagina;
 
 			$_temas = Model_Tema::find(function ($query) use ($id_pregunta){
-		    	return $query->join('Genera')
-		                 ->on('Genera.id_tema', '=', 'Tema.id_tema')
-		                 ->where('Genera.id_pregunta', '=', $id_pregunta);
-		    });
+				return $query->join('Genera')
+						 ->on('Genera.id_tema', '=', 'Tema.id_tema')
+						 ->where('Genera.id_pregunta', '=', $id_pregunta);
+			});
 			$tema = reset($_temas);
 			$pregunta_tema = $tema->nombre;
 			$pregunta_tema_id = $tema->id_tema;
 
 			$_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-		    	return $query->join('Contiene')
-		                 ->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
-		                 ->where('Contiene.id_pregunta', '=', $id_pregunta);
-		    });
+				return $query->join('Contiene')
+						 ->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+						 ->where('Contiene.id_pregunta', '=', $id_pregunta);
+			});
 			$i = 1;
 			$cantidad_respuestas_entero = 0;
 			foreach ((array) $_respuestas as $respuesta) {
@@ -512,7 +512,7 @@ class Modals
 			$boton_agregar_tema = null;
 			$boton_agregar_bibliografia = null;
 			$sufijo_modal = "_modal";
-			$result = 
+			$result =
 			'<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -612,7 +612,7 @@ class Modals
 			$result = $result.'
 					</div>
 					<div class="modal-footer">
-                          <div class="row text-center">
+						  <div class="row text-center">
 							<div class="col-xs-12">
 								<button type="button" class="btn btn-primary btn-block" onclick="javascript:duplicaPregunta()">Duplicar pregunta</button>'.
 								Form::input('pregunta_duplicada','', array('type' => 'hidden')).'
@@ -624,8 +624,8 @@ class Modals
 							<div class="col-xs-6">'.
 								Form::submit('guardar_pregunta','Guardar',array('class' => 'btn btn-danger btn-block')).'
 							</div>
-                          </div>
-                      </div>
+						  </div>
+					  </div>
 				</div>
 			</div>';
 		}else{
@@ -639,7 +639,212 @@ class Modals
 		return $result;
 	}
 
-	public static function getModalPreguntaCompartida($profesores){
+	public static function getModalPreguntaCompartida($id_pregunta = null){
+		$pregunta_texto="";
+		$pregunta_justificacion="";
+		$pregunta_tiempo="";
+		$pregunta_dificultad="";
+		$pregunta_tema="";
+		$pregunta_bibliografia="";
+		$pregunta_pagina="";
+		$pregunta_capitulo="";
+		$pregunta_tipo="";
+		$pregunta_tipo_id="";
+		$respuestas="";
+		$cantidad_respuestas = "";
+
+		if(isset($id_pregunta)){
+			$pregunta = Model_Pregunta::find_one_by('id_pregunta', $id_pregunta);
+			$pregunta_texto=$pregunta->texto;
+			$pregunta_justificacion=$pregunta->justificacion;
+			$pregunta_dificultad=$pregunta->dificultad;
+			$pregunta_tiempo=$pregunta->tiempo;
+
+			$tipos = Model_Tipo::find(function ($query) use ($id_pregunta){
+				return $query->join('DeTipo')
+						 ->on('DeTipo.id_tipo', '=', 'Tipo.id_tipo')
+						 ->where('DeTipo.id_pregunta', '=', $id_pregunta);
+			});
+			$tipo = reset($tipos);
+			$pregunta_tipo = $tipo->nombre;
+			$pregunta_tipo_id = $tipo->id_tipo;
+
+			$_bibliografias = Model_Referencia::find(function ($query) use ($id_pregunta){
+				return $query->join('FundamentadoEn')
+						 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('ReferenciaFuente')
+						 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('Fuente')
+						 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+						 ->join('Edicion')
+						 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+						 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+			});
+			$bibliografia = reset($_bibliografias);
+			$pregunta_bibliografia = $bibliografia->nombre." - ".$bibliografia->autores.". Edición: ".$bibliografia->numero;
+			$pregunta_capitulo = $bibliografia->capitulo;
+			$pregunta_pagina = $bibliografia->pagina;
+
+			$_temas = Model_Tema::find(function ($query) use ($id_pregunta){
+				return $query->join('Genera')
+						 ->on('Genera.id_tema', '=', 'Tema.id_tema')
+						 ->where('Genera.id_pregunta', '=', $id_pregunta);
+			});
+			$tema = reset($_temas);
+			$pregunta_tema = $tema->nombre;
+
+			$_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+				return $query->join('Contiene')
+						 ->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+						 ->where('Contiene.id_pregunta', '=', $id_pregunta);
+			});
+			$i = 1;
+			$cantidad_respuestas_entero = 0;
+			foreach ((array) $_respuestas as $respuesta) {
+				$respuestas = $respuestas.'<div class="col-xs-12 col-sm-12 table">'.
+									Form::input('pregunta_id_respuesta_'.$i.'_modal',$respuesta->id_respuesta, array('type' => 'hidden')).'
+									<div class="col-xs-1 col-sm-1 table-row">'.
+										Form::label('R.'.$i, 'pregunta_respuesta_'.$i.'_modal').'
+									</div>
+									<div class="col-xs-8 col-sm-8 table-row">'.
+										Form::input('pregunta_respuesta_'.$i.'_modal',$respuesta->contenido,array('disabled' => 'true','class'=>'form-control','type' => 'text')).'
+									</div>
+									<div class="col-xs-2 col-sm-2 table-row">'.
+										Form::input('pregunta_respuesta_porcentaje_'.$i.'_modal',$respuesta->porcentaje,array('disabled' => 'true','class'=>'form-control','type' => 'text')).'
+									</div>
+									<div class="col-xs-1 col-sm-1 table-row">'.
+										Form::label('%', 'pregunta_respuesta_porcentaje_'.$i.'_modal').'
+									</div>
+								</div>
+								<br>';
+				$i++;
+				$cantidad_respuestas_entero++;
+			}
+			if($cantidad_respuestas_entero){
+				$cantidad_respuestas = strval($cantidad_respuestas_entero);
+			}
+		}else{
+			$id_pregunta = '';
+		}
+
+		$result = '';
+
+		$boton_agregar_bibliografia = array("href" => "", "value" => "+ Agregar nueva bibliografía", "data-toggle" => "modal", "data-target" => "#modalAgregarBibliografia");
+
+		$dificultades = array(array(1,1),array(2,2),array(3,3));
+
+		$boton_agregar_bibliografia = null;
+		$sufijo_modal = "_modal";
+		$result =
+		'<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">Pregunta Compartida</h4>
+				</div>
+				<div class="modal-body">';
+		$result = $result.Form::open('curso/examen/crear_pregunta');
+
+		$result = $result.'
+							<div class="form-group">
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Tema', 'pregunta_tema'.$sufijo_modal).'
+								</div>
+								<div class="col-xs-12 col-sm-12 table">'.$pregunta_tema.'
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Bibliografía', 'pregunta_bibliografia'.$sufijo_modal).'
+								</div>
+								<div class="col-xs-12 col-sm-12">'.$pregunta_bibliografia.'
+								</div>
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-4 col-sm-4 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Página', 'pregunta_bibliografia_pagina'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('pregunta_bibliografia_pagina'.$sufijo_modal,$pregunta_pagina,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Página')).'
+										</div>
+									</div>
+									<div class="col-xs-8 col-sm-8 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Capítulo', 'pregunta_bibliografia_capitulo'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('pregunta_bibliografia_capitulo'.$sufijo_modal,$pregunta_capitulo,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Capítulo')).'
+										</div>
+									</div>
+								</div>
+
+								<div class="col-xs-12 col-sm-12 table">
+									<div class="col-xs-4 col-sm-4 table-row">
+										<div>'.
+											Form::label('Dificultad', 'pregunta_dificultad'.$sufijo_modal).'
+										</div>
+										<div>'.$pregunta_dificultad.'
+										</div>
+									</div>
+									<div class="col-xs-4 col-sm-4 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Tiempo', 'pregunta_tiempo'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.
+											Form::input('pregunta_tiempo'.$sufijo_modal,$pregunta_tiempo,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'segs')).'
+										</div>
+									</div>
+									<div class="col-xs-4 col-sm-4 table-row">
+										<div class="col-xs-12 col-sm-12">'.
+											Form::label('Tipo', 'pregunta_tipo'.$sufijo_modal).'
+										</div>
+										<div class="col-xs-12 col-sm-12">'.$pregunta_tipo.'
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Pregunta', 'pregunta_texto'.$sufijo_modal).'
+								</div>
+								<div class="col-xs-12 col-sm-12">'.
+									Form::input('pregunta_texto'.$sufijo_modal,$pregunta_texto,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen')).'
+								</div>
+
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Respuestas y porcentaje', '').'
+								</div>
+								<div id="respuestas'.$sufijo_modal.'"">
+									<!-- Aquí van las respuestas -->'.
+									$respuestas.'
+									*-* Selecciona un tipo de pregunta primero *-*
+								</div>'.
+									Form::input('pregunta_cantidad_respuestas'.$sufijo_modal,$cantidad_respuestas, array('type' => 'hidden')).'
+								<div class="col-xs-12 col-sm-12">'.
+									Form::label('Justificación', 'pregunta_justificacion'.$sufijo_modal).'
+								</div>'.
+									Form::input("pregunta_id",$id_pregunta, array('type' => 'hidden')).'
+								<div class="col-xs-12 col-sm-12">'.
+									Form::input('pregunta_justificacion'.$sufijo_modal,$pregunta_justificacion,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación')).'
+								</div>
+							</div>';
+		$result = $result.'
+				</div>
+				<div class="modal-footer">
+					  <div class="row text-center">
+						<div class="col-xs-6">
+							<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
+						</div>
+						<div class="col-xs-6">'.
+							Form::submit('agregar_pregunta','Agregar',array('class' => 'btn btn-danger btn-block')).'
+						</div>
+					  </div>
+				  </div>
+			</div>
+		</div>';
+		$result = $result.Form::close();
+		return $result;
+	}
+
+	public static function getModalPreguntaCompartidaFormulario($profesores){
 		$result = '';
 		$lista_de_profesores = [];
 		if(isset($tipos)){
@@ -680,35 +885,35 @@ class Modals
 	public static function getModalAbandonar($value='')
 	{
 		echo '<div class="modal fade" id="modalAbandonar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">';
-        	echo '<div class="modal-dialog" role="document">';
-                echo '<div class="modal-content">';
-                    echo '<div class="modal-header">';
-                        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
-                          echo '<span aria-hidden="true">&times;</span>';
-                        echo '</button>';
-                        echo '<h4 class="modal-title" id="myModalLabel"> Abandonando Examen </h4>';
-                    echo '</div>';
-                    echo '<div class="modal-body">';
-                      	echo '<div class="form-group">
+			echo '<div class="modal-dialog" role="document">';
+				echo '<div class="modal-content">';
+					echo '<div class="modal-header">';
+						echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+						  echo '<span aria-hidden="true">&times;</span>';
+						echo '</button>';
+						echo '<h4 class="modal-title" id="myModalLabel"> Abandonando Examen </h4>';
+					echo '</div>';
+					echo '<div class="modal-body">';
+						echo '<div class="form-group">
 								<div class="col-xs-12 col-sm-12 table">
 									<div class="col-xs-12 col-sm-12">
 										¿Estás seguro de salir del examen? Esto te restará una vida y afectará tu calificación
 									</div>
 								</div>
 							</div>';
-                    echo '</div>';
-                    echo '<div class="modal-footer">';
-                        echo '<div class="row text-center">';
-                          echo '<div class="col-xs-6">';
-                              echo '<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cerrar</button>';
-                          echo '</div>';
-                          echo '<div class="col-xs-6">';
-                              echo Html::anchor('curso/examen/final/abandonado','Abandonar',array('class'=>'btn btn-primary btn-block btn-lg'));
-                          echo '</div>';
-                        echo '</div>';
-                    echo '</div>';
-                echo '</div>';
-        	echo '</div>';
-        echo '</div>';
+					echo '</div>';
+					echo '<div class="modal-footer">';
+						echo '<div class="row text-center">';
+						  echo '<div class="col-xs-6">';
+							  echo '<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cerrar</button>';
+						  echo '</div>';
+						  echo '<div class="col-xs-6">';
+							  echo Html::anchor('curso/examen/final/abandonado','Abandonar',array('class'=>'btn btn-primary btn-block btn-lg'));
+						  echo '</div>';
+						echo '</div>';
+					echo '</div>';
+				echo '</div>';
+			echo '</div>';
+		echo '</div>';
 	}
 }

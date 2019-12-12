@@ -812,6 +812,33 @@ class Controller_Curso_Examen extends Controller_Template
 	}
 
 	/**
+	 * Controlador que enviará la instrucción de mostrar la modal para modificar pregunta.
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_mostrar_pregunta_compartida($materia, $id_curso_compartido, $id_pregunta)
+	{
+		$id_curso = SESSION::get('id_curso');
+		$mensaje = "";
+		$error = False;
+		if($error){
+			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
+			SESSION::set('mensaje',$mensaje);
+			SESSION::set('pestania','preguntas');
+			// SESSION::set('data',$data);
+			Response::redirect('curso/preguntas_compartidas');
+		}else{
+			SESSION::set('materia',$materia);
+			SESSION::set('id_curso_compartido',$id_curso_compartido);
+			SESSION::set('id_pregunta',$id_pregunta);
+			SESSION::set('pestania','preguntas');
+			Response::redirect('curso/preguntas_compartidas');
+		}
+
+	}
+
+	/**
 	 * Controlador que enviará la instrucción de mostrar la modal para modificar bibliografía.
 	 *
 	 * @access  public
@@ -1430,8 +1457,8 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_materias_preguntas_compartidas(){
-		$materia = trim(Input::post('pregunta_compartida_materia'));
+	public function action_materias_preguntas_compartidas($param_materia = null){
+		$materia = isset($param_materia) ? $param_materia : trim(Input::post('pregunta_compartida_materia'));
 
 		SESSION::set('materia',$materia);
 		SESSION::set('pestania','preguntas');
