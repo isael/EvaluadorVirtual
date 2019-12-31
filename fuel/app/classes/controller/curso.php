@@ -655,6 +655,7 @@ class Controller_Curso extends Controller_Template
 	 * @return  Response
 	 */
 	public function action_preguntas_compartidas(){
+		$id_curso = SESSION::get('id_curso');
 		$id=SESSION::get('id_sesion');
 		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
 			$data = null;
@@ -685,9 +686,15 @@ class Controller_Curso extends Controller_Template
 			                 ->order_by('Pregunta.id_pregunta')
 			                 ->order_by('Pregunta.texto');
 			});
+			$preguntas_compartidas_agregadas = [];
+			foreach ($preguntas as $pregunta) {
+				$pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $pregunta->id_pregunta ));
+				if(isset($pregunta_compartida)){
+					array_push($preguntas_compartidas_agregadas, $pregunta_compartida->id_pregunta);
+				}
+			}
 
-			$data = array('preguntas' => $preguntas, 'materia' => $materia, 'id_curso_compartido' => $id_curso_compartido);
-			
+			$data = array('preguntas' => $preguntas, 'preguntas_compartidas_agregadas' => $preguntas_compartidas_agregadas, 'materia' => $materia, 'id_curso_compartido' => $id_curso_compartido);
 			$this->template->content = View::forge('curso/preguntas_compartidas', $data);
 		}else{
 			Response::redirect('sesion/index');

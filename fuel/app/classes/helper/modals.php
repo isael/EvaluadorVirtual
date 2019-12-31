@@ -639,7 +639,7 @@ class Modals
 		return $result;
 	}
 
-	public static function getModalPreguntaCompartida($id_pregunta = null){
+	public static function getModalPreguntaCompartida($id_pregunta = null, $materia, $id_curso_compartido){
 		$pregunta_texto="";
 		$pregunta_justificacion="";
 		$pregunta_tiempo="";
@@ -745,7 +745,7 @@ class Modals
 				<h4 class="modal-title" id="myModalLabel">Pregunta Compartida</h4>
 				</div>
 				<div class="modal-body">';
-		$result = $result.Form::open('curso/examen/crear_pregunta');
+		$result = $result.Form::open('curso/examen/agregar_pregunta_compartida');
 
 		$result = $result.'
 							<div class="form-group">
@@ -821,7 +821,9 @@ class Modals
 								<div class="col-xs-12 col-sm-12">'.
 									Form::label('Justificación', 'pregunta_justificacion'.$sufijo_modal).'
 								</div>'.
-									Form::input("pregunta_id",$id_pregunta, array('type' => 'hidden')).'
+									Form::input("pregunta_id",$id_pregunta, array('type' => 'hidden')).
+									Form::input("materia",$materia, array('type' => 'hidden')).
+									Form::input("id_curso_compartido",$id_curso_compartido, array('type' => 'hidden')).'
 								<div class="col-xs-12 col-sm-12">'.
 									Form::input('pregunta_justificacion'.$sufijo_modal,$pregunta_justificacion,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación')).'
 								</div>

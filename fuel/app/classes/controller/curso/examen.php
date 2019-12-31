@@ -1466,7 +1466,7 @@ class Controller_Curso_Examen extends Controller_Template
 	}
 
 	/**
-	 * Controlador que llevará a la pantalla previa a presentar un examen.
+	 * Controlador que llevará a la pantalla de las preguntas compartidas de una materia en especifico
 	 *
 	 * @access  public
 	 * @return  Response
@@ -1476,5 +1476,27 @@ class Controller_Curso_Examen extends Controller_Template
 		SESSION::set('materia',$materia);
 		SESSION::set('pestania','preguntas');
 		Response::redirect('curso/preguntas_compartidas');
+	}
+
+	/**
+	 *
+	 */
+	public function action_agregar_pregunta_compartida(){
+		$id_curso = SESSION::get('id_curso');
+		$id_pregunta = trim(Input::post('pregunta_id'));
+		$materia = trim(Input::post('materia'));
+		$id_curso_compartido = trim(Input::post('id_curso_compartido'));
+		$pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $id_pregunta ));
+		if(isset($pregunta_compartida)){
+			$pregunta_compartida->delete();
+		}else{
+			$pregunta_compartida = new Model_CursoPreguntasCompartidas();
+			$pregunta_compartida->id_curso = $id_curso;
+			$pregunta_compartida->id_pregunta = $id_pregunta;
+			$pregunta_compartida->fecha_de_modificacion = date("Y-m-d H:i:s");;
+			$pregunta_compartida->por_cambiar = '0';
+			$pregunta_compartida->save();
+		}
+		Response::redirect('curso/examen/preguntas_compartidas/'.$materia.'/'.$id_curso_compartido);
 	}
 }
