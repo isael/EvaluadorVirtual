@@ -792,7 +792,7 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_mostrar_pregunta($id_pregunta)
+	public function action_mostrar_pregunta($id_pregunta, $externa = null)
 	{
 		$id_curso = SESSION::get('id_curso');
 		$mensaje = "";
@@ -805,6 +805,8 @@ class Controller_Curso_Examen extends Controller_Template
 			Response::redirect('curso/examenes');
 		}else{
 			SESSION::set('id_pregunta',$id_pregunta);
+			if(isset($externa))
+				SESSION::set('externa',True);
 			SESSION::set('pestania','preguntas');
 			Response::redirect('curso/examenes');
 		}
@@ -817,11 +819,11 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_mostrar_pregunta_compartida($materia, $id_curso_compartido, $id_pregunta)
+	public function action_mostrar_pregunta_compartida($id_pregunta, $materia = null, $id_curso_compartido = null)
 	{
 		$id_curso = SESSION::get('id_curso');
-		$mensaje = "";
-		$error = False;
+		$mensaje = "Hubo un error con los datos recibidos";
+		$error = !(isset($materia) && isset($id_curso_compartido));
 		if($error){
 			// $data = array('nombre'=> $nombre, 'autores' => $autores, 'numero' => $numero, 'anio' => $anio, 'liga' => $liga);
 			SESSION::set('mensaje',$mensaje);
@@ -1471,11 +1473,16 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @access  public
 	 * @return  Response
 	 */
-	public function action_preguntas_compartidas($materia,$id_curso_compartido){
-		SESSION::set('id_curso_compartido',$id_curso_compartido);
-		SESSION::set('materia',$materia);
-		SESSION::set('pestania','preguntas');
-		Response::redirect('curso/preguntas_compartidas');
+	public function action_preguntas_compartidas($materia = null, $id_curso_compartido = null){
+		if(isset($materia) && isset($id_curso_compartido)){
+			SESSION::set('id_curso_compartido',$id_curso_compartido);
+			SESSION::set('materia',$materia);
+			SESSION::set('pestania','preguntas');
+			Response::redirect('curso/preguntas_compartidas');
+		}else{
+			SESSION::set('pestania','preguntas');
+			Response::redirect('curso/examenes');
+		}
 	}
 
 	/**

@@ -365,6 +365,18 @@ class Controller_Curso extends Controller_Template
 			                 ->order_by('Pregunta.id_pregunta');
 			});
 
+			$preguntas_externas = Model_Pregunta::find(function ($query) use ($id_curso){
+			    return $query->join('Genera')
+			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->join('Tema')
+			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
+			                 ->join('CursoPreguntasCompartidas')
+			                 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso)
+			                 ->order_by('Tema.nombre')
+			                 ->order_by('Pregunta.id_pregunta');
+			});
+
 			$bibliografias = Model_Fuente::find(function ($query) use ($id_curso){
 			    return $query->join('Edicion')
 			                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
@@ -376,7 +388,7 @@ class Controller_Curso extends Controller_Template
 
 			$profesores = null;
 
-			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas, 'tipos' => $tipos, 'profesores' => $profesores);
+			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas,'preguntas_externas' => $preguntas_externas, 'tipos' => $tipos, 'profesores' => $profesores);
 			
 			$this->template->content = View::forge('curso/examenes', $data);
 		}else{
@@ -588,6 +600,7 @@ class Controller_Curso extends Controller_Template
 	 */
 	public function action_cursos_preguntas_compartidas(){
 		$id=SESSION::get('id_sesion');
+		$id_curso = SESSION::get('id_curso');
 		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
 			$data = null;
 			$materia = SESSION::get('materia');
@@ -598,12 +611,22 @@ class Controller_Curso extends Controller_Template
 				die();
 			}
 			//busqueda de todos los cursos, id_curso, nombre y nombre del profesor que lo imparte.
-			$cursos = Model_Curso::find(function ($query){
+			$cursos = Model_Curso::find(function ($query) use ($id_curso){
 			    return $query->select('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres')
 			                 ->join('Imparte')
 			                 ->on('Imparte.id_curso', '=', 'Curso.id_curso')
+			                 ->join('CursoTema')
+			                 ->on('CursoTema.id_curso', '=', 'Curso.id_curso')
+			                 ->join('Tema')
+			                 ->on('Tema.id_tema', '=', 'CursoTema.id_tema')
+			                 ->join('Genera')
+			                 ->on('Genera.id_tema', '=', 'Tema.id_tema')
+			                 ->join('Pregunta')
+			                 ->on('Pregunta.id_pregunta', '=', 'Genera.id_pregunta')
 			                 ->join('Profesor')
-			                 ->on('Profesor.n_trabajador', '=', 'Imparte.n_trabajador');
+			                 ->on('Profesor.n_trabajador', '=', 'Imparte.n_trabajador')
+			                 ->where('Pregunta.compartida', '=', '1')
+			                 ->where('Curso.id_curso', '<>', $id_curso);
 			});
 			//Comparar los cursos con la palabra de $materia que más se acerquen
 			//Seleccionar los que contengan la o las palabras en un %80 y guardarlos en un arreglo

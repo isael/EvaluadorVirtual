@@ -30,7 +30,6 @@
 									echo '<div class="col-xs-12 table">';
 										echo '<h4>'.$curso->nombre.'</h4>';
 									echo '</div>';
-									echo $curso->id_curso;
 									echo '<div class="col-xs-12" table>';
 										echo '<div class="col-xs-3 table-row">';
 											echo isset($materia) ?
@@ -40,19 +39,17 @@
 										echo '<div class="col-xs-9 table-row">';
 											echo 'Imparte el profesor '.$curso->nombres.' '.$curso->apellidos.'. Temas incluidos: ';
 											if(isset($temas_cursos)){
-												if(in_array($curso->id_curso, $temas_cursos)){
-													$temas = $temas_cursos[$curso->id_curso];
-													if (isset($temas)) {
-														$i = 0;
-														foreach ($temas as $tema) {
-															if($i > 0){
-																echo ', ';
-															}
-															echo $tema->nombre;
-															$i++;
+												$temas = $temas_cursos[$curso->id_curso];
+												if (isset($temas)) {
+													$i = 0;
+													foreach ($temas as $tema) {
+														if($i > 0){
+															echo ', ';
 														}
-														echo '.';
+														echo $tema->nombre;
+														$i++;
 													}
+													echo '.';
 												}
 											}
 										echo '</div>';

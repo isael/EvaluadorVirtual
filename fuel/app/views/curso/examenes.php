@@ -9,6 +9,7 @@
 					$pestania = SESSION::get('pestania');
 					$data = SESSION::get('data');
 					$idPregunta = SESSION::get('id_pregunta');
+					$externa = SESSION::get('externa');
 					$idFuente = SESSION::get('id_fuente');
 					$numeroFuente = SESSION::get('numero_fuente');
 					$idExamen = SESSION::get('id_examen');
@@ -20,6 +21,11 @@
 					}
 					if(isset($idPregunta)){
 						SESSION::delete('id_pregunta');
+					}
+					if(isset($externa)){
+						SESSION::delete('externa');
+					}else{
+						$externa=False;
 					}
 					if(isset($idFuente)){
 						SESSION::delete('id_fuente');
@@ -241,6 +247,7 @@
 							$cual_boton = "preguntas";
 							if(isset($preguntas)){
 								echo '<div class="row">';
+								echo "<h4>Preguntas propias</h4>";
 								$tema_actual = "";
 								foreach ($preguntas as $pregunta) {
 									if($tema_actual !== $pregunta->nombre){
@@ -248,7 +255,7 @@
 											echo "</div>";
 										$tema_actual = $pregunta->nombre;
 										echo '<div class="col-xs-12 table">';
-										echo "<h4>".$tema_actual."</h4>";
+										echo "<h5>".$tema_actual."</h5>";
 									}
 									echo '<div class="col-xs-12 col-md-6 col-lg-4">';
 										echo '<div class="col-xs-9">';
@@ -258,6 +265,33 @@
 										echo '<div class="col-xs-3">';
 											$texto = $pregunta->compartida === '1' ? 'Dejar de compartir' : 'Compartir';
 											echo Html::anchor('curso/examen/compartir_pregunta/'.$pregunta->id_pregunta,$texto, array('class' => 'btn btn-primary btn-block'));
+										echo '</div>';
+										echo "</br>";
+									echo '</div>';
+								}
+								if($tema_actual !== "")
+									echo "</div>";
+								echo '</div>';
+							}
+							if(isset($preguntas_externas)){
+								echo '<div class="row">';
+								echo "<h4>Preguntas externas</h4>";
+								$tema_actual = "";
+								foreach ($preguntas_externas as $pregunta_externa) {
+									if($tema_actual !== $pregunta_externa->nombre){
+										if($tema_actual !== "")
+											echo "</div>";
+										$tema_actual = $pregunta_externa->nombre;
+										echo '<div class="col-xs-12 table">';
+										echo "<h5>".$tema_actual."</h5>";
+									}
+									echo '<div class="col-xs-12 col-md-6 col-lg-4">';
+										echo '<div class="col-xs-9">';
+											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta_externa->id_pregunta.'/externa','<b>Nivel '.$pregunta_externa->dificultad.':</b> <i><span>'.$pregunta_externa->texto.'</span></i>', array('class' => ''));
+											echo "<br>";
+										echo '</div>';
+										echo '<div class="col-xs-3">';
+											echo '<i class="fa fa-cloud-download"></i>';
 										echo '</div>';
 										echo "</br>";
 									echo '</div>';
@@ -302,7 +336,12 @@
 					if(isset($idPregunta)){
 				?>
 				<div class="modal fade" id="modalPregunta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<?php echo Modals::getModalPregunta($temas, $bibliografias, $tipos, True, $idPregunta); ?>
+					<?php
+						if($externa)
+							echo Modals::getModalPreguntaCompartida($idPregunta, null, null, True);
+						else
+							echo Modals::getModalPregunta($temas, $bibliografias, $tipos, True, $idPregunta);
+					?>
 				</div>
 				<?php
 					}

@@ -41,7 +41,7 @@
 											echo '<input type="checkbox" name="'.$pregunta->id_pregunta.'" value="'.$pregunta->id_pregunta.'" '.(isset($preguntas_compartidas_agregadas) && in_array($pregunta->id_pregunta, $preguntas_compartidas_agregadas)? 'checked ' :  '').'disabled>';
 										echo '</div>';
 										echo '<div class="col-xs-8">';
-											echo Html::anchor('curso/examen/mostrar_pregunta_compartida/'.$materia.'/'.$id_curso_compartido.'/'.$pregunta->id_pregunta,$pregunta->texto, array());
+											echo Html::anchor('curso/examen/mostrar_pregunta_compartida/'.$pregunta->id_pregunta.'/'.$materia.'/'.$id_curso_compartido,$pregunta->texto, array());
 										echo '</div>';
 										echo '<div class="col-xs-3">';
 											echo 'Nivel '.$pregunta->dificultad;
@@ -59,7 +59,7 @@
 						if(isset($idPregunta)){
 					?>
 					<div class="modal fade" id="modalPregunta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-						<?php echo Modals::getModalPreguntaCompartida($idPregunta, $materia, $id_curso_compartido); ?>
+						<?php echo Modals::getModalPreguntaCompartida($idPregunta, $materia, $id_curso_compartido, in_array($idPregunta, $preguntas_compartidas_agregadas)); ?>
 					</div>
 					<?php
 						}

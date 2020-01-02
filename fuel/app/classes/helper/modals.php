@@ -639,7 +639,7 @@ class Modals
 		return $result;
 	}
 
-	public static function getModalPreguntaCompartida($id_pregunta = null, $materia, $id_curso_compartido){
+	public static function getModalPreguntaCompartida($id_pregunta = null, $materia, $id_curso_compartido, $checked){
 		$pregunta_texto="";
 		$pregunta_justificacion="";
 		$pregunta_tiempo="";
@@ -836,7 +836,7 @@ class Modals
 							<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 						</div>
 						<div class="col-xs-6">'.
-							Form::submit('agregar_pregunta','Agregar',array('class' => 'btn btn-danger btn-block')).'
+							Form::submit('agregar_pregunta',($checked ? 'Borrar':'Agregar'),array('class' => 'btn btn-'.($checked ? 'danger':'success').' btn-block')).'
 						</div>
 					  </div>
 				  </div>
