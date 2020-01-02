@@ -687,10 +687,12 @@ class Controller_Curso extends Controller_Template
 			                 ->order_by('Pregunta.texto');
 			});
 			$preguntas_compartidas_agregadas = [];
-			foreach ($preguntas as $pregunta) {
-				$pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $pregunta->id_pregunta ));
-				if(isset($pregunta_compartida)){
-					array_push($preguntas_compartidas_agregadas, $pregunta_compartida->id_pregunta);
+			if(isset($preguntas)){
+				foreach ($preguntas as $pregunta) {
+					$pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $pregunta->id_pregunta ));
+					if(isset($pregunta_compartida)){
+						array_push($preguntas_compartidas_agregadas, $pregunta_compartida->id_pregunta);
+					}
 				}
 			}
 
