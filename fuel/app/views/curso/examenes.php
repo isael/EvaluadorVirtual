@@ -141,7 +141,7 @@
 									</div>
 									<br>
 									<div id="agregarExamen" class="row" style="display: none;">
-										<?php echo Modals::getModalExamen($temas); ?>
+										<?php echo Modals::getModalExamen($temas, $temas_externos); ?>
 									</div>
 
 								<?php
@@ -316,7 +316,7 @@
 					if(isset($idExamen)){
 				?>
 				<div class="modal fade" id="modalExamen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<?php echo Modals::getModalExamen($temas, True, $idExamen); ?>
+					<?php echo Modals::getModalExamen($temas, $temas_externos, True, $idExamen); ?>
 				</div>
 				<?php
 					}

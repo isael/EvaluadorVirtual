@@ -21,7 +21,7 @@
  */
 class Modals
 {
-	public static function getModalExamen($temas, $is_modal = false, $id_examen = null){
+	public static function getModalExamen($temas, $temas_externos, $is_modal = false, $id_examen = null){
 		$result = '';
 		$examen_vidas = '1';
 		$examen_oportunidades = '3';
@@ -80,6 +80,45 @@ class Modals
 				if($is_modal && isset($id_examen)){
 					$rango = Model_BasadoEn::find(array('id_examen' => $id_examen, 'id_tema' => $id_tema ));
 					array_push($examen_temas_rangos, $rango->id_tema.'-'.$rango->desde_dificultad.'-'.$rango->hasta_dificultad);
+				}
+			}
+		}
+		if(isset($temas_externos)){
+			foreach ($temas_externos as $tema_externo) {
+				$id_tema = $tema_externo->id_tema;
+				$cantidad_preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('Genera.id_tema', '=', $id_tema)
+							 ->where('Pregunta.dificultad', '=', '1');
+				});
+				$cantidad_preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('Genera.id_tema', '=', $id_tema)
+							 ->where('Pregunta.dificultad', '=', '2');
+				});
+				$cantidad_preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('Genera.id_tema', '=', $id_tema)
+							 ->where('Pregunta.dificultad', '=', '3');
+				});
+				//Es super importante no modificar la manera en que se muestran las preguntas ($texto_tema) para el funcionamiento actual, es decir con la cantidad de preguntas por nivel.
+				//En caso de querer modificarlo, la manera de obtener el número de preguntas por cada tema y nivel deberá ser acorde a lo que necesiten los metodos para conteo de preguntas.
+				$texto_tema = $tema_externo->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.sizeof($cantidad_preguntas_nivel_1).', N2: '.sizeof($cantidad_preguntas_nivel_2).', N3: '.sizeof($cantidad_preguntas_nivel_3).'.';
+				array_push($lista_de_temas, array($id_tema, $texto_tema));
+
+				$input_preguntas_por_tema = Form::input('input_'.$id_tema.$sufijo_modal,sizeof($cantidad_preguntas_nivel_1).','.sizeof($cantidad_preguntas_nivel_2).','.sizeof($cantidad_preguntas_nivel_3),array('class'=>'form-control','type' => 'hidden'));
+				$examen_lista_de_cantidad_de_preguntas = $examen_lista_de_cantidad_de_preguntas.$input_preguntas_por_tema;
+
+				$input_nombre_por_tema = Form::input('input_tema_'.$id_tema.$sufijo_modal,$tema_externo->nombre,array('class'=>'form-control','type' => 'hidden'));
+				$examen_lista_de_nombres_de_preguntas = $examen_lista_de_nombres_de_preguntas.$input_nombre_por_tema;
+
+				if($is_modal && isset($id_examen)){
+					$rango = Model_BasadoEn::find(array('id_examen' => $id_examen, 'id_tema' => $id_tema ));
+					if(isset($rango))
+						array_push($examen_temas_rangos, $rango->id_tema.'-'.$rango->desde_dificultad.'-'.$rango->hasta_dificultad);
 				}
 			}
 		}

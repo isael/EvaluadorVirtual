@@ -351,6 +351,16 @@ class Controller_Curso extends Controller_Template
 			                 ->where('CursoTema.id_curso', '=', $id_curso);
 			});
 
+			$temas_externos = Model_Tema::find(function ($query) use ($id_curso){
+				return $query->join('Genera')
+			                 ->on('Genera.id_tema', '=', 'Tema.id_tema')
+			                 ->join('Pregunta')
+			                 ->on('Pregunta.id_pregunta', '=', 'Genera.id_pregunta')
+			                 ->join('CursoPreguntasCompartidas')
+			                 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso);
+			});
+
 			$tipos = Model_Tipo::find_all();
 
 			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso){
@@ -388,7 +398,7 @@ class Controller_Curso extends Controller_Template
 
 			$profesores = null;
 
-			$data = array('curso' => $curso, 'temas' => $temas, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas,'preguntas_externas' => $preguntas_externas, 'tipos' => $tipos, 'profesores' => $profesores);
+			$data = array('curso' => $curso, 'temas' => $temas, 'temas_externos' => $temas_externos, 'examenes' => $examenes, 'bibliografias' => $bibliografias, 'preguntas' => $preguntas,'preguntas_externas' => $preguntas_externas, 'tipos' => $tipos, 'profesores' => $profesores);
 			
 			$this->template->content = View::forge('curso/examenes', $data);
 		}else{
