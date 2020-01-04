@@ -11,6 +11,7 @@
 							$fallas = SESSION::get('fallas');							
 							$vidas_posibles = intval($examen->vidas);
 							$vidas_usadas = 1;
+							$es_test = True;
 							if(isset($presenta)){
 								$es_test = False;
 								$vidas_usadas = intval($presenta->vidas);
@@ -71,13 +72,15 @@
 					</div>					
 					<div class="col-xs-12">
 						<?php
-							if(intval($presenta->vidas)>1){
-								echo "A pesar de que tu puntaje obtenido fue de ";
-								if(!isset($puntaje_obtenido)){
-									$puntaje_obtenido = '0';
+							if(isset($presenta)){
+								if(intval($presenta->vidas)>1){
+									echo "A pesar de que tu puntaje obtenido fue de ";
+									if(!isset($puntaje_obtenido)){
+										$puntaje_obtenido = '0';
+									}
+									echo  $puntaje_obtenido.'/10';
+									echo ", tu calificación final se ve afectada por las vidas y oportunidades que gastaste.";
 								}
-								echo  $puntaje_obtenido.'/10';
-								echo ", tu calificación final se ve afectada por las vidas y oportunidades que gastaste.";
 							}
 						?>
 					</div>

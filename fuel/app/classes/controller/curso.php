@@ -253,66 +253,84 @@ class Controller_Curso extends Controller_Template
 
 			$promedios = array('examenes' => $promedios_arreglo_examenes, 'promedios' => $promedios_arreglo_promedios);
 
-			$temas = Model_Tema::find(function ($query) use ($id_curso,$n_cuenta){
-			    return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
-			                 ->join('CometeErroresEn')
-			                 ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
-			                 ->join('BasadoEn')
-			                 ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			                 ->join('Examen')
-			                 ->on('Examen.id_examen', '=', 'BasadoEn.id_examen')
-			                 ->join('Evalua')
-			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			                 ->where('Evalua.id_curso', $id_curso)
-			                 ->where('CometeErroresEn.n_cuenta', $n_cuenta)
-			                 ->order_by('nombre_ex')
-			                 ->order_by('Tema.nombre');
-			});
+			// $temas = Model_Tema::find(function ($query) use ($id_curso,$n_cuenta){
+			//     return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
+			//                  ->join('CometeErroresEn')
+			//                  ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
+			//                  ->join('Examen')
+			//                  ->on('Examen.id_examen', '=', 'CometeErroresEn.id_examen')
+			//                  ->join('Evalua')
+			//                  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			//                  ->where('Evalua.id_curso', $id_curso)
+			//                  ->where('CometeErroresEn.n_cuenta', $n_cuenta)
+			//                  ->order_by('nombre_ex')
+			//                  ->order_by('Tema.nombre');
+			// });
 
+			$sql = "SELECT `Tema`.`nombre`, `Examen`.`nombre` AS `nombre_ex`, COUNT(*) AS `suma` FROM `Tema` JOIN `CometeErroresEn` ON (`CometeErroresEn`.`id_tema` = `Tema`.`id_tema`) JOIN `Examen` ON (`Examen`.`id_examen` = `CometeErroresEn`.`id_examen`) JOIN `Evalua` ON (`Evalua`.`id_examen` = `Examen`.`id_examen`) WHERE `Evalua`.`id_curso` = '2' AND `CometeErroresEn`.`n_cuenta` = '1' GROUP BY `Tema`.`nombre`, `nombre_ex`";
+			$temas = DB::query($sql)->execute();
+
+			$temas_ordenados_por_errores = [];
 			$temas_arreglo_temas = [];
 			$temas_arreglo_examenes = [];
 			$temas_arreglo_errores = [];
 
-			$tema_actual = null;
-			$examenes_actuales = null;
-			$errores_actuales = 0;
+			$tema = null;
 
-			$temas_arreglo_examenes_compuestos = [];
 			if(isset($temas)){
 				foreach ($temas as $tema) {
-					if(isset($tema_actual)){
-						if($tema_actual !== $tema->nombre){
-							// array_push($temas_arreglo_temas, $tema_actual);
-							// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
-							$temas_arreglo_temas[$tema_actual] = $errores_actuales;
-							$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
-							array_push($temas_arreglo_errores, $errores_actuales);
-							$tema_actual = $tema->nombre;
-							$examenes_actuales = $tema->nombre_ex;
-							$errores_actuales = 1;
-						}else{
-							if(strpos($examenes_actuales, $tema->nombre_ex) === False){
-								$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
-							}
-							$errores_actuales = $errores_actuales + 1;
-						}
+					$nombre = $tema['nombre'];
+					if(array_key_exists($nombre, $temas_arreglo_temas)){
+						$temas_arreglo_temas[$nombre] = $temas_arreglo_temas[$nombre] + intval($tema['suma']);
 					}else{
-						$tema_actual = $tema->nombre;
-						$examenes_actuales = $tema->nombre_ex;
-						$errores_actuales = 1;
+						$temas_arreglo_temas[$nombre] = intval($tema['suma']);
 					}
 				}
 			}
-			$temas_arreglo_temas[$tema_actual] = $errores_actuales;
-			$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
-			array_push($temas_arreglo_errores, $errores_actuales);
-			asort($temas_arreglo_errores);
+
 			arsort($temas_arreglo_temas);
-			arsort($temas_arreglo_examenes_compuestos);
-			foreach ($temas_arreglo_examenes_compuestos as $nombre_compuesto => $valor) {
-				$nombre_combinado_examen = explode("+++***+++", $nombre_compuesto);
-				array_push($temas_arreglo_examenes, $nombre_combinado_examen[1]);
+			if(isset($temas_arreglo_temas)){
+				foreach ($temas_arreglo_temas as $key => $value) {
+					array_push($temas_ordenados_por_errores, $key);
+					array_push($temas_arreglo_errores, $value);
+				}
 			}
+
+			// if(isset($temas)){
+			// 	foreach ($temas as $tema) {
+			// 		if(isset($tema_actual)){
+			// 			if($tema_actual !== $tema->nombre){
+			// 				// array_push($temas_arreglo_temas, $tema_actual);
+			// 				// array_push($temas_arreglo_examenes_compuestos, $examenes_actuales);
+			// 				$temas_arreglo_temas[$tema_actual] = $errores_actuales;
+			// 				$temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+			// 				array_push($temas_arreglo_errores, $errores_actuales);
+			// 				$tema_actual = $tema->nombre;
+			// 				$examenes_actuales = $tema->nombre_ex;
+			// 				$errores_actuales = 1;
+			// 			}else{
+			// 				if(strpos($examenes_actuales, $tema->nombre_ex) === False){
+			// 					$examenes_actuales = $examenes_actuales.", ".$tema->nombre_ex;
+			// 				}
+			// 				$errores_actuales = $errores_actuales + 1;
+			// 			}
+			// 		}else{
+			// 			$tema_actual = $tema->nombre;
+			// 			$examenes_actuales = $tema->nombre_ex;
+			// 			$errores_actuales = 1;
+			// 		}
+			// 	}
+			// }
+			// $temas_arreglo_temas[$tema_actual] = $errores_actuales;
+			// $temas_arreglo_examenes_compuestos[$tema_actual."+++***+++".$examenes_actuales] = $errores_actuales;
+			// array_push($temas_arreglo_errores, $errores_actuales);
+			// asort($temas_arreglo_errores);
+			// arsort($temas_arreglo_temas);
+			// arsort($temas_arreglo_examenes_compuestos);
+			// foreach ($temas_arreglo_examenes_compuestos as $nombre_compuesto => $valor) {
+			// 	$nombre_combinado_examen = explode("+++***+++", $nombre_compuesto);
+			// 	array_push($temas_arreglo_examenes, $nombre_combinado_examen[1]);
+			// }
 			$temasFallados = array('temas' => $temas_arreglo_temas, 'examenes' => $temas_arreglo_examenes, 'errores' => $temas_arreglo_errores );;
 
 			$data = array('curso' => $curso, 'promedios' => $promedios, 'temasFallados' => $temasFallados);

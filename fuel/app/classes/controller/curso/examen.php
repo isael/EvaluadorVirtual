@@ -1303,7 +1303,7 @@ class Controller_Curso_Examen extends Controller_Template
 				case 'terminado':
 					$respuestas_no_exitosas = [];
 					$numero_pregunta = 0;
-					$comete_error = Model_CometeErroresEn::find('all', array('where' => array(array('n_cuenta', $n_cuenta), 'or' => array(array('id_examen', $id_examen)) ) ) );
+					$comete_error = Model_CometeErroresEn::find('all', array('where' => array(array('n_cuenta', $n_cuenta), array(array('id_examen', $id_examen)) ) ) );
 					foreach ($comete_error as $error_cometido) {
 						array_push($respuestas_no_exitosas, array($numero_pregunta, $error_cometido->id_pregunta, $error_cometido->id_respuesta));
 						$numero_pregunta++;
