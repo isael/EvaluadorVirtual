@@ -35,7 +35,7 @@
 					}
 					$alumnosLength = sizeof($nombresAlumnos);
 					$aspectRatio = $alumnosLength > 17 ? 1/(1+intval($alumnosLength/17)) : ($alumnosLength < 9 ? 2 : 1 ) ; 
-					$temaMasFallado = $nombresTemasFallados[0];
+					$temaMasFallado = sizeof($nombresTemasFallados)>0 ? $nombresTemasFallados[0] : "N/A";
 				?>
 				<!-- Barra -->
 				<div class="row">

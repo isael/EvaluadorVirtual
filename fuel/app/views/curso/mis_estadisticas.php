@@ -187,7 +187,7 @@
 											$nombresTemasFallados.'
 										</div>
 										<div class="col-xs-4 table-row">'.
-											'$listaDeExamenesFallados[$indice]'.'
+											$listaDeExamenesFallados[$indice].'
 										</div>
 										<div class="col-xs-4 table-row">'.
 											$listaDeFallos[$indice].'
