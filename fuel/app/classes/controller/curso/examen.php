@@ -807,6 +807,12 @@ class Controller_Curso_Examen extends Controller_Template
 			SESSION::set('id_pregunta',$id_pregunta);
 			if(isset($externa))
 				SESSION::set('externa',True);
+			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
+			if(isset($pregunta)){
+				if($pregunta->compartida === '1'){
+					SESSION::set('es_compartida','true');
+				}
+			}
 			SESSION::set('pestania','preguntas');
 			Response::redirect('curso/examenes');
 		}

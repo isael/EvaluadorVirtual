@@ -13,6 +13,7 @@
 					$idFuente = SESSION::get('id_fuente');
 					$numeroFuente = SESSION::get('numero_fuente');
 					$idExamen = SESSION::get('id_examen');
+					$es_compartida = SESSION::get('es_compartida');
 					if(isset($pestania)){
 						SESSION::delete('pestania');
 					}
@@ -35,6 +36,11 @@
 					}
 					if(isset($idExamen)){
 						SESSION::delete('id_examen');
+					}
+					if(isset($es_compartida)){
+						SESSION::delete('es_compartida');
+					}else{
+						$es_compartida = 'false';
 					}
 				?>
 				<!-- /SESSION -->
@@ -340,7 +346,7 @@
 						if($externa)
 							echo Modals::getModalPreguntaCompartida($idPregunta, null, null, True);
 						else
-							echo Modals::getModalPregunta($temas, $bibliografias, $tipos, True, $idPregunta);
+							echo Modals::getModalPregunta($temas, $bibliografias, $tipos, $es_compartida, True, $idPregunta);
 					?>
 				</div>
 				<?php
@@ -402,6 +408,37 @@
 										</div>
 										<div class="col-xs-6">
 											<?php echo Html::anchor('javascript:cambiarPestania(pestanias, bibliografia);cancelarBibliografia.click();','Ir a bibliografías', array('class' => 'btn btn-primary btn-block')); ?>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal fade" id="modalActualizarPreguntaCompartida" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">Actualizando pregunta compartida</h4>
+							</div>
+
+							<div class="form-group">
+								<div class="modal-body">
+									Al actualizar la pregunta, se actualizará su versión en linea y quienes tengan esta pregunta en sus repositorios recibirán una invitación para actualizarla localmente.
+									<br>
+									Revisa bien los cambios, ya que no podrás modificar la pregunta de nuevo sino hasta en 10 días.
+								</div>
+								<div class="modal-footer">
+									<div class="row text-center">
+										<div class="col-xs-6">
+											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
+										</div>
+										<div class="col-xs-6">
+											<?php echo Html::anchor('javascript:submitPregunta();','Guardar Cambios', array('class' => 'btn btn-primary btn-block')); ?>
 										</div>
 									</div>
 								</div>

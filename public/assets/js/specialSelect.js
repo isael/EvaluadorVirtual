@@ -113,11 +113,35 @@ function actualizaRespuestas(cantidad){
     }
 }
 
+
+
+function submitPregunta(){
+    let formulario = document.getElementById("pregunta_formulario_modal");
+    formulario.submit();
+}
+
+function muestraModalActualizarPreguntaCompartida($estaSiendoCompartida = false){
+    if($estaSiendoCompartida){
+        let botonModalPregunta = document.createElement('button');
+        botonModalPregunta.setAttribute('data-toggle','modal');
+        botonModalPregunta.setAttribute('data-target','#modalActualizarPreguntaCompartida');
+        botonModalPregunta.style.visibility = "hidden";
+        let padre = document.getElementById('botonModal');
+        padre.appendChild(botonModalPregunta);
+        setTimeout(function(){
+            botonModalPregunta.click();
+            padre.removeChild(botonModalPregunta);
+        },100);
+    }else{
+        submitPregunta();
+    }
+}
+
 function duplicaPregunta(){
-    let submit = document.getElementById("form_guardar_pregunta");
+    let formulario = document.getElementById("pregunta_formulario_modal");
     let elementoDuplicado = document.getElementById("form_pregunta_duplicada");
     elementoDuplicado.value = "duplicada";
-    submit.click();
+    formulario.submit();
 }
 
 function imprimirEstadisticas(seccionesImpresion) {

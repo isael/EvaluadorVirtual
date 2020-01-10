@@ -422,7 +422,7 @@ class Modals
 		echo $result;
 	}
 
-	public static function getModalPregunta($temas, $bibliografias, $tipos, $is_modal = false, $id_pregunta = null){
+	public static function getModalPregunta($temas, $bibliografias, $tipos, $es_compartida = false, $is_modal = false, $id_pregunta = null){
 		$pregunta_texto="";
 		$pregunta_justificacion="";
 		$pregunta_tiempo="";
@@ -562,7 +562,7 @@ class Modals
 					</div>
 					<div class="modal-body">';
 		}
-		$result = $result.Form::open('curso/examen/crear_pregunta');
+		$result = $result.Form::open(array('action' => 'curso/examen/crear_pregunta', 'id' => 'pregunta_formulario'.$sufijo_modal));
 
 		$result = $result.'
 							<div class="form-group">
@@ -660,8 +660,8 @@ class Modals
 							<div class="col-xs-6">
 								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 							</div>
-							<div class="col-xs-6">'.
-								Form::submit('guardar_pregunta','Guardar',array('class' => 'btn btn-danger btn-block')).'
+							<div class="col-xs-6">
+								<button type="button" class="btn btn-danger btn-block" onclick="javascript:muestraModalActualizarPreguntaCompartida('.$es_compartida.')">Guardar</button>
 							</div>
 						  </div>
 					  </div>
