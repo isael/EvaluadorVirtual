@@ -353,7 +353,9 @@ class Controller_Curso_Examen extends Controller_Template
 		$error = False;
 		$modal = "";
 		$modificar_pregunta = False;
+		$id_pregunta_por_respaldar = null;
 		$pregunta_id = trim(Input::post('pregunta_id'));
+
 		if(isset($pregunta_id)  && $pregunta_id!==""){
 			$modal = "_modal";
 			$modificar_pregunta = True;
@@ -506,6 +508,24 @@ class Controller_Curso_Examen extends Controller_Template
 			$mensaje=$mensaje."El campo de Justificación está vacío.<br>";
 		}
 
+		$lista_preguntas_compartidas = Model_CursoPreguntasCompartidas::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
+		if(isset($lista_preguntas_compartidas)){
+			$pregunta_compartida = reset($lista_preguntas_compartidas);
+			if(isset($pregunta_compartida) && isset($pregunta_compartida->por_cambiar) && $pregunta_compartida->por_cambiar === '1'){
+				$date= date("Y-m-d H:i:s");
+				$old_date_value = strtotime ( '-10 days' , strtotime ($date));
+				$old_date = date( "Y-m-d H:i:s" , $old_date_value);
+				$update_date = $pregunta_compartida->fecha_de_modificacion;
+				if(strcmp($old_date, $update_date) < 0){ //Si aun no se ha cumplido la fecha
+					$error=True;
+					$mensaje=$mensaje."No se puede actualizar la aplicación hasta que transcurran 10 días desde su última actualización.";
+				}else{
+					$sql = "UPDATE `CursoPreguntasCompartidas` SET `por_cambiar`= false WHERE `id_pregunta`= '".$pregunta_id."' ";
+					$respuesta_sql = DB::query($sql)->execute();
+				}
+			}
+		}
+
 		if(!$error){
 			/* Bibliografías */
 
@@ -513,7 +533,129 @@ class Controller_Curso_Examen extends Controller_Template
 			$id_referencia=null;
 			$fundamentado_en = null;
 
-			if($modificar_pregunta){
+			$new_pregunta = Model_Pregunta::find_one_by('id_pregunta',$pregunta_id);
+			if(isset($new_pregunta)){
+				$id_pregunta = $pregunta_id;
+				if($new_pregunta->compartida === '1'){
+					$id_pregunta_por_respaldar = $id_pregunta;
+					$sql = "UPDATE `CursoPreguntasCompartidas` SET `fecha_de_modificacion`= '".date("Y-m-d H:i:s")."', `por_cambiar`= true WHERE `id_pregunta`= '".$id_pregunta."' ";
+					$respuesta_sql = DB::query($sql)->execute();
+				}				
+			}
+
+			if($modificar_pregunta){				
+				if(isset($id_pregunta_por_respaldar)){
+					//Que hacer si es para respaldar
+					$old_pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_por_respaldar);
+					if(isset($old_pregunta)){
+						// Copiamos la pregunta
+
+						$pregunta = new Model_Pregunta();
+						$pregunta->texto = $old_pregunta->texto;
+						$pregunta->dificultad = $old_pregunta->dificultad;
+						$pregunta->justificacion = $old_pregunta->justificacion;
+						$pregunta->tiene_subpreguntas = $old_pregunta->tiene_subpreguntas;
+						$pregunta->tiempo = $old_pregunta->tiempo;
+						$pregunta->save();
+						$new_id_pregunta = $old_pregunta->id_pregunta;
+
+						//Copiamos las fuentes
+
+						$old_fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $id_pregunta_por_respaldar))));
+						$old_fundamentado_en = reset($old_fundamentado_en_lista);
+						$old_id_referencia = null;
+						if(isset($old_fundamentado_en)){
+							$fundamentado_en = new Model_FundamentadoEn();
+							$fundamentado_en->id_pregunta = $new_id_pregunta;
+							$fundamentado_en->id_referencia = $old_fundamentado_en->id_referencia;
+							$fundamentado_en->save();
+						}
+
+						//Copiamos el tipo
+						$old_de_tipo_lista = Model_DeTipo::find('all',array('where' => array(array('id_pregunta', $id_pregunta_por_respaldar))));
+						$old_de_tipo = reset($old_de_tipo_lista);
+						if(isset($old_de_tipo)){
+							$de_tipo = new Model_DeTipo();
+							$de_tipo->id_tipo = $old_de_tipo->id_tipo;
+							$de_tipo->id_pregunta = $new_id_pregunta;
+							$de_tipo->save();							
+						}
+
+						//Copiamos el Genera
+
+						//Copiamos el Viene De
+
+						//Copiamos los Contiene (son por respuesta)
+
+
+						$tipo = Model_Tipo::find_one_by('id_tipo',$pregunta_tipo);//Pendiente
+
+
+						$fundamentado_en = new Model_FundamentadoEn();
+						$fundamentado_en->id_pregunta = $id_pregunta;
+						$fundamentado_en->id_referencia = $id_referencia;
+						$fundamentado_en->save();
+
+						for ($i=0; $i < $cantidad_respuestas; $i++) {
+							$texto_actual = $conjunto_respuestas[$i];
+							$porcentaje_actual = $conjunto_porcentajes[$i];
+							$resp = new Model_Respuesta();
+							$resp->contenido = $texto_actual;
+							$resp->porcentaje = $porcentaje_actual;
+							$resp->save();
+
+							$contiene = new Model_Contiene();
+							$contiene->id_pregunta = $id_pregunta;
+							$contiene->id_respuesta = $resp->id_respuesta;
+							$contiene->save();
+						}
+
+						if(!isset($tema)){
+							$tema = new Model_Tema();
+							$tema->nombre = $pregunta_tema;
+							$tema->save();
+						}
+
+						$genera = new Model_Genera();
+						$genera->id_pregunta = $id_pregunta;
+						$genera->id_tema = $tema->id_tema;
+						$genera->save();
+
+						$tema_fuente = Model_TemaFuente::find(array($tema->id_tema, $fuente->id_fuente));
+						if(!isset($tema_fuente)){
+							$tema_fuente = new Model_TemaFuente();
+							$tema_fuente->id_fuente = $fuente->id_fuente;
+							$tema_fuente->id_tema = $tema->id_tema;
+							$tema_fuente->cantidad_preguntas = 1;
+							$tema_fuente->save();
+						}else{
+							$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+							$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
+							$tema_fuente->save();
+						}
+
+						$curso_tema = Model_CursoTema::find(array($id_curso, $tema->id_tema));
+						if(!isset($curso_tema)){
+							$curso_tema = new Model_CursoTema();
+							$curso_tema->id_curso = $id_curso;
+							$curso_tema->id_tema = $tema->id_tema;
+							$curso_tema->cantidad_preguntas = 1;
+							$curso_tema->save();
+						}else{
+							$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+							$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
+							$curso_tema->save();
+						}
+
+					// 	if(isset($id_pregunta_por_respaldar)){
+					// 		$respaldo = new Model_RespaldoDe();
+					// 		$respaldo->id_pregunta = $id_pregunta_por_respaldar;
+					// 		$respaldo->id_pregunta_respaldo = $id_pregunta;
+					// 		$respaldo->save();
+					// 	}
+						
+					}
+				}
 				$id_pregunta=$pregunta_id;
 				$fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
 				if(isset($fundamentado_en_lista)){
@@ -674,7 +816,6 @@ class Controller_Curso_Examen extends Controller_Template
 							}
 						}
 					}
-
 				}
 			}else{
 				$referencia = new Model_Referencia();
@@ -760,6 +901,13 @@ class Controller_Curso_Examen extends Controller_Template
 					$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
 					$curso_tema->save();
 				}
+
+			// 	if(isset($id_pregunta_por_respaldar)){
+			// 		$respaldo = new Model_RespaldoDe();
+			// 		$respaldo->id_pregunta = $id_pregunta_por_respaldar;
+			// 		$respaldo->id_pregunta_respaldo = $id_pregunta;
+			// 		$respaldo->save();
+			// 	}
 			}
 			if($modificar_pregunta){
 				$mensaje = $mensaje."La pregunta fue actualizada con éxito.";
@@ -1506,7 +1654,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$pregunta_compartida = new Model_CursoPreguntasCompartidas();
 			$pregunta_compartida->id_curso = $id_curso;
 			$pregunta_compartida->id_pregunta = $id_pregunta;
-			$pregunta_compartida->fecha_de_modificacion = date("Y-m-d H:i:s");;
+			$pregunta_compartida->fecha_de_modificacion = date("Y-m-d H:i:s");
 			$pregunta_compartida->por_cambiar = '0';
 			$pregunta_compartida->save();
 		}
