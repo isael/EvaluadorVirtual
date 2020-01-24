@@ -582,7 +582,14 @@ class Controller_Curso_Examen extends Controller_Template
 						}
 
 						//Copiamos el Genera
-
+						$old_genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+						$old_genera = reset($old_genera_lista);
+						if(isset($old_genera)){
+							$genera = new Model_Genera();
+							$genera->id_pregunta = $new_id_pregunta;
+							$genera->id_tema = $old_genera->id_tema;
+							$genera->save();
+						}
 						//Copiamos el Viene De
 
 						//Copiamos los Contiene (son por respuesta)
@@ -616,10 +623,6 @@ class Controller_Curso_Examen extends Controller_Template
 							$tema->save();
 						}
 
-						$genera = new Model_Genera();
-						$genera->id_pregunta = $id_pregunta;
-						$genera->id_tema = $tema->id_tema;
-						$genera->save();
 
 						$tema_fuente = Model_TemaFuente::find(array($tema->id_tema, $fuente->id_fuente));
 						if(!isset($tema_fuente)){
