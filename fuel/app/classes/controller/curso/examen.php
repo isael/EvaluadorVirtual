@@ -353,7 +353,9 @@ class Controller_Curso_Examen extends Controller_Template
 		$error = False;
 		$modal = "";
 		$modificar_pregunta = False;
-		$id_pregunta_por_respaldar = null;
+		$duplicar_pregunta = False;
+		$respaldar_pregunta = False;
+		$nueva_pregunta = False;
 		$pregunta_id = trim(Input::post('pregunta_id'));
 
 		if(isset($pregunta_id)  && $pregunta_id!==""){
@@ -375,6 +377,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 		if (isset($pregunta_duplicada) && $pregunta_duplicada === "duplicada") {
 			$modificar_pregunta = False;
+			$duplicar_pregunta = True;
 		}
 
 		$tema=null;
@@ -533,133 +536,130 @@ class Controller_Curso_Examen extends Controller_Template
 			$id_referencia=null;
 			$fundamentado_en = null;
 
-			$new_pregunta = Model_Pregunta::find_one_by('id_pregunta',$pregunta_id);
-			if(isset($new_pregunta)){
+			$old_pregunta = Model_Pregunta::find_one_by('id_pregunta',$pregunta_id);
+			if(isset($old_pregunta)){
 				$id_pregunta = $pregunta_id;
-				if($new_pregunta->compartida === '1'){
-					$id_pregunta_por_respaldar = $id_pregunta;
+				if($old_pregunta->compartida === '1'){
+					$respaldar_pregunta = True;
 					$sql = "UPDATE `CursoPreguntasCompartidas` SET `fecha_de_modificacion`= '".date("Y-m-d H:i:s")."', `por_cambiar`= true WHERE `id_pregunta`= '".$id_pregunta."' ";
 					$respuesta_sql = DB::query($sql)->execute();
-				}				
+				}
+			}
+			$nueva_pregunta = !($duplicar_pregunta || $respaldar_pregunta || $modificar_pregunta);
+
+			if($duplicar_pregunta || $respaldar_pregunta){
+				if(isset($old_pregunta)){
+					//Se realiza el duplicado de la pregunta.
+
+					// Copiamos la pregunta
+
+					$pregunta = new Model_Pregunta();
+					$pregunta->texto = $old_pregunta->texto;
+					$pregunta->dificultad = $old_pregunta->dificultad;
+					$pregunta->justificacion = $old_pregunta->justificacion;
+					$pregunta->tiene_subpreguntas = $old_pregunta->tiene_subpreguntas;
+					$pregunta->tiempo = $old_pregunta->tiempo;
+					$pregunta->save();
+					$new_id_pregunta = $old_pregunta->id_pregunta;
+
+					//Copiamos las fuentes
+
+					$old_fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+					$old_fundamentado_en = reset($old_fundamentado_en_lista);
+					$old_id_referencia = null;
+					if(isset($old_fundamentado_en)){
+						$fundamentado_en = new Model_FundamentadoEn();
+						$fundamentado_en->id_pregunta = $new_id_pregunta;
+						$fundamentado_en->id_referencia = $old_fundamentado_en->id_referencia;
+						$fundamentado_en->save();
+					}
+
+					//Copiamos el tipo
+					$old_de_tipo_lista = Model_DeTipo::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+					$old_de_tipo = reset($old_de_tipo_lista);
+					if(isset($old_de_tipo)){
+						$de_tipo = new Model_DeTipo();
+						$de_tipo->id_tipo = $old_de_tipo->id_tipo;
+						$de_tipo->id_pregunta = $new_id_pregunta;
+						$de_tipo->save();
+					}
+
+					//Copiamos el Genera
+					$old_genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+					$old_genera = reset($old_genera_lista);
+					if(isset($old_genera)){
+						$genera = new Model_Genera();
+						$genera->id_pregunta = $new_id_pregunta;
+						$genera->id_tema = $old_genera->id_tema;
+						$genera->save();
+					}
+
+					//Copiamos los Contiene (son por respuesta)
+					$old_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+					    return $query->join('Contiene')
+									->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+									->where('Contiene.id_pregunta', $id_pregunta);
+					});
+					foreach ($old_respuestas as $old_respuesta) {
+						$new_respuesta = new Model_Respuesta();
+						$new_respuesta->contenido = $old_respuesta->contenido;
+						$new_respuesta->porcentaje = $old_respuesta->porcentaje;
+						$new_respuesta->save();
+						$contiene = new Model_Contiene();
+						$contiene->id_pregunta = $new_id_pregunta;
+						$contiene->id_respuesta = $new_respuesta->id_respuesta;
+						$contiene->save();
+					}
+
+					//Aumentamos cantidad_de_preguntas en CursoTema y TemaFuente
+
+					$tema_fuente = Model_TemaFuente::find(array($tema->id_tema, $fuente->id_fuente));
+					if(isset($tema_fuente)){
+						$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+						$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
+						$tema_fuente->save();
+					}
+
+					$curso_tema = Model_CursoTema::find(array($id_curso, $tema->id_tema));
+					if(isset($curso_tema)){
+						$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+						$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
+						$curso_tema->save();
+					}
+
+					//En caso de ser una copia para respaldar se hace lo siguiente
+
+				// 	if(isset($respaldar_pregunta)){
+				// 		$respaldo = new Model_RespaldoDe();
+				// 		$respaldo->id_pregunta = $id_pregunta;
+				// 		$respaldo->id_pregunta_respaldo = $new_id_pregunta;
+				// 		$respaldo->save();
+				// 	}
+
+				}
 			}
 
-			if($modificar_pregunta){				
-				if(isset($id_pregunta_por_respaldar)){
-					//Que hacer si es para respaldar
-					$old_pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_por_respaldar);
-					if(isset($old_pregunta)){
-						// Copiamos la pregunta
 
-						$pregunta = new Model_Pregunta();
-						$pregunta->texto = $old_pregunta->texto;
-						$pregunta->dificultad = $old_pregunta->dificultad;
-						$pregunta->justificacion = $old_pregunta->justificacion;
-						$pregunta->tiene_subpreguntas = $old_pregunta->tiene_subpreguntas;
-						$pregunta->tiempo = $old_pregunta->tiempo;
-						$pregunta->save();
-						$new_id_pregunta = $old_pregunta->id_pregunta;
+			/*
+				$id_referencia="";
+				//Buscar Referencias que cumplan con las propiedades y que además cumplan con las propiedades de fuente y que esten en la tabla de ReferenciaFuente
+				$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
+				    return $query->join('ReferenciaFuente')
+								->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+								->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
+								->where('Referencia.pagina', $pregunta_bibliografia_pagina)
+								->where('ReferenciaFuente.id_fuente', $fuente->id_fuente);
+				});
+				$old_referencia = reset($old_referencia_lista);
+				if(isset($old_referencia)){
+					//En caso de entregar un elemento se agregará el elemento a FundamentadoEn con el id_pregunta y con ese elemento encontrado (id_referencia)
+					$id_referencia=$old_referencia->id_referencia;
+				}else{
+			*/
 
-						//Copiamos las fuentes
-
-						$old_fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $id_pregunta_por_respaldar))));
-						$old_fundamentado_en = reset($old_fundamentado_en_lista);
-						$old_id_referencia = null;
-						if(isset($old_fundamentado_en)){
-							$fundamentado_en = new Model_FundamentadoEn();
-							$fundamentado_en->id_pregunta = $new_id_pregunta;
-							$fundamentado_en->id_referencia = $old_fundamentado_en->id_referencia;
-							$fundamentado_en->save();
-						}
-
-						//Copiamos el tipo
-						$old_de_tipo_lista = Model_DeTipo::find('all',array('where' => array(array('id_pregunta', $id_pregunta_por_respaldar))));
-						$old_de_tipo = reset($old_de_tipo_lista);
-						if(isset($old_de_tipo)){
-							$de_tipo = new Model_DeTipo();
-							$de_tipo->id_tipo = $old_de_tipo->id_tipo;
-							$de_tipo->id_pregunta = $new_id_pregunta;
-							$de_tipo->save();							
-						}
-
-						//Copiamos el Genera
-						$old_genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
-						$old_genera = reset($old_genera_lista);
-						if(isset($old_genera)){
-							$genera = new Model_Genera();
-							$genera->id_pregunta = $new_id_pregunta;
-							$genera->id_tema = $old_genera->id_tema;
-							$genera->save();
-						}
-						//Copiamos el Viene De
-
-						//Copiamos los Contiene (son por respuesta)
-
-
-						$tipo = Model_Tipo::find_one_by('id_tipo',$pregunta_tipo);//Pendiente
-
-
-						$fundamentado_en = new Model_FundamentadoEn();
-						$fundamentado_en->id_pregunta = $id_pregunta;
-						$fundamentado_en->id_referencia = $id_referencia;
-						$fundamentado_en->save();
-
-						for ($i=0; $i < $cantidad_respuestas; $i++) {
-							$texto_actual = $conjunto_respuestas[$i];
-							$porcentaje_actual = $conjunto_porcentajes[$i];
-							$resp = new Model_Respuesta();
-							$resp->contenido = $texto_actual;
-							$resp->porcentaje = $porcentaje_actual;
-							$resp->save();
-
-							$contiene = new Model_Contiene();
-							$contiene->id_pregunta = $id_pregunta;
-							$contiene->id_respuesta = $resp->id_respuesta;
-							$contiene->save();
-						}
-
-						if(!isset($tema)){
-							$tema = new Model_Tema();
-							$tema->nombre = $pregunta_tema;
-							$tema->save();
-						}
-
-
-						$tema_fuente = Model_TemaFuente::find(array($tema->id_tema, $fuente->id_fuente));
-						if(!isset($tema_fuente)){
-							$tema_fuente = new Model_TemaFuente();
-							$tema_fuente->id_fuente = $fuente->id_fuente;
-							$tema_fuente->id_tema = $tema->id_tema;
-							$tema_fuente->cantidad_preguntas = 1;
-							$tema_fuente->save();
-						}else{
-							$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
-							$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
-							$tema_fuente->save();
-						}
-
-						$curso_tema = Model_CursoTema::find(array($id_curso, $tema->id_tema));
-						if(!isset($curso_tema)){
-							$curso_tema = new Model_CursoTema();
-							$curso_tema->id_curso = $id_curso;
-							$curso_tema->id_tema = $tema->id_tema;
-							$curso_tema->cantidad_preguntas = 1;
-							$curso_tema->save();
-						}else{
-							$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
-							$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
-							$curso_tema->save();
-						}
-
-					// 	if(isset($id_pregunta_por_respaldar)){
-					// 		$respaldo = new Model_RespaldoDe();
-					// 		$respaldo->id_pregunta = $id_pregunta_por_respaldar;
-					// 		$respaldo->id_pregunta_respaldo = $id_pregunta;
-					// 		$respaldo->save();
-					// 	}
-						
-					}
-				}
+			if($modificar_pregunta){
 				$id_pregunta=$pregunta_id;
+//Inicia parte turbia ISAEL
 				$fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
 				if(isset($fundamentado_en_lista)){
 					$fundamentado_en = reset($fundamentado_en_lista);
@@ -679,7 +679,20 @@ class Controller_Curso_Examen extends Controller_Template
 							$update_referencia = True;
 						}
 						if($update_referencia){
-							$new_referencia->save();
+							$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
+							    return $query->join('ReferenciaFuente')
+											->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+											->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
+											->where('Referencia.pagina', $pregunta_bibliografia_pagina)
+											->where('ReferenciaFuente.id_fuente', $fuente->id_fuente);
+							});
+							$old_referencia = reset($old_referencia_lista);
+							if(isset($old_referencia)){
+								$fundamentado_en->id_referencia = $old_referencia->id_referencia;
+								$fundamentado_en->save();
+							}else{
+								$new_referencia->save();
+							}
 						}
 					}
 
@@ -700,7 +713,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$new_referencia_fuente->save();
 						}
 					}
-
+//Termina parte turbia ISAEL
 					$new_pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
 					if(isset($new_pregunta)){
 						$update_pregunta = False;
@@ -820,19 +833,8 @@ class Controller_Curso_Examen extends Controller_Template
 						}
 					}
 				}
-			}else{
-				$referencia = new Model_Referencia();
-				$referencia->capitulo = $pregunta_bibliografia_capitulo;
-				$referencia->pagina = $pregunta_bibliografia_pagina;
-				$referencia->save();
-				$id_referencia=$referencia->id_referencia;
-
-				$referencia_fuente = new Model_ReferenciaFuente();
-				$referencia_fuente->id_referencia = $referencia->id_referencia;
-				$referencia_fuente->id_fuente = $fuente->id_fuente;
-				$referencia_fuente->numero_edicion = $fuente->numero;
-				$referencia_fuente->save();
-
+			}
+			if($nueva_pregunta){
 				$tipo = Model_Tipo::find_one_by('id_tipo',$pregunta_tipo);//Pendiente
 
 				$pregunta = new Model_Pregunta();
@@ -849,6 +851,34 @@ class Controller_Curso_Examen extends Controller_Template
 				$de_tipo->id_pregunta = $id_pregunta;
 				$de_tipo->save();
 
+				$id_referencia="";
+				//Buscar Referencias que cumplan con las propiedades y que además cumplan con las propiedades de fuente y que esten en la tabla de ReferenciaFuente
+				$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
+				    return $query->join('ReferenciaFuente')
+								->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+								->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
+								->where('Referencia.pagina', $pregunta_bibliografia_pagina)
+								->where('ReferenciaFuente.id_fuente', $fuente->id_fuente);
+				});
+				$old_referencia = reset($old_referencia_lista);
+				if(isset($old_referencia)){
+					//En caso de entregar un elemento se agregará el elemento a FundamentadoEn con el id_pregunta y con ese elemento encontrado (id_referencia)
+					$id_referencia=$old_referencia->id_referencia;
+				}else{
+					$referencia = new Model_Referencia();
+					$referencia->capitulo = $pregunta_bibliografia_capitulo;
+					$referencia->pagina = $pregunta_bibliografia_pagina;
+					$referencia->save();
+					$id_referencia=$referencia->id_referencia;
+
+					$referencia_fuente = new Model_ReferenciaFuente();
+					$referencia_fuente->id_referencia = $referencia->id_referencia;
+					$referencia_fuente->id_fuente = $fuente->id_fuente;
+					$referencia_fuente->numero_edicion = $fuente->numero;
+					$referencia_fuente->save();
+				}
+
+				//En cualquier caso se guarda FundamentadoEn ya que al ser nueva no existe aun esa relación
 				$fundamentado_en = new Model_FundamentadoEn();
 				$fundamentado_en->id_pregunta = $id_pregunta;
 				$fundamentado_en->id_referencia = $id_referencia;
@@ -904,13 +934,6 @@ class Controller_Curso_Examen extends Controller_Template
 					$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
 					$curso_tema->save();
 				}
-
-			// 	if(isset($id_pregunta_por_respaldar)){
-			// 		$respaldo = new Model_RespaldoDe();
-			// 		$respaldo->id_pregunta = $id_pregunta_por_respaldar;
-			// 		$respaldo->id_pregunta_respaldo = $id_pregunta;
-			// 		$respaldo->save();
-			// 	}
 			}
 			if($modificar_pregunta){
 				$mensaje = $mensaje."La pregunta fue actualizada con éxito.";
