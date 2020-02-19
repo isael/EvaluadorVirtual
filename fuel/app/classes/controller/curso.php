@@ -350,7 +350,18 @@ class Controller_Curso extends Controller_Template
 
 			$tipos = Model_Tipo::find_all();
 
-			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso){
+			$ids_preguntas_de_respaldo = [];
+			$preguntas_de_respaldo = Model_RespaldoDe::find();
+			if(isset($preguntas_de_respaldo)){
+				foreach ($preguntas_de_respaldo as $pregunta_de_respaldo) {
+					array_push($ids_preguntas_de_respaldo, $pregunta_de_respaldo->id_pregunta_respaldo);
+				}
+			}
+			if($ids_preguntas_de_respaldo === []){
+				$ids_preguntas_de_respaldo = [''];
+			}
+
+			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso,$ids_preguntas_de_respaldo){
 			    return $query->join('Genera')
 			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 			                 ->join('Tema')
@@ -358,6 +369,7 @@ class Controller_Curso extends Controller_Template
 			                 ->join('CursoTema')
 			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
 			                 ->where('CursoTema.id_curso', '=', $id_curso)
+			                 ->where('Genera.id_pregunta', 'NOT IN', $ids_preguntas_de_respaldo)
 			                 ->order_by('Tema.nombre')
 			                 ->order_by('Pregunta.id_pregunta');
 			});

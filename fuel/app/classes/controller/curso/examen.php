@@ -560,7 +560,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$pregunta->tiene_subpreguntas = $old_pregunta->tiene_subpreguntas;
 					$pregunta->tiempo = $old_pregunta->tiempo;
 					$pregunta->save();
-					$new_id_pregunta = $old_pregunta->id_pregunta;
+					$new_id_pregunta = $pregunta->id_pregunta;
 
 					//Copiamos las fuentes
 
@@ -629,12 +629,12 @@ class Controller_Curso_Examen extends Controller_Template
 
 					//En caso de ser una copia para respaldar se hace lo siguiente
 
-				// 	if(isset($respaldar_pregunta)){
-				// 		$respaldo = new Model_RespaldoDe();
-				// 		$respaldo->id_pregunta = $id_pregunta;
-				// 		$respaldo->id_pregunta_respaldo = $new_id_pregunta;
-				// 		$respaldo->save();
-				// 	}
+					if($respaldar_pregunta){
+						$respaldo = new Model_RespaldoDe();
+						$respaldo->id_pregunta = $id_pregunta;
+						$respaldo->id_pregunta_respaldo = $new_id_pregunta;
+						$respaldo->save();
+					}
 
 				}
 			}
