@@ -639,81 +639,91 @@ class Controller_Curso_Examen extends Controller_Template
 				}
 			}
 
-
-			/*
-				$id_referencia="";
-				//Buscar Referencias que cumplan con las propiedades y que además cumplan con las propiedades de fuente y que esten en la tabla de ReferenciaFuente
-				$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
-				    return $query->join('ReferenciaFuente')
-								->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-								->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
-								->where('Referencia.pagina', $pregunta_bibliografia_pagina)
-								->where('ReferenciaFuente.id_fuente', $fuente->id_fuente);
-				});
-				$old_referencia = reset($old_referencia_lista);
-				if(isset($old_referencia)){
-					//En caso de entregar un elemento se agregará el elemento a FundamentadoEn con el id_pregunta y con ese elemento encontrado (id_referencia)
-					$id_referencia=$old_referencia->id_referencia;
-				}else{
-			*/
-
 			if($modificar_pregunta){
 				$id_pregunta=$pregunta_id;
-//Inicia parte turbia ISAEL
 				$fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
 				if(isset($fundamentado_en_lista)){
 					$fundamentado_en = reset($fundamentado_en_lista);
 					$id_referencia = $fundamentado_en->id_referencia;
 
-					$new_referencia = Model_Referencia::find_one_by('id_referencia',$id_referencia);
-					if(isset($new_referencia)){
-						$update_referencia = False;
-						$pagina_iguales = ($new_referencia->pagina === $pregunta_bibliografia_pagina);
+					$update_referencia = False;
+					$current_referencia = Model_Referencia::find_one_by('id_referencia',$id_referencia);
+					if(isset($current_referencia)){
+						$pagina_iguales = ($current_referencia->pagina === $pregunta_bibliografia_pagina);
 						if(!$pagina_iguales){
-							$new_referencia->pagina = $pregunta_bibliografia_pagina;
+							$current_referencia->pagina = $pregunta_bibliografia_pagina;
 							$update_referencia = True;
 						}
-						$capitulo_iguales = ($new_referencia->capitulo === $pregunta_bibliografia_capitulo);
+						$capitulo_iguales = ($current_referencia->capitulo === $pregunta_bibliografia_capitulo);
 						if(!$capitulo_iguales){
-							$new_referencia->capitulo = $pregunta_bibliografia_capitulo;
+							$current_referencia->capitulo = $pregunta_bibliografia_capitulo;
 							$update_referencia = True;
 						}
 						if($update_referencia){
-							$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
+							$similar_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
 							    return $query->join('ReferenciaFuente')
 											->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
 											->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
 											->where('Referencia.pagina', $pregunta_bibliografia_pagina)
 											->where('ReferenciaFuente.id_fuente', $fuente->id_fuente);
 							});
-							$old_referencia = reset($old_referencia_lista);
-							if(isset($old_referencia)){
-								$fundamentado_en->id_referencia = $old_referencia->id_referencia;
+							$similar_referencia = reset($similar_referencia_lista);
+
+							// Ya existe una referencia con esas propiedades, diferente a la actual
+							if(isset($similar_referencia)){
+								$fundamentado_en->id_referencia = $similar_referencia->id_referencia;
 								$fundamentado_en->save();
+
+								// Preguntar si aun se usa la referencia pasada, si no borrarla y también de la lista de Referencia Fuente
+
+								$borrar_referencia = False;
+								$old_referencia_fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_referencia', $id_referencia))));
+								if(isset($old_referencia_fundamentado_en_lista)){
+									$old_referencia_fundamentado_en = reset($old_referencia_fundamentado_en_lista);
+									if(!isset($old_referencia_fundamentado_en)){ // Es decir que no tiene ninguna referencia
+										$borrar_referencia = True;
+									}
+								}else{
+									$borrar_referencia = True;
+								}
+
+								if($borrar_referencia){
+									$current_referencia->delete();
+
+									$current_referencia_fuente_lista = Model_ReferenciaFuente::find('all',array('where' => array(array('id_referencia', $id_referencia))));
+									if(isset($current_referencia_fuente_lista)){
+										$current_referencia_fuente = reset($current_referencia_fuente_lista);
+										if(isset($current_referencia_fuente)){
+											$current_referencia_fuente->delete();
+										}
+									}
+								}
+
 							}else{
-								$new_referencia->save();
+								$current_referencia->save();
+							}
+						}
+					}
+					if($fundamentado_en->id_referencia === $id_referencia){ //Si no se cambio y solo se actualizó o no se realizó ningún cambio en la referencia
+						$current_referencia_fuente_lista = Model_ReferenciaFuente::find('all',array('where' => array(array('id_referencia', $id_referencia))));
+						if(isset($current_referencia_fuente_lista)){
+							$current_referencia_fuente = reset($current_referencia_fuente_lista);
+							$update_referencia_fuente = False;
+							$fuente_iguales = ($current_referencia_fuente->id_fuente === $fuente->id_fuente);
+							if(!$fuente_iguales){
+								$current_referencia_fuente->delete();
+								$current_referencia_fuente = new Model_ReferenciaFuente();
+								$current_referencia_fuente->id_fuente = $fuente->id_fuente;
+								$current_referencia_fuente->id_referencia = $id_referencia;
+								$current_referencia_fuente->numero_edicion = $fuente->numero;
+								$update_referencia_fuente = True;
+							}
+							if($update_referencia_fuente){
+								$current_referencia_fuente->save();
 							}
 						}
 					}
 
-					$new_referencia_fuente_lista = Model_ReferenciaFuente::find('all',array('where' => array(array('id_referencia', $id_referencia))));
-					if(isset($new_referencia_fuente_lista)){
-						$new_referencia_fuente = reset($new_referencia_fuente_lista);
-						$update_referencia_fuente = False;
-						$fuente_iguales = ($new_referencia_fuente->id_fuente === $fuente->id_fuente);
-						if(!$fuente_iguales){
-							$new_referencia_fuente->delete();
-							$new_referencia_fuente = new Model_ReferenciaFuente();
-							$new_referencia_fuente->id_fuente = $fuente->id_fuente;
-							$new_referencia_fuente->id_referencia = $id_referencia;
-							$new_referencia_fuente->numero_edicion = $fuente->numero;
-							$update_referencia_fuente = True;
-						}
-						if($update_referencia_fuente){
-							$new_referencia_fuente->save();
-						}
-					}
-//Termina parte turbia ISAEL
 					$new_pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
 					if(isset($new_pregunta)){
 						$update_pregunta = False;
@@ -780,55 +790,55 @@ class Controller_Curso_Examen extends Controller_Template
 							$genera->id_pregunta = $id_pregunta;
 							$genera->id_tema = $id_tema_actual;
 							$genera->save();
-						}
 
-						$id_fuente = $fuente->id_fuente;
+							$id_fuente = $fuente->id_fuente;
 
-						$tema_fuente = Model_TemaFuente::find(array($id_tema_antiguo, $id_fuente));
-						if(isset($tema_fuente)){
-							$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
-							$cantidad_tema_fuente = intval($cantidad_tema_fuente_string);
-							if($cantidad_tema_fuente > 1){
-								$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente -1;
-								$tema_fuente->save();
-							}else{
-								$tema_fuente->delete();
+							$tema_fuente = Model_TemaFuente::find(array($id_tema_antiguo, $id_fuente));
+							if(isset($tema_fuente)){
+								$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+								$cantidad_tema_fuente = intval($cantidad_tema_fuente_string);
+								if($cantidad_tema_fuente > 1){
+									$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente -1;
+									$tema_fuente->save();
+								}else{
+									$tema_fuente->delete();
+								}
+								$tema_fuente_nuevo = Model_TemaFuente::find(array($id_tema_actual, $id_fuente));
+								if(isset($tema_fuente_nuevo)){
+									$cantidad = intval($tema_fuente_nuevo->cantidad_preguntas);
+									$tema_fuente_nuevo->cantidad_preguntas = $cantidad + 1;
+									$tema_fuente_nuevo->save();
+								}else{
+									$tema_fuente_nuevo = new Model_TemaFuente();
+									$tema_fuente_nuevo->id_fuente = $id_fuente;
+									$tema_fuente_nuevo->id_tema = $id_tema_actual;
+									$tema_fuente_nuevo->cantidad_preguntas = 1;
+									$tema_fuente_nuevo->save();
+								}
 							}
-							$tema_fuente_nuevo = Model_TemaFuente::find(array($id_tema_actual, $id_fuente));
-							if(isset($tema_fuente_nuevo)){
-								$cantidad = intval($tema_fuente_nuevo->cantidad_preguntas);
-								$tema_fuente_nuevo->cantidad_preguntas = $cantidad + 1;
-								$tema_fuente_nuevo->save();
-							}else{
-								$tema_fuente_nuevo = new Model_TemaFuente();
-								$tema_fuente_nuevo->id_fuente = $id_fuente;
-								$tema_fuente_nuevo->id_tema = $id_tema_actual;
-								$tema_fuente_nuevo->cantidad_preguntas = 1;
-								$tema_fuente_nuevo->save();
-							}
-						}
 
-						$curso_tema = Model_CursoTema::find(array($id_curso, $id_tema_antiguo));
-						if(isset($curso_tema)){
-							$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
-							$cantidad_curso_tema = intval($cantidad_curso_tema_string);
-							if($cantidad_curso_tema > 1){
-								$curso_tema->cantidad_preguntas =  $cantidad_curso_tema -1;
-								$curso_tema->save();
-							}else{
-								$curso_tema->delete();
-							}
-							$curso_tema_nuevo = Model_CursoTema::find(array($id_curso, $id_tema_actual));
-							if(isset($curso_tema_nuevo)){
-								$cantidad = intval($curso_tema_nuevo->cantidad_preguntas);
-								$curso_tema_nuevo->cantidad_preguntas = $cantidad + 1;
-								$curso_tema_nuevo->save();
-							}else{
-								$curso_tema_nuevo = new Model_CursoTema();
-								$curso_tema_nuevo->id_curso = $id_curso;
-								$curso_tema_nuevo->id_tema = $id_tema_actual;
-								$curso_tema_nuevo->cantidad_preguntas = 1;
-								$curso_tema_nuevo->save();
+							$curso_tema = Model_CursoTema::find(array($id_curso, $id_tema_antiguo));
+							if(isset($curso_tema)){
+								$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+								$cantidad_curso_tema = intval($cantidad_curso_tema_string);
+								if($cantidad_curso_tema > 1){
+									$curso_tema->cantidad_preguntas =  $cantidad_curso_tema -1;
+									$curso_tema->save();
+								}else{
+									$curso_tema->delete();
+								}
+								$curso_tema_nuevo = Model_CursoTema::find(array($id_curso, $id_tema_actual));
+								if(isset($curso_tema_nuevo)){
+									$cantidad = intval($curso_tema_nuevo->cantidad_preguntas);
+									$curso_tema_nuevo->cantidad_preguntas = $cantidad + 1;
+									$curso_tema_nuevo->save();
+								}else{
+									$curso_tema_nuevo = new Model_CursoTema();
+									$curso_tema_nuevo->id_curso = $id_curso;
+									$curso_tema_nuevo->id_tema = $id_tema_actual;
+									$curso_tema_nuevo->cantidad_preguntas = 1;
+									$curso_tema_nuevo->save();
+								}
 							}
 						}
 					}
