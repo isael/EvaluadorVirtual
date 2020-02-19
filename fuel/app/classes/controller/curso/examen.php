@@ -512,7 +512,7 @@ class Controller_Curso_Examen extends Controller_Template
 		}
 
 		$lista_preguntas_compartidas = Model_CursoPreguntasCompartidas::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
-		if(isset($lista_preguntas_compartidas)){
+		if(!$duplicar_pregunta && isset($lista_preguntas_compartidas)){
 			$pregunta_compartida = reset($lista_preguntas_compartidas);
 			if(isset($pregunta_compartida) && isset($pregunta_compartida->por_cambiar) && $pregunta_compartida->por_cambiar === '1'){
 				$date= date("Y-m-d H:i:s");
@@ -539,7 +539,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$old_pregunta = Model_Pregunta::find_one_by('id_pregunta',$pregunta_id);
 			if(isset($old_pregunta)){
 				$id_pregunta = $pregunta_id;
-				if($old_pregunta->compartida === '1'){
+				if($old_pregunta->compartida === '1' && !$duplicar_pregunta){
 					$respaldar_pregunta = True;
 					$sql = "UPDATE `CursoPreguntasCompartidas` SET `fecha_de_modificacion`= '".date("Y-m-d H:i:s")."', `por_cambiar`= true WHERE `id_pregunta`= '".$id_pregunta."' ";
 					$respuesta_sql = DB::query($sql)->execute();
@@ -660,7 +660,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$update_referencia = True;
 						}
 						if($update_referencia){
-							$similar_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
+							$similar_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta, $pregunta_bibliografia_capitulo, $pregunta_bibliografia_pagina, $fuente){
 							    return $query->join('ReferenciaFuente')
 											->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
 											->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
@@ -863,14 +863,14 @@ class Controller_Curso_Examen extends Controller_Template
 
 				$id_referencia="";
 				//Buscar Referencias que cumplan con las propiedades y que además cumplan con las propiedades de fuente y que esten en la tabla de ReferenciaFuente
-				$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta){
+				$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta, $pregunta_bibliografia_capitulo, $pregunta_bibliografia_pagina, $fuente){
 				    return $query->join('ReferenciaFuente')
 								->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
 								->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
 								->where('Referencia.pagina', $pregunta_bibliografia_pagina)
 								->where('ReferenciaFuente.id_fuente', $fuente->id_fuente);
 				});
-				$old_referencia = reset($old_referencia_lista);
+				$old_referencia = isset($old_referencia_lista) ? reset($old_referencia_lista) : null;
 				if(isset($old_referencia)){
 					//En caso de entregar un elemento se agregará el elemento a FundamentadoEn con el id_pregunta y con ese elemento encontrado (id_referencia)
 					$id_referencia=$old_referencia->id_referencia;

@@ -435,7 +435,7 @@
 								<div class="modal-footer">
 									<div class="row text-center">
 										<div class="col-xs-6">
-											<button id="cancelarTema" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
+											<button id="cancelarActualizacionPregunta" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
 										</div>
 										<div class="col-xs-6">
 											<?php echo Html::anchor('javascript:submitPregunta();','Guardar Cambios', array('class' => 'btn btn-primary btn-block')); ?>

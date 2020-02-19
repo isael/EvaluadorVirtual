@@ -7,7 +7,7 @@ class Model_RespaldoDe extends \Orm\Model{
 	);
 	
 	protected static $_table_name = 'RespaldoDe';
-	protected static $_primary_key = 'id_pregunta';
+	protected static $_primary_key = array('id_pregunta');
 
 }
 
