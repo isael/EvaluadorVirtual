@@ -537,7 +537,8 @@ class Controller_Curso_Examen extends Controller_Template
 			$fundamentado_en = null;
 
 			$old_pregunta = Model_Pregunta::find_one_by('id_pregunta',$pregunta_id);
-			if(isset($old_pregunta)){
+			$curso_pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $pregunta_id ));
+			if(isset($old_pregunta) && isset($curso_pregunta_compartida)){
 				$id_pregunta = $pregunta_id;
 				if($old_pregunta->compartida === '1' && !$duplicar_pregunta){
 					$respaldar_pregunta = True;

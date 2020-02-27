@@ -268,7 +268,7 @@
 											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta->id_pregunta,'<b>Nivel '.$pregunta->dificultad.':</b> <i><span>'.$pregunta->texto.'</span></i>', array('class' => ''));
 											echo "<br>";
 										echo '</div>';
-										echo '<div class="col-xs-3">';
+										echo '<div class="col-xs-3" style="padding: 5px;">';
 											$texto = $pregunta->compartida === '1' ? 'Dejar de compartir' : 'Compartir';
 											echo Html::anchor('curso/examen/compartir_pregunta/'.$pregunta->id_pregunta,$texto, array('class' => 'btn btn-primary btn-block'));
 										echo '</div>';
@@ -430,7 +430,8 @@
 								<div class="modal-body">
 									Al actualizar la pregunta, se actualizará su versión en linea y quienes tengan esta pregunta en sus repositorios recibirán una invitación para actualizarla localmente.
 									<br>
-									Revisa bien los cambios, ya que no podrás modificar la pregunta de nuevo sino hasta en 10 días.
+									<br>
+									Revisa bien los cambios, ya que en caso de que algun profesor tenga en su repositorio esta pregunta, no podrás modificar la pregunta de nuevo sino hasta en 10 días. En caso contrario, se podrán seguir realizando cambios indefinidamente.
 								</div>
 								<div class="modal-footer">
 									<div class="row text-center">
