@@ -1568,3 +1568,11 @@ ALTER TABLE `VieneDe`
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+CREATE VIEW PreguntasExternas AS
+SELECT `CursoPreguntasCompartidas`.`id_pregunta`,`CursoPreguntasCompartidas`.`id_curso`
+FROM `CursoPreguntasCompartidas`
+WHERE `CursoPreguntasCompartidas`.`por_cambiar` <> 1
+UNION (SELECT `RespaldoDe`.`id_pregunta_respaldo`,`CursoPreguntasCompartidas`.`id_curso`
+  FROM `CursoPreguntasCompartidas`
+  JOIN `RespaldoDe` ON `RespaldoDe`.`id_pregunta` = `CursoPreguntasCompartidas`.`id_pregunta`
+  WHERE `CursoPreguntasCompartidas`.`por_cambiar` = 1);

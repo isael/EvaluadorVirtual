@@ -379,9 +379,9 @@ class Controller_Curso extends Controller_Template
 			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 			                 ->join('Tema')
 			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
-			                 ->join('CursoPreguntasCompartidas')
-			                 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso)
+			                 ->join('PreguntasExternas')
+			                 ->on('PreguntasExternas.id_pregunta', '=', 'Pregunta.id_pregunta')
+			                 ->where('PreguntasExternas.id_curso', '=', $id_curso)
 			                 ->order_by('Tema.nombre')
 			                 ->order_by('Pregunta.id_pregunta');
 			});
