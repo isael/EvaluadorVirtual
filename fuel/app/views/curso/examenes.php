@@ -10,6 +10,7 @@
 					$data = SESSION::get('data');
 					$idPregunta = SESSION::get('id_pregunta');
 					$externa = SESSION::get('externa');
+					$por_actualizar = SESSION::get('por_actualizar');
 					$idFuente = SESSION::get('id_fuente');
 					$numeroFuente = SESSION::get('numero_fuente');
 					$idExamen = SESSION::get('id_examen');
@@ -27,6 +28,11 @@
 						SESSION::delete('externa');
 					}else{
 						$externa=False;
+					}
+					if(isset($por_actualizar)){
+						SESSION::delete('por_actualizar');
+					}else{
+						$por_actualizar=False;
 					}
 					if(isset($idFuente)){
 						SESSION::delete('id_fuente');
@@ -297,7 +303,7 @@
 											echo "<br>";
 										echo '</div>';
 										echo '<div class="col-xs-3">';
-											echo '<i class="fa fa-cloud-download"></i>';
+											echo $pregunta_externa->por_cambiar === '1' ? '<div style="color: red;"><i class="fa fa-refresh"></i></div>':'<div style="color: #2c3e73;"><i class="fa fa-cloud-download"></i></div>';
 										echo '</div>';
 										echo "</br>";
 									echo '</div>';
@@ -344,7 +350,10 @@
 				<div class="modal fade" id="modalPregunta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<?php
 						if($externa)
-							echo Modals::getModalPreguntaCompartida($idPregunta, null, null, True);
+							if($por_actualizar)
+								echo Modals::getModalPreguntaCompartidaActualizada($idPregunta, null, null, True);
+							else
+								echo Modals::getModalPreguntaCompartida($idPregunta, null, null, True);
 						else
 							echo Modals::getModalPregunta($temas, $bibliografias, $tipos, $es_compartida, True, $idPregunta);
 					?>

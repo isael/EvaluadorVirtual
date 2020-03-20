@@ -997,6 +997,13 @@ class Controller_Curso_Examen extends Controller_Template
 				if($pregunta->compartida === '1'){
 					SESSION::set('es_compartida','true');
 				}
+				$respaldo_lista = Model_RespaldoDe::find('all',array('where' => array(array('id_pregunta_respaldo', $id_pregunta))));
+				if(isset($respaldo_lista)){
+					$respaldo = reset($respaldo_lista);
+					if(isset($respaldo)){
+						SESSION::set('por_actualizar','true');
+					}
+				}
 			}
 			SESSION::set('pestania','preguntas');
 			Response::redirect('curso/examenes');
