@@ -30,11 +30,14 @@
         <div class="row">
             <div class="col-lg-12 text-center">
               <?php
+                  if(!isset($mensaje)){
+                    $mensaje = SESSION::get('mensaje');
+                    SESSION::delete('mensaje');
+                  }
                   if(isset($mensaje)){
                       echo "<div class='alert alert-success alert-dismissible fade in' style='z-index: 100;'>";
                       echo $mensaje;
                       echo "</div>";
-                      SESSION::delete('mensaje');
                   }
               ?> 
             </div>

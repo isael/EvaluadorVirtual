@@ -28,6 +28,8 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
     <!-- Extra-Styles -->
     <?php echo Asset::css('specialSelect.css'); ?>
+    <?php echo Asset::css('offline-theme-default.css'); ?>
+    <?php echo Asset::css('offline-language-spanish.css'); ?>
 
     <!-- Custom Fonts -->
     <?php echo Asset::css('font-awesome.min.css'); ?>
@@ -97,6 +99,23 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 <!-- Extra-functionality -->
     <?php echo Asset::js('specialSelect.js'); ?>
+
+<!-- Connected -->
+    <?php echo Asset::js('offline.min.js'); ?>
+    <script type="text/javascript">
+        Offline.options = {checks: {image: {url: 'https://media1.tenor.com/images/45e529c116a1758fd09bdb27e2172eca/tenor.gif?_='+(Math.random()*Date.now())}, active: 'image'}};
+        let handleOn = () =>{
+            console.log("prendido");
+            Offline.options = {checks: {image: {url: 'https://media1.tenor.com/images/45e529c116a1758fd09bdb27e2172eca/tenor.gif?_='+(Math.random()*Date.now())}, active: 'image'}};
+        }
+        let handleOff = () =>{
+            console.log("apagado");
+        }
+        Offline.off("up", handleOn);
+        Offline.off("down", handleOff);
+        Offline.on("up", handleOn);
+        Offline.on("down", handleOff);
+    </script>
 
 </body>
 

@@ -990,7 +990,10 @@ class Modals
 				</button>
 				<h4 class="modal-title" id="myModalLabel">Pregunta Compartida Actualizada</h4>
 				</div>
-				<div class="modal-body">';
+				<div class="modal-body">
+					<div style="color: red">
+						<h4>Actualización requerida</h4>
+					</div>';
 		$result = $result.Form::open('curso/examen/agregar_pregunta_compartida');
 
 		$result = $result.'
