@@ -899,13 +899,39 @@ class Modals
 		$respuestas="";
 		$cantidad_respuestas = "";
 
+
+		$pregunta_respaldo_texto="";
+		$pregunta_respaldo_justificacion="";
+		$pregunta_respaldo_tiempo="";
+		$pregunta_respaldo_dificultad="";
+		$pregunta_respaldo_tema="";
+		$pregunta_respaldo_bibliografia="";
+		$pregunta_respaldo_pagina="";
+		$pregunta_respaldo_capitulo="";
+		$pregunta_respaldo_tipo="";
+		$pregunta_respaldo_tipo_id="";
+		$respuestas_respaldo="";
+		$cantidad_respuestas_respaldo = "";
+
 		if(isset($id_pregunta)){
+			$id_pregunta_respaldo = $id_pregunta;
+			$pregunta_respaldo = Model_Pregunta::find_one_by('id_pregunta', $id_pregunta_respaldo);
+			$respaldo_lista = Model_RespaldoDe::find('all',array('where' => array(array('id_pregunta_respaldo', $id_pregunta_respaldo))));
+			$respaldo = reset($respaldo_lista);
+			$id_pregunta = $respaldo->id_pregunta;
 			$pregunta = Model_Pregunta::find_one_by('id_pregunta', $id_pregunta);
+
 			$pregunta_texto=$pregunta->texto;
 			$pregunta_justificacion=$pregunta->justificacion;
 			$pregunta_dificultad=$pregunta->dificultad;
 			$pregunta_tiempo=$pregunta->tiempo;
 
+
+			$pregunta_respaldo_texto=$pregunta_respaldo->texto;
+			$pregunta_respaldo_justificacion=$pregunta_respaldo->justificacion;
+			$pregunta_respaldo_dificultad=$pregunta_respaldo->dificultad;
+			$pregunta_respaldo_tiempo=$pregunta_respaldo->tiempo;
+			/* Tipos */
 			$tipos = Model_Tipo::find(function ($query) use ($id_pregunta){
 				return $query->join('DeTipo')
 						 ->on('DeTipo.id_tipo', '=', 'Tipo.id_tipo')
@@ -915,6 +941,16 @@ class Modals
 			$pregunta_tipo = $tipo->nombre;
 			$pregunta_tipo_id = $tipo->id_tipo;
 
+			$tipos_respaldo = Model_Tipo::find(function ($query) use ($id_pregunta_respaldo){
+				return $query->join('DeTipo')
+						 ->on('DeTipo.id_tipo', '=', 'Tipo.id_tipo')
+						 ->where('DeTipo.id_pregunta', '=', $id_pregunta_respaldo);
+			});
+			$tipo_respaldo = reset($tipos);
+			$pregunta_respaldo_tipo = $tipo_respaldo->nombre;
+			$pregunta_respaldo_tipo_id = $tipo_respaldo->id_tipo;
+			/* /Tipos */
+			/* Bibliografías */
 			$_bibliografias = Model_Referencia::find(function ($query) use ($id_pregunta){
 				return $query->join('FundamentadoEn')
 						 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
@@ -931,6 +967,23 @@ class Modals
 			$pregunta_capitulo = $bibliografia->capitulo;
 			$pregunta_pagina = $bibliografia->pagina;
 
+			$_bibliografias_respaldo = Model_Referencia::find(function ($query) use ($id_pregunta_respaldo){
+				return $query->join('FundamentadoEn')
+						 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('ReferenciaFuente')
+						 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('Fuente')
+						 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+						 ->join('Edicion')
+						 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+						 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta_respaldo);
+			});
+			$bibliografia_respaldo = reset($_bibliografias_respaldo);
+			$pregunta_respaldo_bibliografia = $bibliografia_respaldo->nombre." - ".$bibliografia_respaldo->autores.". Edición: ".$bibliografia_respaldo->numero;
+			$pregunta_respaldo_capitulo = $bibliografia_respaldo->capitulo;
+			$pregunta_respaldo_pagina = $bibliografia_respaldo->pagina;
+			/* /Bibliografías */
+			/* Tema */
 			$_temas = Model_Tema::find(function ($query) use ($id_pregunta){
 				return $query->join('Genera')
 						 ->on('Genera.id_tema', '=', 'Tema.id_tema')
@@ -939,6 +992,14 @@ class Modals
 			$tema = reset($_temas);
 			$pregunta_tema = $tema->nombre;
 
+			$_temas_respaldo = Model_Tema::find(function ($query) use ($id_pregunta_respaldo){
+				return $query->join('Genera')
+						 ->on('Genera.id_tema', '=', 'Tema.id_tema')
+						 ->where('Genera.id_pregunta', '=', $id_pregunta_respaldo);
+			});
+			$tema_respaldo = reset($_temas_respaldo);
+			$pregunta_respaldo_tema = $tema_respaldo->nombre;
+			/* /Tema */
 			$_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
 				return $query->join('Contiene')
 						 ->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
@@ -946,6 +1007,14 @@ class Modals
 			});
 			$i = 1;
 			$cantidad_respuestas_entero = 0;
+
+			$_respuestas_respaldo = Model_Respuesta::find(function ($query) use ($id_pregunta_respaldo){
+				return $query->join('Contiene')
+						 ->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+						 ->where('Contiene.id_pregunta', '=', $id_pregunta_respaldo);
+			});
+			$j = 0;
+			$cantidad_respuestas_respaldo_entero = 0;
 			foreach ((array) $_respuestas as $respuesta) {
 				$respuestas = $respuestas.'<div class="col-xs-12 col-sm-12 table">'.
 									Form::input('pregunta_id_respuesta_'.$i.'_modal',$respuesta->id_respuesta, array('type' => 'hidden')).'
@@ -962,8 +1031,26 @@ class Modals
 										Form::label('%', 'pregunta_respuesta_porcentaje_'.$i.'_modal').'
 									</div>
 								</div>
+								'.(($_respuestas_respaldo[$j]->contenido !== $respuesta->contenido ||
+								$_respuestas_respaldo[$j]->porcentaje !== $respuesta->porcentaje) ?
+								'<div class="col-xs-12 col-sm-12 table">'.
+									Form::input('pregunta_id_respuesta_'.$i.'_modal',$_respuestas_respaldo[$j]->id_respuesta, array('type' => 'hidden')).'
+									<div class="col-xs-1 col-sm-1 table-row">'.
+										Form::label('R.'.$i, 'pregunta_respuesta_'.$i.'_modal').'
+									</div>
+									<div class="col-xs-8 col-sm-8 table-row update-alert-input">'.
+										$_respuestas_respaldo[$j]->contenido.'
+									</div>
+									<div class="col-xs-2 col-sm-2 table-row update-alert-input">'.
+										$_respuestas_respaldo[$j]->porcentaje.'
+									</div>
+									<div class="col-xs-1 col-sm-1 table-row">'.
+										Form::label('%', 'pregunta_respuesta_porcentaje_'.$i.'_modal').'
+									</div>
+								</div>':'').'
 								<br>';
 				$i++;
+				$j++;
 				$cantidad_respuestas_entero++;
 			}
 			if($cantidad_respuestas_entero){
@@ -974,10 +1061,6 @@ class Modals
 		}
 
 		$result = '';
-
-		$boton_agregar_bibliografia = array("href" => "", "value" => "+ Agregar nueva bibliografía", "data-toggle" => "modal", "data-target" => "#modalAgregarBibliografia");
-
-		$dificultades = array(array(1,1),array(2,2),array(3,3));
 
 		$boton_agregar_bibliografia = null;
 		$sufijo_modal = "_modal";
@@ -991,7 +1074,7 @@ class Modals
 				<h4 class="modal-title" id="myModalLabel">Pregunta Compartida Actualizada</h4>
 				</div>
 				<div class="modal-body">
-					<div style="color: red">
+					<div class="update-alert">
 						<h4>Actualización requerida</h4>
 					</div>';
 		$result = $result.Form::open('curso/examen/agregar_pregunta_compartida');
@@ -1001,13 +1084,20 @@ class Modals
 								<div class="col-xs-12 col-sm-12">'.
 									Form::label('Tema', 'pregunta_tema'.$sufijo_modal).'
 								</div>
-								<div class="col-xs-12 col-sm-12 table">'.$pregunta_tema.'
+								<div class="col-xs-12 col-sm-12">'.$pregunta_tema.'
 								</div>
-								<div class="col-xs-12 col-sm-12">'.
+								'.($pregunta_respaldo_tema !== $pregunta_tema ?
+								'<div class="col-xs-12 col-sm-12 update-alert">'.$pregunta_respaldo_tema.'
+								</div>':'').'
+								<br/>
+								<div class="col-xs-12 col-sm-12" table>'.
 									Form::label('Bibliografía', 'pregunta_bibliografia'.$sufijo_modal).'
 								</div>
 								<div class="col-xs-12 col-sm-12">'.$pregunta_bibliografia.'
 								</div>
+								'.($pregunta_respaldo_bibliografia !== $pregunta_bibliografia ?
+								'<div class="col-xs-12 col-sm-12 update-alert">'.$pregunta_respaldo_bibliografia.'
+								</div>':'').'
 								<div class="col-xs-12 col-sm-12 table">
 									<div class="col-xs-4 col-sm-4 table-row">
 										<div class="col-xs-12 col-sm-12">'.
@@ -1016,6 +1106,10 @@ class Modals
 										<div class="col-xs-12 col-sm-12">'.
 											Form::input('pregunta_bibliografia_pagina'.$sufijo_modal,$pregunta_pagina,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Página')).'
 										</div>
+										'.($pregunta_respaldo_pagina !== $pregunta_pagina ?
+										'<div class="col-xs-12 col-sm-12 update-alert-input">'.
+											$pregunta_respaldo_pagina.'
+										</div>':'').'
 									</div>
 									<div class="col-xs-8 col-sm-8 table-row">
 										<div class="col-xs-12 col-sm-12">'.
@@ -1024,24 +1118,35 @@ class Modals
 										<div class="col-xs-12 col-sm-12">'.
 											Form::input('pregunta_bibliografia_capitulo'.$sufijo_modal,$pregunta_capitulo,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Capítulo')).'
 										</div>
+										'.($pregunta_respaldo_capitulo !== $pregunta_capitulo ?
+										'<div class="col-xs-12 col-sm-12 update-alert-input">'.
+											$pregunta_respaldo_capitulo.'
+										</div>':'').'
 									</div>
 								</div>
 
 								<div class="col-xs-12 col-sm-12 table">
 									<div class="col-xs-4 col-sm-4 table-row">
-										<div>'.
+										<div class="col-xs-12 col-sm-12">'.
 											Form::label('Dificultad', 'pregunta_dificultad'.$sufijo_modal).'
 										</div>
-										<div>'.$pregunta_dificultad.'
+										<div class="col-xs-12 col-sm-12">'.$pregunta_dificultad.'
 										</div>
+										'.($pregunta_respaldo_dificultad !== $pregunta_dificultad ?
+										'<div class="col-xs-12 col-sm-12 update-alert">'.
+											$pregunta_respaldo_dificultad.'
+										</div>':'').'
 									</div>
 									<div class="col-xs-4 col-sm-4 table-row">
 										<div class="col-xs-12 col-sm-12">'.
 											Form::label('Tiempo', 'pregunta_tiempo'.$sufijo_modal).'
 										</div>
-										<div class="col-xs-12 col-sm-12">'.
-											Form::input('pregunta_tiempo'.$sufijo_modal,$pregunta_tiempo,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'segs')).'
+										<div class="col-xs-12 col-sm-12">'.$pregunta_tiempo.'
 										</div>
+										'.($pregunta_respaldo_tiempo !== $pregunta_tiempo ?
+										'<div class="col-xs-12 col-sm-12 update-alert">'.
+											$pregunta_respaldo_tiempo.'
+										</div>':'').'
 									</div>
 									<div class="col-xs-4 col-sm-4 table-row">
 										<div class="col-xs-12 col-sm-12">'.
@@ -1049,6 +1154,10 @@ class Modals
 										</div>
 										<div class="col-xs-12 col-sm-12">'.$pregunta_tipo.'
 										</div>
+										'.($pregunta_respaldo_tipo !== $pregunta_tipo ?
+										'<div class="col-xs-12 col-sm-12 update-alert">'.
+											$pregunta_respaldo_tipo.'
+										</div>':'').'
 									</div>
 								</div>
 								<div class="col-xs-12 col-sm-12">'.
@@ -1057,6 +1166,10 @@ class Modals
 								<div class="col-xs-12 col-sm-12">'.
 									Form::input('pregunta_texto'.$sufijo_modal,$pregunta_texto,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Texto, URLVideo o URLImágen')).'
 								</div>
+								'.($pregunta_respaldo_texto !== $pregunta_texto ?
+								'<div class="col-xs-12 col-sm-12 update-alert-input">'.
+									$pregunta_respaldo_texto.'
+								</div>':'').'
 
 								<div class="col-xs-12 col-sm-12">'.
 									Form::label('Respuestas y porcentaje', '').'
@@ -1065,8 +1178,7 @@ class Modals
 									<!-- Aquí van las respuestas -->'.
 									$respuestas.'
 									*-* Selecciona un tipo de pregunta primero *-*
-								</div>'.
-									Form::input('pregunta_cantidad_respuestas'.$sufijo_modal,$cantidad_respuestas, array('type' => 'hidden')).'
+								</div>
 								<div class="col-xs-12 col-sm-12">'.
 									Form::label('Justificación', 'pregunta_justificacion'.$sufijo_modal).'
 								</div>'.
@@ -1076,6 +1188,10 @@ class Modals
 								<div class="col-xs-12 col-sm-12">'.
 									Form::input('pregunta_justificacion'.$sufijo_modal,$pregunta_justificacion,array('disabled' => 'true','class'=>'form-control','type' => 'text', 'placeholder'=>'Justificación')).'
 								</div>
+								'.($pregunta_respaldo_justificacion !== $pregunta_justificacion ?
+								'<div class="col-xs-12 col-sm-12 update-alert-input">'.
+									$pregunta_respaldo_justificacion.'
+								</div>':'').'
 							</div>';
 		$result = $result.'
 				</div>

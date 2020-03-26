@@ -673,3 +673,10 @@ i.fav_icon {
 .canvas_chart{
   background-color: #ffffff;
 }
+.update-alert{
+  color: #2154a9;
+}
+.update-alert-input{
+  color: #2154a9;
+  text-align: left;
+}
