@@ -349,13 +349,15 @@
 				?>
 				<div class="modal fade" id="modalPregunta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<?php
-						if($externa)
-							if($por_actualizar)
+						if($externa){
+							if($por_actualizar){
 								echo Modals::getModalPreguntaCompartidaActualizada($idPregunta, null, null, True);
-							else
+							}else{
 								echo Modals::getModalPreguntaCompartida($idPregunta, null, null, True);
-						else
+							}
+						}else{
 							echo Modals::getModalPregunta($temas, $bibliografias, $tipos, $es_compartida, True, $idPregunta);
+						}
 					?>
 				</div>
 				<?php

@@ -1076,8 +1076,9 @@ class Modals
 				<div class="modal-body">
 					<div class="update-alert">
 						<h4>Actualización requerida</h4>
+						<p>Los valores antiguos están en color azul.</p>
 					</div>';
-		$result = $result.Form::open('curso/examen/agregar_pregunta_compartida');
+		$result = $result.Form::open('curso/examen/actualizar_pregunta_compartida');
 
 		$result = $result.'
 							<div class="form-group">
@@ -1197,11 +1198,14 @@ class Modals
 				</div>
 				<div class="modal-footer">
 					  <div class="row text-center">
-						<div class="col-xs-6">
+						<div class="col-xs-4">
 							<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 						</div>
-						<div class="col-xs-6">'.
-							Form::submit('agregar_pregunta',($checked ? 'Borrar':'Agregar'),array('class' => 'btn btn-'.($checked ? 'danger':'success').' btn-block')).'
+						<div class="col-xs-4">'.
+							Html::anchor('curso/examen/guardar_pregunta_compartida/'.$id_pregunta,'Respaldar y Actualizar',array('class'=>'btn btn-success btn-block')).'
+						</div>
+						<div class="col-xs-4">'.
+							Form::submit('actualizar_pregunta_respaldo','Solo Actualizar',array('class' => 'btn btn-danger btn-block')).'
 						</div>
 					  </div>
 				  </div>

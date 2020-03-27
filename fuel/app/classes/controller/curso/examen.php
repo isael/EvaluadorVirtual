@@ -537,7 +537,10 @@ class Controller_Curso_Examen extends Controller_Template
 			$fundamentado_en = null;
 
 			$old_pregunta = Model_Pregunta::find_one_by('id_pregunta',$pregunta_id);
-			$curso_pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $pregunta_id ));
+			$curso_pregunta_compartida_lista = Model_CursoPreguntasCompartidas::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
+			$curso_pregunta_compartida = reset($curso_pregunta_compartida_lista);
+			// echo var_dump($id_curso."======".$pregunta_id);
+			// die();
 			if(isset($old_pregunta) && isset($curso_pregunta_compartida)){
 				$id_pregunta = $pregunta_id;
 				if($old_pregunta->compartida === '1' && !$duplicar_pregunta){
@@ -1001,7 +1004,7 @@ class Controller_Curso_Examen extends Controller_Template
 				if(isset($respaldo_lista)){
 					$respaldo = reset($respaldo_lista);
 					if(isset($respaldo)){
-						SESSION::set('por_actualizar','true');
+						SESSION::set('por_actualizar',$respaldo);
 					}
 				}
 			}
@@ -1703,5 +1706,58 @@ class Controller_Curso_Examen extends Controller_Template
 			$pregunta_compartida->save();
 		}
 		Response::redirect('curso/examen/preguntas_compartidas/'.$materia.'/'.$id_curso_compartido);
+	}
+
+	/**
+	 *
+	 */
+	public function action_actualizar_pregunta_compartida($pregunta_id = null){
+		$id_curso = SESSION::get('id_curso');
+		$id_pregunta = Input::post('pregunta_id');
+		$id_pregunta = isset($id_pregunta) ? trim($id_pregunta) : $pregunta_id;
+		$pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $id_pregunta ));
+		if(isset($pregunta_compartida)){
+			$pregunta_compartida->por_cambiar = '0';
+			$pregunta_compartida->save();
+
+			$primera_pregunta_compartida = Model_CursoPreguntasCompartidas::find('first',array('where' => array(array('id_pregunta', $id_pregunta),array('por_cambiar', '1'))));
+
+			if(!isset($primera_pregunta_compartida)){
+				$respaldo = Model_RespaldoDe::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
+				if(isset($respaldo)){
+					$id_pregunta_respaldo = $respaldo->id_pregunta_respaldo;
+					$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_respaldo);
+					if(isset($pregunta)){
+						$pregunta->delete();
+					}
+					$respaldo->delete();
+				}
+			}
+		}
+		SESSION::set('pestania','preguntas');
+		Response::redirect('curso/examenes');
+	}
+
+
+	/**
+	 *
+	 */
+	public function action_guardar_pregunta_compartida($id_pregunta){
+		$id_curso = SESSION::get('id_curso');
+		// $id_pregunta = trim(Input::post('pregunta_id'));
+		// $materia = trim(Input::post('materia'));
+		// $id_curso_compartido = trim(Input::post('id_curso_compartido'));
+		// $pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $id_pregunta ));
+		// if(isset($pregunta_compartida)){
+		// 	$pregunta_compartida->delete();
+		// }else{
+		// 	$pregunta_compartida = new Model_CursoPreguntasCompartidas();
+		// 	$pregunta_compartida->id_curso = $id_curso;
+		// 	$pregunta_compartida->id_pregunta = $id_pregunta;
+		// 	$pregunta_compartida->fecha_de_modificacion = date("Y-m-d H:i:s");
+		// 	$pregunta_compartida->por_cambiar = '0';
+		// 	$pregunta_compartida->save();
+		// }
+		Response::redirect('curso/examen/actualizar_pregunta_compartida/'.$id_pregunta);
 	}
 }

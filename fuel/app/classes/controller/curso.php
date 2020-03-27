@@ -667,7 +667,8 @@ class Controller_Curso extends Controller_Template
 			                 ->join('Profesor')
 			                 ->on('Profesor.n_trabajador', '=', 'Imparte.n_trabajador')
 			                 ->where('Pregunta.compartida', '=', '1')
-			                 ->where('Curso.id_curso', '<>', $id_curso);
+			                 ->where('Curso.id_curso', '<>', $id_curso)
+			                 ->group_by('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres');
 			});
 			//Comparar los cursos con la palabra de $materia que más se acerquen
 			//Seleccionar los que contengan la o las palabras en un %80 y guardarlos en un arreglo
