@@ -5,7 +5,15 @@
  *
  * @package PhpMyAdmin
  */
-use PMA\libraries\Linter;
+declare(strict_types=1);
+
+use PhpMyAdmin\Core;
+use PhpMyAdmin\Linter;
+use PhpMyAdmin\Response;
+
+if (! defined('ROOT_PATH')) {
+    define('ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR);
+}
 
 $_GET['ajax_request'] = 'true';
 
@@ -13,7 +21,7 @@ $_GET['ajax_request'] = 'true';
  * Loading common files. Used to check for authorization, localization and to
  * load the parsing library.
  */
-require_once 'libraries/common.inc.php';
+require_once ROOT_PATH . 'libraries/common.inc.php';
 
 /**
  * The SQL query to be analyzed.
@@ -26,12 +34,12 @@ require_once 'libraries/common.inc.php';
  *
  * @var string
  */
-$sql_query = !empty($_POST['sql_query']) ? $_POST['sql_query'] : '';
+$sql_query = ! empty($_POST['sql_query']) ? $_POST['sql_query'] : '';
 
 // Disabling standard response.
-PMA\libraries\Response::getInstance()->disable();
+Response::getInstance()->disable();
 
-PMA_headerJSON();
+Core::headerJSON();
 
 if (! empty($_POST['options'])) {
     $options = $_POST['options'];
@@ -39,7 +47,8 @@ if (! empty($_POST['options'])) {
     if (! empty($options['routine_editor'])) {
         $sql_query = 'CREATE PROCEDURE `a`() ' . $sql_query;
     } elseif (! empty($options['trigger_editor'])) {
-        $sql_query = 'CREATE TRIGGER `a` AFTER INSERT ON `b` FOR EACH ROW ' . $sql_query;
+        $sql_query = 'CREATE TRIGGER `a` AFTER INSERT ON `b` FOR EACH ROW '
+            . $sql_query;
     } elseif (! empty($options['event_editor'])) {
         $sql_query = 'CREATE EVENT `a` ON SCHEDULE EVERY MINUTE DO ' . $sql_query;
     }

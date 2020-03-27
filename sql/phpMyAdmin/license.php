@@ -8,13 +8,20 @@
  *
  * @package PhpMyAdmin
  */
+declare(strict_types=1);
+
+use PhpMyAdmin\Response;
+
+if (! defined('ROOT_PATH')) {
+    define('ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR);
+}
 
 /**
  * Gets core libraries and defines some variables
  */
-require 'libraries/common.inc.php';
+require ROOT_PATH . 'libraries/common.inc.php';
 
-$response = PMA\libraries\Response::getInstance();
+$response = Response::getInstance();
 $response->disable();
 
 /**
@@ -31,7 +38,9 @@ if (@is_readable($filename)) {
     printf(
         __(
             'The %s file is not available on this system, please visit ' .
-            'www.phpmyadmin.net for more information.'
-        ), $filename
+            '%s for more information.'
+        ),
+        $filename,
+        'https://www.phpmyadmin.net/'
     );
 }

@@ -14,14 +14,8 @@
 </head>
 <body>
 	<div id="wrapper">
-		<h1>Lo sentimos</h1>
-		<p class="intro">Ocurrió un error inesperado. Por favor intenta más tarde.</p>
+		<h1>Oops!</h1>
+		<p class="intro">An unexpected error has occurred.</p>
 	</div>
 </body>
 </html>
-<?php
-SESSION::set('mensaje',"Ocurrió un error inesperado. Por favor intenta más tarde.");
-$root = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/';
-header("Location: ".$root."EvaluadorVirtual/");
-exit;
-?>

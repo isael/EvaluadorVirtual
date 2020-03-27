@@ -9,44 +9,46 @@
  *
  * @package PhpMyAdmin
  */
+declare(strict_types=1);
+
 if (! defined('PHPMYADMIN')) {
     exit;
 }
 
 /**
+ * Path to vendor autoload file. Useful when you want to
+ * have have vendor dependencies somewhere else.
+ */
+define('AUTOLOAD_FILE', ROOT_PATH . 'vendor/autoload.php');
+
+/**
+ * Directory where cache files are stored.
+ */
+define('TEMP_DIR', ROOT_PATH . 'tmp/');
+
+/**
  * Path to changelog file, can be gzip compressed. Useful when you want to
  * have documentation somewhere else, eg. /usr/share/doc.
  */
-define('CHANGELOG_FILE', './ChangeLog');
+define('CHANGELOG_FILE', ROOT_PATH . 'ChangeLog');
 
 /**
  * Path to license file. Useful when you want to have documentation somewhere
  * else, eg. /usr/share/doc.
  */
-define('LICENSE_FILE', './LICENSE');
-
-/**
- * Path to config file generated using setup script.
- */
-define('SETUP_CONFIG_FILE', './config/config.inc.php');
-
-/**
- * Whether setup requires writable directory where config
- * file will be generated.
- */
-define('SETUP_DIR_WRITABLE', true);
+define('LICENSE_FILE', ROOT_PATH . 'LICENSE');
 
 /**
  * Directory where SQL scripts to create/upgrade configuration storage reside.
  */
-define('SQL_DIR', './sql/');
+define('SQL_DIR', ROOT_PATH . 'sql/');
 
 /**
  * Directory where configuration files are stored.
  * It is not used directly in code, just a convenient
  * define used further in this file.
  */
-define('CONFIG_DIR', '');
+define('CONFIG_DIR', ROOT_PATH);
 
 /**
  * Filename of a configuration file.
@@ -69,33 +71,12 @@ define('CUSTOM_FOOTER_FILE', CONFIG_DIR . 'config.footer.inc.php');
 define('VERSION_CHECK_DEFAULT', true);
 
 /**
- * Path to gettext.inc file. Useful when you want php-gettext somewhere else,
- * eg. /usr/share/php/gettext/gettext.inc.
- */
-define('GETTEXT_INC', './libraries/php-gettext/gettext.inc');
-/**
- * Path to tcpdf.php file. Useful when you want to use system tcpdf,
- * eg. /usr/share/php/tcpdf/tcpdf.php.
- */
-define('TCPDF_INC', './libraries/tcpdf/tcpdf.php');
-
-/**
- * Path to the phpseclib. Useful when you want to use system phpseclib.
- */
-define('PHPSECLIB_INC_DIR', './libraries/phpseclib/');
-
-/**
- * Path to the udan11/sql-parser. Useful when you want to use system version.
- */
-define('SQL_PARSER_AUTOLOAD', './libraries/sql-parser/autoload.php');
-
-/**
  * Path to files with compiled locales (*.mo)
  */
-define('LOCALE_PATH', './locale/');
+define('LOCALE_PATH', ROOT_PATH . 'locale/');
 
 /**
  * Avoid referring to nonexistent files (causes warnings when open_basedir
  * is used)
  */
-define('K_PATH_IMAGES', '');
+define('K_PATH_IMAGES', ROOT_PATH);

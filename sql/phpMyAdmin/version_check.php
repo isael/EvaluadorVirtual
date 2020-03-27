@@ -1,29 +1,35 @@
 <?php
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * A caching proxy for retrieving version information from phpmyadmin.net
+ * A caching proxy for retrieving version information from https://www.phpmyadmin.net/
  *
  * @package PhpMyAdmin
  */
+declare(strict_types=1);
 
-// Sets up the session
-use PMA\libraries\VersionInformation;
+use PhpMyAdmin\Core;
+use PhpMyAdmin\Response;
+use PhpMyAdmin\VersionInformation;
+
+if (! defined('ROOT_PATH')) {
+    define('ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR);
+}
 
 $_GET['ajax_request'] = 'true';
 
-require_once 'libraries/common.inc.php';
+require_once ROOT_PATH . 'libraries/common.inc.php';
 
 // Disabling standard response.
-PMA\libraries\Response::getInstance()->disable();
+Response::getInstance()->disable();
 
 // Always send the correct headers
-PMA_headerJSON();
+Core::headerJSON();
 
 $versionInformation = new VersionInformation();
 $versionDetails = $versionInformation->getLatestVersion();
 
 if (empty($versionDetails)) {
-    echo json_encode(array());
+    echo json_encode([]);
 } else {
     $latestCompatible = $versionInformation->getLatestCompatibleVersion(
         $versionDetails->releases
@@ -35,9 +41,9 @@ if (empty($versionDetails)) {
         $date = $latestCompatible['date'];
     }
     echo json_encode(
-        array(
-            'version' => (! empty($version) ? $version : ''),
-            'date' => (! empty($date) ? $date : ''),
-        )
+        [
+            'version' => ! empty($version) ? $version : '',
+            'date' => ! empty($date) ? $date : '',
+        ]
     );
 }
