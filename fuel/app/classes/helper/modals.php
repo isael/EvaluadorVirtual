@@ -48,19 +48,19 @@ class Modals
 		if(isset($temas)){
 			foreach ($temas as $tema) {
 				$id_tema = $tema->id_tema;
-				$cantidad_preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '1');
 				});
-				$cantidad_preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '2');
 				});
-				$cantidad_preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 							 ->where('Genera.id_tema', '=', $id_tema)
@@ -68,10 +68,14 @@ class Modals
 				});
 				//Es super importante no modificar la manera en que se muestran las preguntas ($texto_tema) para el funcionamiento actual, es decir con la cantidad de preguntas por nivel.
 				//En caso de querer modificarlo, la manera de obtener el número de preguntas por cada tema y nivel deberá ser acorde a lo que necesiten los metodos para conteo de preguntas.
-				$texto_tema = $tema->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.sizeof($cantidad_preguntas_nivel_1).', N2: '.sizeof($cantidad_preguntas_nivel_2).', N3: '.sizeof($cantidad_preguntas_nivel_3).'.';
+				$cantidad_preguntas_nivel_1 = is_array($preguntas_nivel_1) ? sizeof($preguntas_nivel_1) : 0;
+				$cantidad_preguntas_nivel_2 = is_array($preguntas_nivel_2) ? sizeof($preguntas_nivel_2) : 0;
+				$cantidad_preguntas_nivel_3 = is_array($preguntas_nivel_3) ? sizeof($preguntas_nivel_3) : 0;
+
+				$texto_tema = $tema->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.$cantidad_preguntas_nivel_1.', N2: '.$cantidad_preguntas_nivel_2.', N3: '.$cantidad_preguntas_nivel_3.'.';
 				array_push($lista_de_temas, array($id_tema, $texto_tema));
 
-				$input_preguntas_por_tema = Form::input('input_'.$id_tema.$sufijo_modal,sizeof($cantidad_preguntas_nivel_1).','.sizeof($cantidad_preguntas_nivel_2).','.sizeof($cantidad_preguntas_nivel_3),array('class'=>'form-control','type' => 'hidden'));
+				$input_preguntas_por_tema = Form::input('input_'.$id_tema.$sufijo_modal,$cantidad_preguntas_nivel_1.','.$cantidad_preguntas_nivel_2.','.$cantidad_preguntas_nivel_3,array('class'=>'form-control','type' => 'hidden'));
 				$examen_lista_de_cantidad_de_preguntas = $examen_lista_de_cantidad_de_preguntas.$input_preguntas_por_tema;
 
 				$input_nombre_por_tema = Form::input('input_tema_'.$id_tema.$sufijo_modal,$tema->nombre,array('class'=>'form-control','type' => 'hidden'));
@@ -86,30 +90,32 @@ class Modals
 		if(isset($temas_externos)){
 			foreach ($temas_externos as $tema_externo) {
 				$id_tema = $tema_externo->id_tema;
-				$cantidad_preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '1');
 				});
-				$cantidad_preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '2');
 				});
-				$cantidad_preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '3');
 				});
-				//Es super importante no modificar la manera en que se muestran las preguntas ($texto_tema) para el funcionamiento actual, es decir con la cantidad de preguntas por nivel.
-				//En caso de querer modificarlo, la manera de obtener el número de preguntas por cada tema y nivel deberá ser acorde a lo que necesiten los metodos para conteo de preguntas.
-				$texto_tema = $tema_externo->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.sizeof($cantidad_preguntas_nivel_1).', N2: '.sizeof($cantidad_preguntas_nivel_2).', N3: '.sizeof($cantidad_preguntas_nivel_3).'.';
+				$cantidad_preguntas_nivel_1 = is_array($preguntas_nivel_1) ? sizeof($preguntas_nivel_1) : 0;
+				$cantidad_preguntas_nivel_2 = is_array($preguntas_nivel_2) ? sizeof($preguntas_nivel_2) : 0;
+				$cantidad_preguntas_nivel_3 = is_array($preguntas_nivel_3) ? sizeof($preguntas_nivel_3) : 0;
+
+				$texto_tema = $tema_externo->nombre.':&nbsp;&nbsp;&nbsp;&nbsp;preguntas: N1: '.$cantidad_preguntas_nivel_1.', N2: '.$cantidad_preguntas_nivel_2.', N3: '.$cantidad_preguntas_nivel_3.'.';
 				array_push($lista_de_temas, array($id_tema, $texto_tema));
 
-				$input_preguntas_por_tema = Form::input('input_'.$id_tema.$sufijo_modal,sizeof($cantidad_preguntas_nivel_1).','.sizeof($cantidad_preguntas_nivel_2).','.sizeof($cantidad_preguntas_nivel_3),array('class'=>'form-control','type' => 'hidden'));
+				$input_preguntas_por_tema = Form::input('input_'.$id_tema.$sufijo_modal,$cantidad_preguntas_nivel_1.','.$cantidad_preguntas_nivel_2.','.$cantidad_preguntas_nivel_3,array('class'=>'form-control','type' => 'hidden'));
 				$examen_lista_de_cantidad_de_preguntas = $examen_lista_de_cantidad_de_preguntas.$input_preguntas_por_tema;
 
 				$input_nombre_por_tema = Form::input('input_tema_'.$id_tema.$sufijo_modal,$tema_externo->nombre,array('class'=>'form-control','type' => 'hidden'));
