@@ -675,13 +675,13 @@ class Controller_Curso extends Controller_Template
 			$cursos_similares = [];
 			if(isset($cursos)){
 				foreach ($cursos as $curso) {
-					$menor_texto = sizeof($materia) > sizeof($curso->nombre) ? $curso->nombre : $materia;
-					$mayor_texto = sizeof($materia) <= sizeof($curso->nombre) ? $curso->nombre : $materia;
+					$menor_texto = strlen($materia) > strlen($curso->nombre) ? $curso->nombre : $materia;
+					$mayor_texto = strlen($materia) <= strlen($curso->nombre) ? $curso->nombre : $materia;
 					$letras_iguales = similar_text($menor_texto, $mayor_texto);
-					$similitud = 100 * ($letras_iguales / sizeof($menor_texto));
+					$similitud = 100 * ($letras_iguales / strlen($menor_texto));
 					if($similitud < 70){
 						$letras_iguales = similar_text($mayor_texto, $menor_texto);
-						$similitud = 100 * ($letras_iguales / sizeof($menor_texto));
+						$similitud = 100 * ($letras_iguales / strlen($menor_texto));
 					}
 					if($similitud >= 70){
 						array_push($cursos_similares, $curso);

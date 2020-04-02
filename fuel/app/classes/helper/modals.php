@@ -22,6 +22,7 @@
 class Modals
 {
 	public static function getModalExamen($temas, $temas_externos, $is_modal = false, $id_examen = null){
+		$id_curso = SESSION::get('id_curso');
 		$result = '';
 		$examen_vidas = '1';
 		$examen_oportunidades = '3';
@@ -83,28 +84,39 @@ class Modals
 
 				if($is_modal && isset($id_examen)){
 					$rango = Model_BasadoEn::find(array('id_examen' => $id_examen, 'id_tema' => $id_tema ));
-					array_push($examen_temas_rangos, $rango->id_tema.'-'.$rango->desde_dificultad.'-'.$rango->hasta_dificultad);
+					if(isset($rango)){
+						array_push($examen_temas_rangos, $rango->id_tema.'-'.$rango->desde_dificultad.'-'.$rango->hasta_dificultad);
+					}
 				}
 			}
 		}
 		if(isset($temas_externos)){
 			foreach ($temas_externos as $tema_externo) {
 				$id_tema = $tema_externo->id_tema;
-				$preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_1 = Model_Pregunta::find(function ($query) use ($id_tema, $id_curso){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->join('CursoPreguntasCompartidas')
+							 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Genera.id_pregunta')
+							 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso)
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '1');
 				});
-				$preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_2 = Model_Pregunta::find(function ($query) use ($id_tema, $id_curso){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->join('CursoPreguntasCompartidas')
+							 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Genera.id_pregunta')
+							 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso)
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '2');
 				});
-				$preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema){
+				$preguntas_nivel_3 = Model_Pregunta::find(function ($query) use ($id_tema, $id_curso){
 				return $query->join('Genera')
 							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->join('CursoPreguntasCompartidas')
+							 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Genera.id_pregunta')
+							 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso)
 							 ->where('Genera.id_tema', '=', $id_tema)
 							 ->where('Pregunta.dificultad', '=', '3');
 				});

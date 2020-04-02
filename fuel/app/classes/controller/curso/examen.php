@@ -339,6 +339,209 @@ class Controller_Curso_Examen extends Controller_Template
 		}
 
 	}
+
+
+	/**
+	 * Se encarga de copiar la pregunta y tablas relacionadas a ella.
+	 * @access private
+	 * @return void
+	 */
+	private function copiar_pregunta($old_pregunta, $id_tema, $id_fuente, $completa = False){
+		//Revisar CursoTema y CursoFuente si es $completa == True
+
+		// Copiamos la pregunta
+		$id_curso = SESSION::get('id_curso');
+		$id_pregunta = $old_pregunta->id_pregunta;
+
+		$pregunta = new Model_Pregunta();
+		$pregunta->texto = $old_pregunta->texto;
+		$pregunta->dificultad = $old_pregunta->dificultad;
+		$pregunta->justificacion = $old_pregunta->justificacion;
+		$pregunta->tiene_subpreguntas = $old_pregunta->tiene_subpreguntas;
+		$pregunta->tiempo = $old_pregunta->tiempo;
+		$pregunta->save();
+		$new_id_pregunta = $pregunta->id_pregunta;
+
+		//Copiamos las fuentes
+
+		$old_fundamentado_en_lista = Model_FundamentadoEn::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+		$old_fundamentado_en = reset($old_fundamentado_en_lista);
+		$old_id_referencia = null;
+		if(isset($old_fundamentado_en)){
+			$fundamentado_en = new Model_FundamentadoEn();
+			$fundamentado_en->id_pregunta = $new_id_pregunta;
+			$fundamentado_en->id_referencia = $old_fundamentado_en->id_referencia;
+			$fundamentado_en->save();
+		}
+
+		//Copiamos el tipo
+		$old_de_tipo_lista = Model_DeTipo::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+		$old_de_tipo = reset($old_de_tipo_lista);
+		if(isset($old_de_tipo)){
+			$de_tipo = new Model_DeTipo();
+			$de_tipo->id_tipo = $old_de_tipo->id_tipo;
+			$de_tipo->id_pregunta = $new_id_pregunta;
+			$de_tipo->save();
+		}
+
+		//Manejo del Genera Y Tema
+		if($completa){
+			//Debo revisar que el tema que tenga un nombre similar y exista en curso tema
+			$old_tema = Model_Tema::find_one_by( 'id_tema', $id_tema);
+			$nombre = $old_tema->nombre;
+			$similar_tema_lista = Model_Tema::find(function ($query) use ($id_curso, $nombre){
+			    return $query->join('CursoTema')
+							->on('Tema.id_tema', '=', 'CursoTema.id_tema')
+							->where('Tema.nombre', '=', $nombre)
+							->where('CursoTema.id_curso', '=', $id_curso);
+			});
+
+			if(isset($similar_tema_lista)){
+				$similar_tema = reset($similar_tema_lista);
+				$id_tema = $similar_tema->id_tema;
+			}else{				
+				$new_tema = new Model_Tema();
+				$new_tema->nombre = $old_tema->nombre;
+				$new_tema->save();
+				$id_tema = $new_tema->id_tema;
+			}
+
+			// Se crea un nuevo Genera
+			$genera = new Model_Genera();
+			$genera->id_pregunta = $new_id_pregunta;
+			$genera->id_tema = $id_tema;
+			$genera->save();
+
+		}else{			
+			//Copiamos el Genera
+			$old_genera_lista = Model_Genera::find('all',array('where' => array(array('id_pregunta', $id_pregunta))));
+			$old_genera = reset($old_genera_lista);
+			if(isset($old_genera)){
+				$genera = new Model_Genera();
+				$genera->id_pregunta = $new_id_pregunta;
+				$genera->id_tema = $old_genera->id_tema;
+				$genera->save();
+			}
+		}
+
+
+		//Copiamos los Contiene (son por respuesta)
+		$old_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
+		    return $query->join('Contiene')
+						->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
+						->where('Contiene.id_pregunta', $id_pregunta);
+		});
+		foreach ($old_respuestas as $old_respuesta) {
+			$new_respuesta = new Model_Respuesta();
+			$new_respuesta->contenido = $old_respuesta->contenido;
+			$new_respuesta->porcentaje = $old_respuesta->porcentaje;
+			$new_respuesta->save();
+			$contiene = new Model_Contiene();
+			$contiene->id_pregunta = $new_id_pregunta;
+			$contiene->id_respuesta = $new_respuesta->id_respuesta;
+			$contiene->save();
+		}
+
+		//Aumentamos cantidad_de_preguntas en CursoTema y TemaFuente
+		
+		$tema_fuente = Model_TemaFuente::find(array($id_tema, $id_fuente));
+		if(isset($tema_fuente)){
+			$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+			$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
+			$tema_fuente->save();
+		}else{
+			$tema_fuente = new Model_TemaFuente();
+			$tema_fuente->id_tema = $id_tema;
+			$tema_fuente->id_fuente = $id_fuente;
+			$tema_fuente->cantidad_preguntas = 1;
+			$tema_fuente->save();
+		}
+
+		$curso_tema = Model_CursoTema::find(array($id_curso, $id_tema));
+
+		if(isset($curso_tema)){
+			$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+			$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
+			$curso_tema->save();
+		}else{
+			$curso_tema = new Model_CursoTema();
+			$curso_tema->id_curso = $id_curso;
+			$curso_tema->id_tema = $id_tema;
+			$curso_tema->cantidad_preguntas = 1;
+			$curso_tema->save();
+		}
+
+		$curso_fuente = Model_CursoFuente::find(array($id_curso, $id_fuente));
+		if(!isset($curso_fuente)){
+			$curso_fuente = new Model_CursoFuente();
+			$curso_fuente->id_curso = $id_curso;
+			$curso_fuente->id_fuente = $id_fuente;
+			$curso_fuente->save();
+		}
+
+		return $pregunta;
+	}
+
+	/**
+	 * Borra la pregunta y sus datos relacionados
+	 */
+	private function borra_pregunta($pregunta){		
+		$genera = Model_Genera::find('first',array('where' => array(array('id_pregunta', $pregunta->id_pregunta))));
+		//Obtenemos el id del tema para cambiar la cantidad de preguntas
+		$id_tema = null;
+		if(isset($genera)){
+			$id_tema = $genera->id_tema;
+		}
+		//Obtenemos el id de la fuente para cambiar la cantidad de preguntas
+		$id_fuente = null;
+		$fundamentado_en = Model_FundamentadoEn::find('first',array('where' => array(array('id_pregunta', $pregunta->id_pregunta))));
+		if(isset($fundamentado_en)){
+			$referencia_fuente = Model_ReferenciaFuente::find('first',array('where' => array(array('id_referencia', $fundamentado_en->id_referencia))));
+			if(isset($referencia_fuente)){
+				$id_fuente = $referencia_fuente->id_fuente;
+			}
+		}
+
+		//Borramos primero la pregunta
+		$pregunta->delete();
+
+		//Luego, si obtuvimos los Id's entonces los disminuimos
+		if(isset($id_tema) && isset($id_fuente)){
+			$this->disminuir_cantidad_preguntas($id_tema, $id_fuente);
+		}
+	}
+
+	/**
+	 * Método que reduce en 1 el campo cantidad_preguntas de TemaFuente y CursoTema 
+	 *
+	 */
+	private function disminuir_cantidad_preguntas($id_tema, $id_fuente){
+		$id_curso = SESSION::get('id_curso');
+		$curso_tema = Model_CursoTema::find(array($id_curso, $id_tema));
+		if(isset($curso_tema)){
+			$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
+			$cantidad_curso_tema = intval($cantidad_curso_tema_string);
+			if($cantidad_curso_tema > 1){
+				$curso_tema->cantidad_preguntas =  $cantidad_curso_tema - 1;
+				$curso_tema->save();
+			}else{
+				$curso_tema->delete();
+			}
+		}
+
+		$tema_fuente = Model_TemaFuente::find(array($id_tema, $id_fuente));
+		if(isset($tema_fuente)){			
+			$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
+			$cantidad_tema_fuente = intval($cantidad_tema_fuente_string);
+			if($cantidad_tema_fuente > 1){
+				$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente - 1;
+				$tema_fuente->save();
+			}else{
+				$tema_fuente->delete();
+			}
+		}
+	}
+
 	/**
 	 * Controlador que permite la creación, actualización y duplicación de una pregunta
 	 *
@@ -554,8 +757,9 @@ class Controller_Curso_Examen extends Controller_Template
 			if($duplicar_pregunta || $respaldar_pregunta){
 				if(isset($old_pregunta)){
 					//Se realiza el duplicado de la pregunta.
-
-					// Copiamos la pregunta
+					$pregunta = $this->copiar_pregunta($old_pregunta, $tema->id_tema, $fuente->id_fuente);
+					$new_id_pregunta = $pregunta->id_pregunta;
+					/*// Copiamos la pregunta
 
 					$pregunta = new Model_Pregunta();
 					$pregunta->texto = $old_pregunta->texto;
@@ -629,7 +833,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
 						$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
 						$curso_tema->save();
-					}
+					}*/
 
 					//En caso de ser una copia para respaldar se hace lo siguiente
 
@@ -1728,7 +1932,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$id_pregunta_respaldo = $respaldo->id_pregunta_respaldo;
 					$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_respaldo);
 					if(isset($pregunta)){
-						$pregunta->delete();
+						$this->borra_pregunta($pregunta);
 					}
 					$respaldo->delete();
 				}
@@ -1744,20 +1948,33 @@ class Controller_Curso_Examen extends Controller_Template
 	 */
 	public function action_guardar_pregunta_compartida($id_pregunta){
 		$id_curso = SESSION::get('id_curso');
-		// $id_pregunta = trim(Input::post('pregunta_id'));
-		// $materia = trim(Input::post('materia'));
-		// $id_curso_compartido = trim(Input::post('id_curso_compartido'));
-		// $pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $id_pregunta ));
-		// if(isset($pregunta_compartida)){
-		// 	$pregunta_compartida->delete();
-		// }else{
-		// 	$pregunta_compartida = new Model_CursoPreguntasCompartidas();
-		// 	$pregunta_compartida->id_curso = $id_curso;
-		// 	$pregunta_compartida->id_pregunta = $id_pregunta;
-		// 	$pregunta_compartida->fecha_de_modificacion = date("Y-m-d H:i:s");
-		// 	$pregunta_compartida->por_cambiar = '0';
-		// 	$pregunta_compartida->save();
-		// }
+
+		$respaldo = Model_RespaldoDe::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
+		if(isset($respaldo)){
+			$id_pregunta_respaldo = $respaldo->id_pregunta_respaldo;
+			$pregunta_respaldo = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_respaldo);
+
+			$id_tema = null;
+			$genera = Model_Genera::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
+			if(isset($genera)){
+				$id_tema = $genera->id_tema;
+			}
+
+			$id_fuente = null;
+			$fundamentado_en = Model_FundamentadoEn::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
+			if(isset($fundamentado_en)){
+				$referencia_fuente = Model_ReferenciaFuente::find('first',array('where' => array(array('id_referencia', $fundamentado_en->id_referencia))));
+				if(isset($referencia_fuente)){
+					$id_fuente = $referencia_fuente->id_fuente;
+				}
+			}
+
+			if(isset($pregunta_respaldo) && isset($id_fuente) && isset($id_fuente)){
+				$completa = True;
+				$pregunta = $this->copiar_pregunta($pregunta_respaldo, $id_tema, $id_fuente, $completa);
+			}
+
+		}
 		Response::redirect('curso/examen/actualizar_pregunta_compartida/'.$id_pregunta);
 	}
 }
