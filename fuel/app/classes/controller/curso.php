@@ -26,10 +26,9 @@ class Controller_Curso extends Controller_Template
 
 	public function before()
     {
-        parent::before(); 
+        parent::before();
         $this->template->nav_bar = View::forge('nav_bar_sesion');
         $this->template->title = "Evaluador Virtual";
-     
     }
 
 	/**

@@ -2,12 +2,12 @@
 /**
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
- * @package    Fuel
- * @version    1.8
- * @author     Fuel Development Team
- * @license    MIT License
+ * @package	Fuel
+ * @version	1.8
+ * @author	 Fuel Development Team
+ * @license	MIT License
  * @copyright  2010 - 2016 Fuel Development Team
- * @link       http://fuelphp.com
+ * @link	   http://fuelphp.com
  */
 
 /**
@@ -26,13 +26,29 @@ class Controller_Curso_Examen extends Controller_Template
 	public $template = 'template';
 
 	public function before()
-    {
-        parent::before();
-        $this->template->nav_bar = View::forge('nav_bar_sesion');
-        $this->template->title = "Evaluador Virtual";
+	{
+		parent::before();
+		$this->template->nav_bar = View::forge('nav_bar_sesion');
+		$this->template->title = "Evaluador Virtual";
 
-    }
+		$this->revisar_fecha_preguntas_compartidas();
+	}
 
+	private function revisar_fecha_preguntas_compartidas(){
+		$id_curso = SESSION::get('id_curso');
+		$date= date("Y-m-d H:i:s");
+		$old_date_value = strtotime ( '-10 days' , strtotime ($date));
+		$old_date = date( "Y-m-d H:i:s" , $old_date_value);
+		$lista_preguntas_compartidas = Model_CursoPreguntasCompartidas::find('all',array('where' => array(array('id_curso', $id_curso),array('por_cambiar', '1'),array('fecha_de_modificacion', '<=', $old_date))));
+		if(isset($lista_preguntas_compartidas)){
+			$sql = "UPDATE `CursoPreguntasCompartidas` SET `por_cambiar`= false WHERE `fecha_de_modificacion` <= '".$old_date."' ";
+			$respuesta_sql = DB::query($sql)->execute();
+		}
+
+		foreach ($lista_preguntas_compartidas as $pregunta_compartida) {
+			$this->elimina_respaldo($pregunta_compartida->id_pregunta);
+		}
+	}
 	/**
 	 * Controlador que permite la creación y modificación de una fuente bibliográfica
 	 *
@@ -390,7 +406,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$old_tema = Model_Tema::find_one_by( 'id_tema', $id_tema);
 			$nombre = $old_tema->nombre;
 			$similar_tema_lista = Model_Tema::find(function ($query) use ($id_curso, $nombre){
-			    return $query->join('CursoTema')
+				return $query->join('CursoTema')
 							->on('Tema.id_tema', '=', 'CursoTema.id_tema')
 							->where('Tema.nombre', '=', $nombre)
 							->where('CursoTema.id_curso', '=', $id_curso);
@@ -427,7 +443,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 		//Copiamos los Contiene (son por respuesta)
 		$old_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-		    return $query->join('Contiene')
+			return $query->join('Contiene')
 						->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
 						->where('Contiene.id_pregunta', $id_pregunta);
 		});
@@ -599,7 +615,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$id = $array_fuente[0];
 			$numero = $array_fuente[1];
 			$_fuentes = Model_Fuente::find(function ($query) use ($numero,$id){
-			    return $query->join('Edicion')
+				return $query->join('Edicion')
 							->on('Fuente.id_fuente', '=', 'Edicion.id_fuente')
 							->where('Edicion.numero', '=', $numero)
 							->where('Edicion.id_fuente', '=', $id);
@@ -804,7 +820,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 					//Copiamos los Contiene (son por respuesta)
 					$old_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-					    return $query->join('Contiene')
+						return $query->join('Contiene')
 									->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
 									->where('Contiene.id_pregunta', $id_pregunta);
 					});
@@ -869,7 +885,7 @@ class Controller_Curso_Examen extends Controller_Template
 						}
 						if($update_referencia){
 							$similar_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta, $pregunta_bibliografia_capitulo, $pregunta_bibliografia_pagina, $fuente){
-							    return $query->join('ReferenciaFuente')
+								return $query->join('ReferenciaFuente')
 											->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
 											->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
 											->where('Referencia.pagina', $pregunta_bibliografia_pagina)
@@ -1072,7 +1088,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$id_referencia="";
 				//Buscar Referencias que cumplan con las propiedades y que además cumplan con las propiedades de fuente y que esten en la tabla de ReferenciaFuente
 				$old_referencia_lista = Model_Referencia::find(function ($query) use ($id_pregunta, $pregunta_bibliografia_capitulo, $pregunta_bibliografia_pagina, $fuente){
-				    return $query->join('ReferenciaFuente')
+					return $query->join('ReferenciaFuente')
 								->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
 								->where('Referencia.capitulo', $pregunta_bibliografia_capitulo)
 								->where('Referencia.pagina', $pregunta_bibliografia_pagina)
@@ -1362,7 +1378,7 @@ class Controller_Curso_Examen extends Controller_Template
 			}
 
 			$temas = Model_Tema::find(function ($query) use ($id_examen){
-			    return $query->join('BasadoEn')
+				return $query->join('BasadoEn')
 							->on('Tema.id_tema', '=', 'BasadoEn.id_tema')
 							->where('BasadoEn.id_examen', $id_examen);
 			});
@@ -1385,14 +1401,14 @@ class Controller_Curso_Examen extends Controller_Template
 							$query->and_where("Pregunta.dificultad","BETWEEN",array($tema->desde_dificultad, $tema->hasta_dificultad ));
 							$query->or_where_close();
 						}
-					    return $query;
+						return $query;
 				});
 				shuffle($preguntas);
 				$preguntas = array_slice($preguntas, 0, intval($examen->preguntas_por_mostrar));
 			}
 
 			$fuentes = Model_Fuente::find(function ($query) use ($temas_ids){
-			    return $query->select('nombre')
+				return $query->select('nombre')
 							->join('TemaFuente')
 							->on('TemaFuente.id_fuente', '=', 'Fuente.id_fuente')
 							->where('TemaFuente.id_tema', 'IN', $temas_ids)
@@ -1499,22 +1515,22 @@ class Controller_Curso_Examen extends Controller_Template
 
 		$id_pregunta = $pregunta->id_pregunta;
 		$respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-			    return $query->join('Contiene')
+				return $query->join('Contiene')
 							->on('Contiene.id_respuesta', '=', 'Respuesta.id_respuesta')
 							->where('Contiene.id_pregunta', $id_pregunta);
 			});
 		shuffle($respuestas);
 		$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
 				return $query->join('FundamentadoEn')
-		                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
-		                 ->join('ReferenciaFuente')
-		                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-		                 ->join('Fuente')
-		                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
-		                 ->join('Edicion')
-		                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
-		                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
-		                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+						 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('ReferenciaFuente')
+						 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+						 ->join('Fuente')
+						 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+						 ->join('Edicion')
+						 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+						 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
+						 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
 			});
 		$referencia = reset($_referencias);
 
@@ -1753,7 +1769,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
 					$respuesta = ($id_respuesta >= 0) ? Model_Respuesta::find_one_by('id_respuesta',$id_respuesta) : null;
 					$_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
-					    return $query->join('Contiene')
+						return $query->join('Contiene')
 									->on('Respuesta.id_respuesta', '=', 'Contiene.id_respuesta')
 									->where('Contiene.id_pregunta', '=', $id_pregunta)
 									->where('Respuesta.porcentaje','=','100');
@@ -1761,16 +1777,16 @@ class Controller_Curso_Examen extends Controller_Template
 					$respuesta_correcta = reset($_respuestas);
 
 					$_referencias = Model_Referencia::find(function ($query) use ($id_pregunta){
-					    	return $query->join('FundamentadoEn')
-					                 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
-					                 ->join('ReferenciaFuente')
-					                 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
-					                 ->join('Fuente')
-					                 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
-					                 ->join('Edicion')
-					                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
-					                 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
-					                 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
+							return $query->join('FundamentadoEn')
+									 ->on('FundamentadoEn.id_referencia', '=', 'Referencia.id_referencia')
+									 ->join('ReferenciaFuente')
+									 ->on('ReferenciaFuente.id_referencia', '=', 'Referencia.id_referencia')
+									 ->join('Fuente')
+									 ->on('Fuente.id_fuente', '=', 'ReferenciaFuente.id_fuente')
+									 ->join('Edicion')
+									 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+									 ->and_on('ReferenciaFuente.numero_edicion', '=','Edicion.numero')
+									 ->where('FundamentadoEn.id_pregunta', '=', $id_pregunta);
 						});
 					$referencia = reset($_referencias);
 
@@ -1914,6 +1930,23 @@ class Controller_Curso_Examen extends Controller_Template
 
 	/**
 	 *
+	 *	Elimina la pregunta de respaldo
+	 *
+	 */
+	private function elimina_respaldo($id_pregunta){
+		$respaldo = Model_RespaldoDe::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
+		if(isset($respaldo)){
+			$id_pregunta_respaldo = $respaldo->id_pregunta_respaldo;
+			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_respaldo);
+			if(isset($pregunta)){
+				$this->borra_pregunta($pregunta);
+			}
+			$respaldo->delete();
+		}
+	}
+
+	/**
+	 *
 	 */
 	public function action_actualizar_pregunta_compartida($pregunta_id = null){
 		$id_curso = SESSION::get('id_curso');
@@ -1927,15 +1960,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$primera_pregunta_compartida = Model_CursoPreguntasCompartidas::find('first',array('where' => array(array('id_pregunta', $id_pregunta),array('por_cambiar', '1'))));
 
 			if(!isset($primera_pregunta_compartida)){
-				$respaldo = Model_RespaldoDe::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
-				if(isset($respaldo)){
-					$id_pregunta_respaldo = $respaldo->id_pregunta_respaldo;
-					$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta_respaldo);
-					if(isset($pregunta)){
-						$this->borra_pregunta($pregunta);
-					}
-					$respaldo->delete();
-				}
+				$this->elimina_respaldo($id_pregunta);
 			}
 		}
 		SESSION::set('pestania','preguntas');
