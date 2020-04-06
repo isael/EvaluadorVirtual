@@ -57,7 +57,6 @@ class Controller_Curso extends Controller_Template
 		}else{
 			Response::redirect('sesion/inicio');	
 		}
-		
 	}
 
 	/**
