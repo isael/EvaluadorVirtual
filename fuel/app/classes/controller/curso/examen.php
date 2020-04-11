@@ -866,8 +866,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$fundamentado_en = null;
 
 				$old_pregunta = Model_Pregunta::find_one_by('id_pregunta',$pregunta_id);
-				$curso_pregunta_compartida_lista = Model_CursoPreguntasCompartidas::find('all',array('where' => array(array('id_pregunta', $pregunta_id))));
-				$curso_pregunta_compartida = reset($curso_pregunta_compartida_lista);
+				$curso_pregunta_compartida = Model_CursoPreguntasCompartidas::find('first',array('where' => array(array('id_pregunta', $pregunta_id))));
 				if(isset($old_pregunta) && isset($curso_pregunta_compartida)){
 					$id_pregunta = $pregunta_id;
 					if($old_pregunta->compartida === '1' && !$duplicar_pregunta){
@@ -1124,7 +1123,7 @@ class Controller_Curso_Examen extends Controller_Template
 									$resp->contenido = $texto_actual;
 									$update_respuesta = True;
 								}
-								$porcentaje_iguales = ($resp->porcentaje === $porcentaje_actual);
+								$porcentaje_iguales = ($resp->porcentaje == $porcentaje_actual);
 								if(!$porcentaje_iguales){
 									$resp->porcentaje = $porcentaje_actual;
 									$update_respuesta = True;
@@ -1849,6 +1848,7 @@ class Controller_Curso_Examen extends Controller_Template
 							if (!$presenta->save()){
 						        throw new \Exception('Falla evalua en Presenta');
 							}
+						}
 					}
 					$fallas = SESSION::get('fallas');
 					if(isset($fallas)){
@@ -2113,10 +2113,16 @@ class Controller_Curso_Examen extends Controller_Template
 		if(isset($id_pregunta)){
 			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
 			if(isset($pregunta)){
-				if($pregunta->compartida === '0')
+				if($pregunta->compartida === '0'){
 					$pregunta->compartida = '1';
-				else
-					$pregunta->compartida = '0';
+				}else{
+					$pregunta_compartida = Model_CursoPreguntasCompartidas::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
+					if(isset($pregunta_compartida)){
+						SESSION::set('mensaje','Esta pregunta solo puede ser actualizada, ya que alguna profesora o profesor la está utilizando.');
+					}else{
+						$pregunta->compartida = '0';
+					}
+				}
 				$pregunta->save();
 			}
 		}
