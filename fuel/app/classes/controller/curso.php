@@ -46,7 +46,22 @@ class Controller_Curso extends Controller_Template
 				$id_curso = Input::get('id');
 				SESSION::set('id_curso',$id_curso);
 			}
+			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+			$hoy = date('Y-m-d H:i:s');
+			$delete_data_date_value = strtotime ( '-30 days' , strtotime ($hoy));
+			$delete_data_date = date( "Y-m-d H:i:s" , $delete_data_date_value);
+			if($curso && $curso->activo && $curso->fecha_fin < $hoy){
+				$curso->activo = 0;
+				$curso->save();
+			}
 			SESSION::set('id_curso',$id_curso);
+			// echo var_dump($curso->fecha_fin < $delete_data_date);
+			// echo var_dump($curso->fecha_fin);
+			// echo var_dump($delete_data_date);
+			// die();
+			if($curso && !$curso->activo && $curso->fecha_fin < $delete_data_date){
+				$this->borrar_informacion();
+			}
 			$tipo_usuario = substr($id,0,1);
 			if($tipo_usuario == "p"){
 				$sesion = "profesor";
@@ -55,7 +70,7 @@ class Controller_Curso extends Controller_Template
 			}
 			Response::redirect("curso/".$sesion);
 		}else{
-			Response::redirect('sesion/inicio');	
+			Response::redirect('sesion/inicio');
 		}
 	}
 
@@ -173,56 +188,67 @@ class Controller_Curso extends Controller_Template
 		$id=SESSION::get('id_sesion');
 		$id_curso = SESSION::get('id_curso');
 		if(isset($id_curso) && isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
-
-			DB::start_transaction(); 
-			try{
-				//Borrar todos los Cursa cuyo id_curso = id_curso
-				$sql = "DELETE FROM `Cursa` WHERE `id_curso` =".$id_curso;
-				$borrado = DB::query($sql)->execute();					
-				if (!$borrado){
-					throw new \Exception('Falla al borrar los elementos de Cursa');
-				}				
-				//Buscar los id de Examenes que tenga Evalua con el Curso y guardarlos en $lista_examenes
-				$lista_examenes = [];
-				$examenes = Model_Examen::find(function ($query) use ($id_curso){
-					return $query->join('Evalua')
-							 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-							 ->where('Evalua.id_curso', $id_curso);
-				});
-				if(isset($examenes)){
-					foreach ($examenes as $examen) {
-						array_push($lista_examenes, '"'.$examen->id_examen.'"');
-					}
-				}else{
-					$lista_examenes = [''];
-				}
-				$lista_examenes_string = implode(",", $lista_examenes);
-				//Borrar todos los Presenta cuyo id_examen esté en $lista_examenes
-				$presenta = Model_Presenta::find('first',array('where' => array(array('id_examen', 'IN', $lista_examenes))));
-				if(isset($presenta)){
-					$sql = "DELETE FROM `Presenta` WHERE `id_examen` IN (".$lista_examenes_string.")";
-					$borrado = DB::query($sql)->execute();					
-					if (!$borrado){
-						throw new \Exception('Falla al borrar los elementos de Presenta');
-					}
-				}
-				//Borrar todos los Comete Errores En cuyo id_examen esté en $lista_examenes
-				$comete_errores_en = Model_CometeErroresEn::find('first',array('where' => array(array('id_examen', 'IN', $lista_examenes))));
-				if(isset($comete_errores_en)){
-					$sql = "DELETE FROM `CometeErroresEn` WHERE `id_examen` IN (".$lista_examenes_string.")";
-					$borrado = DB::query($sql)->execute();					
-					if (!$borrado){
-						throw new \Exception('Falla al borrar los elementos de Presenta');
-					}
-				}
-				DB::commit_transaction();
-			}catch(\Exception $ex){
-				DB::rollback_transaction();
-				SESSION::set('mensaje',"Hubo un error al borrar la información: ".$ex->getMessage());
-			}
+			$this->borrar_informacion();
 			Response::redirect('curso/profesor');
 		}else{
 			Response::redirect('sesion/index');
+		}
+	}
+
+	/**
+	 *
+	 */
+	private function borrar_informacion(){
+		$id=SESSION::get('id_sesion');
+		$id_curso = SESSION::get('id_curso');
+		DB::start_transaction();
+		try{
+			//Borrar todos los Cursa cuyo id_curso = id_curso
+			$cursa = Model_Cursa::find('first',array('where' => array(array('id_curso', $id_curso))));
+			if(isset($cursa)){
+				$sql = "DELETE FROM `Cursa` WHERE `id_curso` =".$id_curso;
+				$borrado = DB::query($sql)->execute();
+				if (!$borrado){
+					throw new \Exception('Falla al borrar los elementos de Cursa');
+				}
+			}
+			//Buscar los id de Examenes que tenga Evalua con el Curso y guardarlos en $lista_examenes
+			$lista_examenes = [];
+			$examenes = Model_Examen::find(function ($query) use ($id_curso){
+				return $query->join('Evalua')
+						 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+						 ->where('Evalua.id_curso', $id_curso);
+			});
+			if(isset($examenes)){
+				foreach ($examenes as $examen) {
+					array_push($lista_examenes, '"'.$examen->id_examen.'"');
+				}
+			}else{
+				$lista_examenes = [''];
+			}
+			$lista_examenes_string = implode(",", $lista_examenes);
+			//Borrar todos los Presenta cuyo id_examen esté en $lista_examenes
+			$presenta = Model_Presenta::find('first',array('where' => array(array('id_examen', 'IN', $lista_examenes))));
+			if(isset($presenta)){
+				$sql = "DELETE FROM `Presenta` WHERE `id_examen` IN (".$lista_examenes_string.")";
+				$borrado = DB::query($sql)->execute();					
+				if (!$borrado){
+					throw new \Exception('Falla al borrar los elementos de Presenta');
+				}
+			}
+			//Borrar todos los Comete Errores En cuyo id_examen esté en $lista_examenes
+			$comete_errores_en = Model_CometeErroresEn::find('first',array('where' => array(array('id_examen', 'IN', $lista_examenes))));
+			if(isset($comete_errores_en)){
+				$sql = "DELETE FROM `CometeErroresEn` WHERE `id_examen` IN (".$lista_examenes_string.")";
+				$borrado = DB::query($sql)->execute();					
+				if (!$borrado){
+					throw new \Exception('Falla al borrar los elementos de Presenta');
+				}
+			}
+			DB::commit_transaction();
+		}catch(\Exception $ex){
+			DB::rollback_transaction();
+			SESSION::set('mensaje',"Hubo un error al borrar la información: ".$ex->getMessage());
 		}
 	}
 
@@ -240,7 +266,6 @@ class Controller_Curso extends Controller_Template
 			if($curso->activo === '0'){
 				$hoy= date("Y-m-d H:i:s");
 				$new_date_value = strtotime ( '+5 months' , strtotime ($hoy));
-				echo $new_date_value;
 				$new_date = date( "Y-m-d H:i:s" , $new_date_value);
 				$curso->clave = $clave_curso;
 				$curso->fecha_inicio = $hoy;

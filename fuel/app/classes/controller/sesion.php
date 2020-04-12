@@ -395,19 +395,26 @@ class Controller_Sesion extends Controller_Template
 				$tipo_usuario = substr($id,0,1);
 				$id = substr($id,1);
 				if ($tipo_usuario=="a"){
-					$curso = Model_Curso::find_one_by('clave',$clave);
-
-					$cursa = new Model_Cursa();
-					$cursa->n_cuenta = $id;
-					$cursa->id_curso = $curso->id_curso;
-					$cursa->estado = 'e'; //Esperando
 					try{
+						$curso = Model_Curso::find_one_by('clave',$clave);
+						if(!isset($curso) || !$curso->activo){
+							throw new Database_Exception("Error al obtener el curso");
+						}
+
+						$cursa = new Model_Cursa();
+						$cursa->n_cuenta = $id;
+						$cursa->id_curso = $curso->id_curso;
+						$cursa->estado = 'e'; //Esperando
 						$cursa->save();
 						$mensaje="Curso solicitado con éxito. Espera confirmación del profesor.";
 					}catch(Database_Exception $e){
 						$pos = strpos($e->getMessage(), "Duplicate entry");	//Es el error que marca cuando hay duplicados
 						if ($pos !== false) {
 							$mensaje="Ya existe una solicitud previa al curso '$clave'";
+						} else if(!isset($curso)){
+							$mensaje="No se encontró el curso '".$clave."'. Verifica la clave.";
+						} else if(!$curso->activo){
+							$mensaje="El curso que solicitaste no está disponible";
 						} else {
 							$mensaje="Hubo un error al solicitar el curso";
 						}
@@ -415,7 +422,7 @@ class Controller_Sesion extends Controller_Template
 				}else{
 					$mensaje="Acción no permitida";
 				}
-			}			
+			}
 			SESSION::set('mensaje',$mensaje);
 		}
 		Response::redirect("sesion/index");

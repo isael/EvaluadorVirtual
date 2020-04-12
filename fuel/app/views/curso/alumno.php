@@ -3,8 +3,9 @@
 		<div class="row">
 			<div class="col-lg-12 text-center">
 				<?php
-					$curso_inicio = '2019-07-04';//substr($curso->fecha_inicio, 0, 10);
-					$curso_final = '2020-01-04';//substr($curso->fecha_fin, 0, 10);
+					$curso_inicio = substr($curso->fecha_inicio, 0, 10);
+					$curso_final = substr($curso->fecha_fin, 0, 10);
+
 				?>
 				<!-- Contenido -->
 				<div class="row">
@@ -27,6 +28,9 @@
 							<p>Vigencia del curso</p>
 						</div>
 					</div>
+					<?php
+					if($curso->activo){
+					?>
 					<div class="col-xs-12 table">
 						<div class="col-xs-6 table-row">
 							<div class="mega">
@@ -55,10 +59,16 @@
 					<div class="col-xs-12">
 						<?php echo Html::anchor('curso/mis_estadisticas','<i class="fa fa-bar-chart"></i> <br> Ver mis estadísticas',array('class'=>'btn btn-primary btn-block btn-lg')) ;?>
 					</div>
+					<?php
+					}else{
+						echo "<h1> Curso dado de baja </h1>";
+					}
+					?>
 				</div>
 				<hr>
 
 				<?php
+				if($curso->activo){
 					echo "<h3>Exámenes disponibles</h3>";
 					if (isset($examenes)) {
 						$contador = 0;
@@ -95,6 +105,7 @@
 							echo "<p>-*- No hay exámenes disponibles -*-</p>";
 						}
 					}
+				}
 
 				?>
 				<!-- /Contenido -->

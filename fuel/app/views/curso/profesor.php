@@ -12,7 +12,7 @@
 						</div>
 						<div class="col-xs-4 materia">
 								<!-- <?php echo $curso->nombre;?> -->
-							<?php echo Html::anchor('sesion/profesor',$curso->nombre, array('class' => 'btn btn-primary btn-block btn-lg')); ?>
+							<?php echo Form::button('modificar_curso', $curso->nombre, array('class' => 'btn btn-primary btn-block btn-lg', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalModificarCurso'));?>
 						</div>
 				</div>
 				<!-- /Barra -->
@@ -121,6 +121,65 @@
 				<!-- /Contenido -->
 
 				<!-- Modales -->
+				<?php
+				if($curso->activo){
+				?>
+					<div class="modal fade" id="modalModificarCurso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								<h4 class="modal-title" id="myModalLabel">Vigencia del curso</h4>
+								</div>
+								<?php
+									echo Form::open('curso/reestablecer_curso');
+								?>
+									<div class="form-group">
+										<div class="modal-body">
+											<?php
+												$texto_modal = 'Tu curso se reiniciará
+													<br>
+													Para dar de alta el curso se requiere que escribas una nueva clave, que esté relacionada con la clave de la materia de la institución, con el año en curso y que de preferencia sea diferente a la anterior.
+													<br>
+													Clave anterior: '.$curso->clave.'
+													<br>
+													<br>
+													<div id="agregarCurso" class="row">
+														<div class="col-xs-12">'.
+															Form::label('Nueva clave del curso', 'clave_curso').'
+														</div>
+														<div class="col-xs-12">'.
+															Form::input('clave_curso','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nueva clave')).'
+														</div>
+													</div>';
+												echo $texto_modal;
+											?>
+										</div>
+										<div class="modal-footer">
+											<div class="row text-center">
+												<div class="col-xs-6">
+													<button id="cancelarActualizacionPregunta" type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancelar</button>
+												</div>
+												<div class="col-xs-6">
+													<?php
+														echo Form::button('boton_agregar_curso', 'Agregar nueva clave', array('class' => 'btn btn-primary btn-block'));
+													?>
+												</div>
+											</div>
+										</div>
+									</div>
+								<?php
+									echo Form::close();
+								?>
+							</div>
+						</div>
+					</div>
+				<?php
+				}
+				?>
+
 				<div class="modal fade" id="modalDarDeAltaBaja" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
@@ -193,6 +252,7 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="modal fade" id="modalBorrarInformacionCurso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
