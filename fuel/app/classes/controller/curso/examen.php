@@ -1531,6 +1531,9 @@ class Controller_Curso_Examen extends Controller_Template
 	 */
 	public function action_presentar($id_examen)
 	{
+		$id_curso = SESSION::get('id_curso');
+		$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+		if(isset($curso) && $curso->activo){
 			SESSION::set('id_examen',$id_examen);
 			SESSION::delete('n_cuenta');
 			$id = SESSION::get('id_sesion');
@@ -1539,6 +1542,9 @@ class Controller_Curso_Examen extends Controller_Template
 				SESSION::set('n_cuenta',$n_cuenta);
 			}
 			Response::redirect('curso/examen/presentar_inicio');
+		}else{
+			Response::redirect('curso/alumno');
+		}
 	}
 
 	/**
