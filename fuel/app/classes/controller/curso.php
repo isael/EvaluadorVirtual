@@ -2,12 +2,12 @@
 /**
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
- * @package    Fuel
- * @version    1.8
- * @author     Fuel Development Team
- * @license    MIT License
+ * @package	Fuel
+ * @version	1.8
+ * @author	 Fuel Development Team
+ * @license	MIT License
  * @copyright  2010 - 2016 Fuel Development Team
- * @link       http://fuelphp.com
+ * @link	   http://fuelphp.com
  */
 
 /**
@@ -25,11 +25,11 @@ class Controller_Curso extends Controller_Template
 	public $template = 'template';
 
 	public function before()
-    {
-        parent::before();
-        $this->template->nav_bar = View::forge('nav_bar_sesion');
-        $this->template->title = "Evaluador Virtual";
-    }
+	{
+		parent::before();
+		$this->template->nav_bar = View::forge('nav_bar_sesion');
+		$this->template->title = "Evaluador Virtual";
+	}
 
 	/**
 	 * Controlador de la vista principal de la aplicacion
@@ -79,10 +79,10 @@ class Controller_Curso extends Controller_Template
 			$n_cuenta = substr($id, 1);
 
 			$examenes = Model_Examen::find(function ($query) use ($id_curso, $hoy){
-			    return $query->join('Evalua')
-			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			                 ->where('Evalua.id_curso', $id_curso)
-			                 ->order_by('Examen.fecha_fin');
+				return $query->join('Evalua')
+							 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+							 ->where('Evalua.id_curso', $id_curso)
+							 ->order_by('Examen.fecha_fin');
 			});
 			$examenes_disponibles=[];
 			$examenes_hechos=[];
@@ -132,13 +132,133 @@ class Controller_Curso extends Controller_Template
 				Response::redirect('sesion/index');
 			}
 			$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
-			    return $query->join('Cursa')
-			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
-			                 ->where('Cursa.id_curso', $id_curso)
-			                 ->order_by('Cursa.estado');
+				return $query->join('Cursa')
+							 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
+							 ->where('Cursa.id_curso', $id_curso)
+							 ->order_by('Cursa.estado');
 			});
-			$data = array('curso' => $curso, 'alumnos' => $alumnos);
+
+			$hay_informacion_por_borrar = isset($alumnos) && $curso->activo === '0';
+			$data = array('curso' => $curso, 'alumnos' => $alumnos, 'hay_informacion_por_borrar' => $hay_informacion_por_borrar);
 			$this->template->content = View::forge('curso/profesor', $data);
+		}else{
+			Response::redirect('sesion/index');
+		}
+	}
+
+	/**
+	 * Controlador que cambia entre curso activo y curso no activo
+	 *
+	 */
+
+	public function action_alta_baja(){
+		$id=SESSION::get('id_sesion');
+		$id_curso = SESSION::get('id_curso');
+		if(isset($id_curso) && isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
+			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+			$curso->activo = $curso->activo === '1' ? '0' : '1';
+			$curso->save();
+			Response::redirect('curso/profesor');
+		}else{
+			Response::redirect('sesion/index');
+		}
+	}
+
+	/**
+	 * Controlador que cambia las fechas de inicio, fin y la clave del curso
+	 *
+	 */
+
+	public function action_borrar_informacion(){
+		$id=SESSION::get('id_sesion');
+		$id_curso = SESSION::get('id_curso');
+		if(isset($id_curso) && isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
+
+			DB::start_transaction(); 
+			try{
+				//Borrar todos los Cursa cuyo id_curso = id_curso
+				$sql = "DELETE FROM `Cursa` WHERE `id_curso` =".$id_curso;
+				$borrado = DB::query($sql)->execute();					
+				if (!$borrado){
+					throw new \Exception('Falla al borrar los elementos de Cursa');
+				}				
+				//Buscar los id de Examenes que tenga Evalua con el Curso y guardarlos en $lista_examenes
+				$lista_examenes = [];
+				$examenes = Model_Examen::find(function ($query) use ($id_curso){
+					return $query->join('Evalua')
+							 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+							 ->where('Evalua.id_curso', $id_curso);
+				});
+				if(isset($examenes)){
+					foreach ($examenes as $examen) {
+						array_push($lista_examenes, '"'.$examen->id_examen.'"');
+					}
+				}else{
+					$lista_examenes = [''];
+				}
+				$lista_examenes_string = implode(",", $lista_examenes);
+				//Borrar todos los Presenta cuyo id_examen esté en $lista_examenes
+				$presenta = Model_Presenta::find('first',array('where' => array(array('id_examen', 'IN', $lista_examenes))));
+				if(isset($presenta)){
+					$sql = "DELETE FROM `Presenta` WHERE `id_examen` IN (".$lista_examenes_string.")";
+					$borrado = DB::query($sql)->execute();					
+					if (!$borrado){
+						throw new \Exception('Falla al borrar los elementos de Presenta');
+					}
+				}
+				//Borrar todos los Comete Errores En cuyo id_examen esté en $lista_examenes
+				$comete_errores_en = Model_CometeErroresEn::find('first',array('where' => array(array('id_examen', 'IN', $lista_examenes))));
+				if(isset($comete_errores_en)){
+					$sql = "DELETE FROM `CometeErroresEn` WHERE `id_examen` IN (".$lista_examenes_string.")";
+					$borrado = DB::query($sql)->execute();					
+					if (!$borrado){
+						throw new \Exception('Falla al borrar los elementos de Presenta');
+					}
+				}
+				DB::commit_transaction();
+			}catch(\Exception $ex){
+				DB::rollback_transaction();
+				SESSION::set('mensaje',"Hubo un error al borrar la información: ".$ex->getMessage());
+			}
+			Response::redirect('curso/profesor');
+		}else{
+			Response::redirect('sesion/index');
+		}
+	}
+
+	/**
+	 * Controlador que cambia las fechas de inicio, fin y la clave del curso
+	 *
+	 */
+
+	public function action_reestablecer_curso(){
+		$id_curso = SESSION::get('id_curso');
+		$id=SESSION::get('id_sesion');
+		$clave_curso = trim(Input::post('clave_curso'));
+		if(isset($id_curso) && isset($clave_curso) && isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
+			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+			if($curso->activo === '0'){
+				$hoy= date("Y-m-d H:i:s");
+				$new_date_value = strtotime ( '+5 months' , strtotime ($hoy));
+				echo $new_date_value;
+				$new_date = date( "Y-m-d H:i:s" , $new_date_value);
+				$curso->clave = $clave_curso;
+				$curso->fecha_inicio = $hoy;
+				$curso->fecha_fin = $new_date;
+				$curso->activo = '1';
+				try{
+					$curso->save();
+				}catch(Database_Exception $e){
+					$pos = strpos($e->getMessage(), "Duplicate entry");	//Es el error que marca cuando hay duplicados
+					if ($pos !== false) {
+						$mensaje="Ya existe un curso con esa clave '$clave_curso'";
+					} else {
+						$mensaje="Hubo un error al crear el curso";
+					}
+					SESSION::set('mensaje',$mensaje);
+				}
+			}
+			Response::redirect('curso/profesor');
 		}else{
 			Response::redirect('sesion/index');
 		}
@@ -229,15 +349,15 @@ class Controller_Curso extends Controller_Template
 			$n_cuenta = substr($id, 1);
 			
 			$calificaciones = Model_Examen::find(function ($query) use ($id_curso,$n_cuenta){
-			    return $query->select('Examen.nombre','Presenta.calificacion')
-			                 ->join('Evalua')
-			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			                 ->join('Presenta')
-			                 ->on('Presenta.id_examen', '=', 'Examen.id_examen')
-			                 ->where('Evalua.id_curso', $id_curso)
-			                 ->where('Presenta.n_cuenta', $n_cuenta)
-			                 ->where('Presenta.terminado', '=', '1')
-			                 ->order_by('Examen.id_examen');
+				return $query->select('Examen.nombre','Presenta.calificacion')
+							 ->join('Evalua')
+							 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+							 ->join('Presenta')
+							 ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+							 ->where('Evalua.id_curso', $id_curso)
+							 ->where('Presenta.n_cuenta', $n_cuenta)
+							 ->where('Presenta.terminado', '=', '1')
+							 ->order_by('Examen.id_examen');
 			});
 
 			$promedios_arreglo_examenes = [];
@@ -252,17 +372,17 @@ class Controller_Curso extends Controller_Template
 			$promedios = array('examenes' => $promedios_arreglo_examenes, 'promedios' => $promedios_arreglo_promedios);
 
 			// $temas = Model_Tema::find(function ($query) use ($id_curso,$n_cuenta){
-			//     return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
-			//                  ->join('CometeErroresEn')
-			//                  ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
-			//                  ->join('Examen')
-			//                  ->on('Examen.id_examen', '=', 'CometeErroresEn.id_examen')
-			//                  ->join('Evalua')
-			//                  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			//                  ->where('Evalua.id_curso', $id_curso)
-			//                  ->where('CometeErroresEn.n_cuenta', $n_cuenta)
-			//                  ->order_by('nombre_ex')
-			//                  ->order_by('Tema.nombre');
+			//	 return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
+			//				  ->join('CometeErroresEn')
+			//				  ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
+			//				  ->join('Examen')
+			//				  ->on('Examen.id_examen', '=', 'CometeErroresEn.id_examen')
+			//				  ->join('Evalua')
+			//				  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			//				  ->where('Evalua.id_curso', $id_curso)
+			//				  ->where('CometeErroresEn.n_cuenta', $n_cuenta)
+			//				  ->order_by('nombre_ex')
+			//				  ->order_by('Tema.nombre');
 			// });
 
 			$sql = "SELECT `Tema`.`nombre`, `Examen`.`nombre` AS `nombre_ex`, COUNT(*) AS `suma` FROM `Tema` JOIN `CometeErroresEn` ON (`CometeErroresEn`.`id_tema` = `Tema`.`id_tema`) JOIN `Examen` ON (`Examen`.`id_examen` = `CometeErroresEn`.`id_examen`) JOIN `Evalua` ON (`Evalua`.`id_examen` = `Examen`.`id_examen`) WHERE `Evalua`.`id_curso` = '".$id_curso."' AND `CometeErroresEn`.`n_cuenta` = '".$n_cuenta."' GROUP BY `Tema`.`nombre`, `nombre_ex`";
@@ -324,26 +444,26 @@ class Controller_Curso extends Controller_Template
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 			
 			$examenes = Model_Examen::find(function ($query) use ($id_curso){
-			    return $query->join('Evalua')
-			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			                 ->where('Evalua.id_curso', $id_curso)
-			                 ->order_by('Evalua.id_examen');
+				return $query->join('Evalua')
+							 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+							 ->where('Evalua.id_curso', $id_curso)
+							 ->order_by('Evalua.id_examen');
 			});
 
 			$temas = Model_Tema::find(function ($query) use ($id_curso){
 				return $query->join('CursoTema')
-			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
-			                 ->where('CursoTema.id_curso', '=', $id_curso);
+							 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+							 ->where('CursoTema.id_curso', '=', $id_curso);
 			});
 
 			$temas_externos = Model_Tema::find(function ($query) use ($id_curso){
 				return $query->join('Genera')
-			                 ->on('Genera.id_tema', '=', 'Tema.id_tema')
-			                 ->join('Pregunta')
-			                 ->on('Pregunta.id_pregunta', '=', 'Genera.id_pregunta')
-			                 ->join('CursoPreguntasCompartidas')
-			                 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso);
+							 ->on('Genera.id_tema', '=', 'Tema.id_tema')
+							 ->join('Pregunta')
+							 ->on('Pregunta.id_pregunta', '=', 'Genera.id_pregunta')
+							 ->join('CursoPreguntasCompartidas')
+							 ->on('CursoPreguntasCompartidas.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('CursoPreguntasCompartidas.id_curso', '=', $id_curso);
 			});
 
 			$tipos = Model_Tipo::find_all();
@@ -359,37 +479,37 @@ class Controller_Curso extends Controller_Template
 				$ids_preguntas_de_respaldo = [''];
 			}
 			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso,$ids_preguntas_de_respaldo){
-			    return $query->join('Genera')
-			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->join('Tema')
-			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
-			                 ->join('CursoTema')
-			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
-			                 ->where('CursoTema.id_curso', '=', $id_curso)
-			                 ->where('Genera.id_pregunta', 'NOT IN', $ids_preguntas_de_respaldo)
-			                 ->order_by('Tema.nombre')
-			                 ->order_by('Pregunta.id_pregunta');
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->join('Tema')
+							 ->on('Tema.id_tema', '=', 'Genera.id_tema')
+							 ->join('CursoTema')
+							 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+							 ->where('CursoTema.id_curso', '=', $id_curso)
+							 ->where('Genera.id_pregunta', 'NOT IN', $ids_preguntas_de_respaldo)
+							 ->order_by('Tema.nombre')
+							 ->order_by('Pregunta.id_pregunta');
 			});
 
 			$preguntas_externas = Model_Pregunta::find(function ($query) use ($id_curso){
-			    return $query->join('Genera')
-			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->join('Tema')
-			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
-			                 ->join('PreguntasExternas')
-			                 ->on('PreguntasExternas.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->where('PreguntasExternas.id_curso', '=', $id_curso)
-			                 ->order_by('Tema.nombre')
-			                 ->order_by('Pregunta.id_pregunta');
+				return $query->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->join('Tema')
+							 ->on('Tema.id_tema', '=', 'Genera.id_tema')
+							 ->join('PreguntasExternas')
+							 ->on('PreguntasExternas.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->where('PreguntasExternas.id_curso', '=', $id_curso)
+							 ->order_by('Tema.nombre')
+							 ->order_by('Pregunta.id_pregunta');
 			});
 
 			$bibliografias = Model_Fuente::find(function ($query) use ($id_curso){
-			    return $query->join('Edicion')
-			                 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
-			                 ->join('CursoFuente')
-			                 ->on('CursoFuente.id_fuente', '=', 'Fuente.id_fuente')
-			                 ->where('CursoFuente.id_curso', $id_curso)
-			                 ->order_by('Fuente.nombre');
+				return $query->join('Edicion')
+							 ->on('Edicion.id_fuente', '=', 'Fuente.id_fuente')
+							 ->join('CursoFuente')
+							 ->on('CursoFuente.id_fuente', '=', 'Fuente.id_fuente')
+							 ->where('CursoFuente.id_curso', $id_curso)
+							 ->order_by('Fuente.nombre');
 			});
 
 			$profesores = null;
@@ -415,14 +535,14 @@ class Controller_Curso extends Controller_Template
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 			
 			$calificaciones = Model_Examen::find(function ($query) use ($id_curso){
-			    return $query->select('Examen.nombre','Presenta.calificacion')
-			                 ->join('Evalua')
-			                 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			                 ->join('Presenta')
-			                 ->on('Presenta.id_examen', '=', 'Examen.id_examen')
-			                 ->where('Evalua.id_curso', $id_curso)
-			                 ->where('Presenta.terminado', '=', '1')
-			                 ->order_by('Examen.id_examen');
+				return $query->select('Examen.nombre','Presenta.calificacion')
+							 ->join('Evalua')
+							 ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+							 ->join('Presenta')
+							 ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+							 ->where('Evalua.id_curso', $id_curso)
+							 ->where('Presenta.terminado', '=', '1')
+							 ->order_by('Examen.id_examen');
 			});
 
 			$promedios_arreglo_examenes = [];
@@ -492,18 +612,18 @@ class Controller_Curso extends Controller_Template
 				}
 			}
 			// $temas = Model_Tema::find(function ($query) use ($id_curso){
-			//     return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
-			//                  ->join('CometeErroresEn')
-			//                  ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
-			//                  ->join('BasadoEn')
-			//                  ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
-			//                  ->join('Examen')
-			//                  ->on('Examen.id_examen', '=', 'BasadoEn.id_examen')
-			//                  ->join('Evalua')
-			//                  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			//                  ->where('Evalua.id_curso', $id_curso)
-			//                  ->order_by('nombre_ex')
-			//                  ->order_by('Tema.nombre');
+			//	 return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
+			//				  ->join('CometeErroresEn')
+			//				  ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
+			//				  ->join('BasadoEn')
+			//				  ->on('BasadoEn.id_tema', '=', 'Tema.id_tema')
+			//				  ->join('Examen')
+			//				  ->on('Examen.id_examen', '=', 'BasadoEn.id_examen')
+			//				  ->join('Evalua')
+			//				  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			//				  ->where('Evalua.id_curso', $id_curso)
+			//				  ->order_by('nombre_ex')
+			//				  ->order_by('Tema.nombre');
 			// });
 
 			// $temas_arreglo_temas = [];
@@ -557,25 +677,25 @@ class Controller_Curso extends Controller_Template
 			$calificaciones = DB::query($sql)->execute();
 
 			// $calificaciones = Model_Alumno::find(function ($query) use ($id_curso){
-			//     return $query->select('Alumno.nombres', 'Alumno.apellidos', 'Examen.nombre', 'Presenta.calificacion', 'Presenta.terminado')
-			//                  ->join('Presenta')
-			//                  ->on('Presenta.n_cuenta', '=', 'Alumno.n_cuenta')
-			//                  ->join('Examen')
-			//                  ->on('Presenta.id_examen', '=', 'Examen.id_examen')
-			//                  ->join('Evalua')
-			//                  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			//                  ->where('Evalua.id_curso', $id_curso)
-			//                  ->order_by('Alumno.apellidos');
+			//	 return $query->select('Alumno.nombres', 'Alumno.apellidos', 'Examen.nombre', 'Presenta.calificacion', 'Presenta.terminado')
+			//				  ->join('Presenta')
+			//				  ->on('Presenta.n_cuenta', '=', 'Alumno.n_cuenta')
+			//				  ->join('Examen')
+			//				  ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+			//				  ->join('Evalua')
+			//				  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			//				  ->where('Evalua.id_curso', $id_curso)
+			//				  ->order_by('Alumno.apellidos');
 			// });
 			// $calificaciones_complemento = Model_Alumno::find(function ($query) use ($id_curso){
-			//     return $query->select('Alumno.nombres', 'Alumno.apellidos', 'jajaja', '0', 'NUL')
-			//     			->union($calificaciones, False)
-			//                  // ->join('Examen')
-			//                  // ->on('Presenta.id_examen', '=', 'Examen.id_examen')
-			//                  // ->join('Evalua')
-			//                  // ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			//                  // ->where('Evalua.id_curso', $id_curso)
-			//                  ->order_by('Alumnos.apellidos');
+			//	 return $query->select('Alumno.nombres', 'Alumno.apellidos', 'jajaja', '0', 'NUL')
+			//	 			->union($calificaciones, False)
+			//				  // ->join('Examen')
+			//				  // ->on('Presenta.id_examen', '=', 'Examen.id_examen')
+			//				  // ->join('Evalua')
+			//				  // ->on('Evalua.id_examen', '=', 'Examen.id_examen')
+			//				  // ->where('Evalua.id_curso', $id_curso)
+			//				  ->order_by('Alumnos.apellidos');
 			// });
 			if(isset($calificaciones)){
 				foreach ($calificaciones as $calificacion) {
@@ -615,11 +735,11 @@ class Controller_Curso extends Controller_Template
 			$curso = Model_Curso::find_one_by('id_curso',$id_curso);
 			
 			$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
-			    return $query->join('Cursa')
-			                 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
-			                 ->where('Cursa.id_curso', $id_curso)
-			                 ->order_by('Cursa.estado')
-			                 ->order_by('Alumno.apellidos');
+				return $query->join('Cursa')
+							 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
+							 ->where('Cursa.id_curso', $id_curso)
+							 ->order_by('Cursa.estado')
+							 ->order_by('Alumno.apellidos');
 			});
 
 			$data = array('curso' => $curso, 'alumnos' => $alumnos);
@@ -650,22 +770,22 @@ class Controller_Curso extends Controller_Template
 			}
 			//busqueda de todos los cursos, id_curso, nombre y nombre del profesor que lo imparte.
 			$cursos = Model_Curso::find(function ($query) use ($id_curso){
-			    return $query->select('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres')
-			                 ->join('Imparte')
-			                 ->on('Imparte.id_curso', '=', 'Curso.id_curso')
-			                 ->join('CursoTema')
-			                 ->on('CursoTema.id_curso', '=', 'Curso.id_curso')
-			                 ->join('Tema')
-			                 ->on('Tema.id_tema', '=', 'CursoTema.id_tema')
-			                 ->join('Genera')
-			                 ->on('Genera.id_tema', '=', 'Tema.id_tema')
-			                 ->join('Pregunta')
-			                 ->on('Pregunta.id_pregunta', '=', 'Genera.id_pregunta')
-			                 ->join('Profesor')
-			                 ->on('Profesor.n_trabajador', '=', 'Imparte.n_trabajador')
-			                 ->where('Pregunta.compartida', '=', '1')
-			                 ->where('Curso.id_curso', '<>', $id_curso)
-			                 ->group_by('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres');
+				return $query->select('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres')
+							 ->join('Imparte')
+							 ->on('Imparte.id_curso', '=', 'Curso.id_curso')
+							 ->join('CursoTema')
+							 ->on('CursoTema.id_curso', '=', 'Curso.id_curso')
+							 ->join('Tema')
+							 ->on('Tema.id_tema', '=', 'CursoTema.id_tema')
+							 ->join('Genera')
+							 ->on('Genera.id_tema', '=', 'Tema.id_tema')
+							 ->join('Pregunta')
+							 ->on('Pregunta.id_pregunta', '=', 'Genera.id_pregunta')
+							 ->join('Profesor')
+							 ->on('Profesor.n_trabajador', '=', 'Imparte.n_trabajador')
+							 ->where('Pregunta.compartida', '=', '1')
+							 ->where('Curso.id_curso', '<>', $id_curso)
+							 ->group_by('Curso.id_curso','Curso.nombre','Profesor.apellidos','Profesor.nombres');
 			});
 			//Comparar los cursos con la palabra de $materia que más se acerquen
 			//Seleccionar los que contengan la o las palabras en un %80 y guardarlos en un arreglo
@@ -692,9 +812,9 @@ class Controller_Curso extends Controller_Template
 				foreach ($cursos as $curso) {
 					$id_curso_actual = $curso->id_curso;
 					$temas = Model_Tema::find(function ($query) use ($id_curso_actual){
-					    return $query->join('CursoTema')
-					                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
-					                 ->where('CursoTema.id_curso', '=', $id_curso_actual);
+						return $query->join('CursoTema')
+									 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+									 ->where('CursoTema.id_curso', '=', $id_curso_actual);
 					});
 					if(isset($temas)){
 						$temas_cursos[$id_curso_actual] = $temas;
@@ -733,20 +853,20 @@ class Controller_Curso extends Controller_Template
 
 			//busqueda de todos los cursos, id_curso, nombre y nombre del profesor que lo imparte.
 			$preguntas = Model_Pregunta::find(function ($query) use ($id_curso_compartido){
-			    return $query->select('Tema.id_tema','Tema.nombre','Pregunta.dificultad','Pregunta.id_pregunta','Pregunta.texto')
-			                 ->join('Genera')
-			                 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
-			                 ->join('Tema')
-			                 ->on('Tema.id_tema', '=', 'Genera.id_tema')
-			                 ->join('CursoTema')
-			                 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
-			                 ->where('CursoTema.id_curso', '=', $id_curso_compartido)
-			                 ->where('Pregunta.compartida', '=', '1')
-			                 ->order_by('Tema.id_tema')
-			                 ->order_by('Tema.nombre')
-			                 ->order_by('Pregunta.dificultad')
-			                 ->order_by('Pregunta.id_pregunta')
-			                 ->order_by('Pregunta.texto');
+				return $query->select('Tema.id_tema','Tema.nombre','Pregunta.dificultad','Pregunta.id_pregunta','Pregunta.texto')
+							 ->join('Genera')
+							 ->on('Genera.id_pregunta', '=', 'Pregunta.id_pregunta')
+							 ->join('Tema')
+							 ->on('Tema.id_tema', '=', 'Genera.id_tema')
+							 ->join('CursoTema')
+							 ->on('CursoTema.id_tema', '=', 'Tema.id_tema')
+							 ->where('CursoTema.id_curso', '=', $id_curso_compartido)
+							 ->where('Pregunta.compartida', '=', '1')
+							 ->order_by('Tema.id_tema')
+							 ->order_by('Tema.nombre')
+							 ->order_by('Pregunta.dificultad')
+							 ->order_by('Pregunta.id_pregunta')
+							 ->order_by('Pregunta.texto');
 			});
 			$preguntas_compartidas_agregadas = [];
 			if(isset($preguntas)){

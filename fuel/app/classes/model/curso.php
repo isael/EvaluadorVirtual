@@ -5,6 +5,9 @@ class Model_Curso extends \Model_Crud{
 		'id_curso',
 		'clave',
 		'nombre',
+		'activo',
+		'fecha_inicio',
+		'fecha_fin',
 	);
 	
 	protected static $_table_name = 'Curso';

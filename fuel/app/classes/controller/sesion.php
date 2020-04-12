@@ -371,7 +371,7 @@ class Controller_Sesion extends Controller_Template
 				}else{
 					$mensaje="Acción no permitida";
 				}
-			}			
+			}
 			SESSION::set('mensaje',$mensaje);
 		}
 		Response::redirect("sesion/index");
