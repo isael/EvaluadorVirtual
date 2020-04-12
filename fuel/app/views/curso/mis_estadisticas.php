@@ -14,9 +14,10 @@
 					}
 					// $calificaciones = [10, 9, 8.3, 5, 2, 3];//ISAEL obtener desde controlador
 					$calificaciones = $promedios['promedios'];
+					$divisor = sizeof($calificaciones) ? sizeof($calificaciones) : 1;
 					// $asistencia = [12, 19, 29, 14, 22, 13];//ISAEL obtener desde controlador
 					// $asistencia = $promedios['asistencia'];
-					$promedio = array_sum($calificaciones)/sizeof($calificaciones);
+					$promedio = array_sum($calificaciones)/$divisor;
 
 					$nombresTemasFallados = [];
 					$numeroDeFallas = [];
@@ -26,7 +27,7 @@
 						array_push($nombresTemasFallados, "'".$nombre."'");
 						array_push($numeroDeFallas, $valor);
 					}
-					$temaMasFallado = $nombresTemasFallados[0];
+					$temaMasFallado = sizeof($nombresTemasFallados) ? $nombresTemasFallados[0] : 'No disponible';
 				?>
 			    <!-- Barra -->
 			    <div class="row">

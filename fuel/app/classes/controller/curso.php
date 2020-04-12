@@ -122,7 +122,16 @@ class Controller_Curso extends Controller_Template
 				$promedio = $suma_calificacion_presentados / $cantidad_presentados;
 			}
 
-			$data = array('curso' => $curso, 'examenes' => $examenes, 'examenes_disponibles' => $examenes_disponibles, 'examenes_hechos' => $examenes_hechos, 'promedio' => $promedio, 'hoy' => $hoy);
+			$alumnos = Model_Alumno::find(function ($query) use ($id_curso){
+				return $query->join('Cursa')
+							 ->on('Cursa.n_cuenta', '=', 'Alumno.n_cuenta')
+							 ->where('Cursa.id_curso', $id_curso)
+							 ->order_by('Cursa.estado');
+			});
+
+			$hay_informacion_por_borrar = isset($alumnos) && $curso->activo === '0';
+
+			$data = array('curso' => $curso, 'examenes' => $examenes, 'examenes_disponibles' => $examenes_disponibles, 'examenes_hechos' => $examenes_hechos, 'promedio' => $promedio, 'hoy' => $hoy, 'hay_informacion_por_borrar' => $hay_informacion_por_borrar);
 			$this->template->content = View::forge('curso/alumno', $data);
 		}else{
 			Response::redirect('sesion/index');

@@ -28,15 +28,15 @@
 							<p>Vigencia del curso</p>
 						</div>
 					</div>
-					<?php
-					if($curso->activo){
-					?>
 					<div class="col-xs-12 table">
 						<div class="col-xs-6 table-row">
 							<div class="mega">
 								<?php echo $promedio !== null ? $promedio : 0 ;//"<h3>".$curso->nombre."</h3>" ?>
 							</div>
-						</div>
+						</div>						
+						<?php
+						if($curso->activo){
+						?>
 						<div class="col-xs-6 table-row">
 							<div class="col-xs-12 col-sm-12">
 								<div class="col-xs-12 col-sm-12">
@@ -55,20 +55,28 @@
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="col-xs-12">
-						<?php echo Html::anchor('curso/mis_estadisticas','<i class="fa fa-bar-chart"></i> <br> Ver mis estadísticas',array('class'=>'btn btn-primary btn-block btn-lg')) ;?>
+						<?php
+						}else{
+							echo "<h1> Curso dado de baja </h1>";
+							if($hay_informacion_por_borrar){
+								echo "Guarda tus estadísticas antes de que sean borradas.";
+							}
+						}
+						?>
 					</div>
 					<?php
-					}else{
-						echo "<h1> Curso dado de baja </h1>";
+					if($curso->activo || $hay_informacion_por_borrar){
+					?>
+						<div class="col-xs-12">
+							<?php echo Html::anchor('curso/mis_estadisticas','<i class="fa fa-bar-chart"></i> <br> Ver mis estadísticas',array('class'=>'btn btn-primary btn-block btn-lg')) ;?>
+						</div>
+					<?php
 					}
 					?>
 				</div>
 				<hr>
 
 				<?php
-				if($curso->activo){
 					echo "<h3>Exámenes disponibles</h3>";
 					if (isset($examenes)) {
 						$contador = 0;
@@ -105,7 +113,6 @@
 							echo "<p>-*- No hay exámenes disponibles -*-</p>";
 						}
 					}
-				}
 
 				?>
 				<!-- /Contenido -->
