@@ -75,6 +75,74 @@ class Controller_Curso extends Controller_Template
 	}
 
 	/**
+	 *
+	 *
+	 */
+	public function action_modificar_curso(){
+		$id=SESSION::get('id_sesion');
+		$error = False;
+		$mensaje = "";
+		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
+			$id_curso = SESSION::get('id_curso');
+			$nombre_curso = trim(Input::post('nombre_curso_modificado'));
+			$clave_curso = trim(Input::post('clave_curso_modificado'));
+			$inicio_curso = trim(Input::post('inicio_curso_modificado'));
+			$fin_curso = trim(Input::post('fin_curso_modificado'));
+			//Validarlos y guardarlos en el curso actual TODO
+			if($nombre_curso === '' || $nombre_curso === null){
+				$error = True;
+				$mensaje = "Ningún campo debe ser vacío<br>";
+			}
+			if($clave_curso === '' || $clave_curso === null){
+				$error = True;
+				$mensaje = "Ningún campo debe ser vacío<br>";
+			}
+			if($inicio_curso === '' || $inicio_curso === null){
+				$error = True;
+				$mensaje = "Ningún campo debe ser vacío<br>";
+			}elseif (!preg_match("/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/",$inicio_curso)) {
+				$error = True;
+				$mensaje = $mensaje."La fecha de inicio no tiene el formato de fecha AAAA-MM-DD.<br>";
+			}
+			if($fin_curso === '' || $fin_curso === null){
+				$error = True;
+				$mensaje = "Ningún campo debe ser vacío<br>";
+			}elseif (!preg_match("/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/",$fin_curso)) {
+				$error = True;
+				$mensaje = $mensaje."La fecha de fin no tiene el formato de fecha AAAA-MM-DD.<br>";
+			}
+			if(!$error){
+				$curso_actual = Model_Curso::find_one_by('id_curso',$id_curso);
+				$should_update = False;
+				if($curso_actual->nombre !== $nombre_curso){
+					$curso_actual->nombre = $nombre_curso;
+					$should_update = True;
+				}
+				if($curso_actual->clave !== $clave_curso){
+					$curso_actual->clave = $clave_curso;
+					$should_update = True;
+				}
+				if(substr($curso_actual->fecha_inicio, 0, 10) !== $inicio_curso){
+					$curso_actual->fecha_inicio = $inicio_curso;
+					$should_update = True;
+				}
+				if(substr($curso_actual->fecha_fin, 0, 10) !== $fin_curso){
+					$curso_actual->fecha_fin = $fin_curso;
+					$should_update = True;
+				}
+				if($should_update){
+					$curso_actual->save();
+				}
+			}else{
+				SESSION::set('mensaje',$mensaje);
+			}
+			Response::redirect('curso/profesor');
+		}else{
+			Response::redirect('sesion/inicio');
+		}
+	}
+
+	/**
 	 * Controlador de la vista principal del alumno
 	 *
 	 * @access  public

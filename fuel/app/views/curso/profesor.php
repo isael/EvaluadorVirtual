@@ -131,30 +131,40 @@
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
-								<h4 class="modal-title" id="myModalLabel">Vigencia del curso</h4>
+								<h4 class="modal-title" id="myModalLabel">Modificar curso</h4>
 								</div>
 								<?php
-									echo Form::open('curso/reestablecer_curso');
+									echo Form::open('curso/modificar_curso');
 								?>
 									<div class="form-group">
 										<div class="modal-body">
 											<?php
-												$texto_modal = 'Tu curso se reiniciará
-													<br>
-													Para dar de alta el curso se requiere que escribas una nueva clave, que esté relacionada con la clave de la materia de la institución, con el año en curso y que de preferencia sea diferente a la anterior.
-													<br>
-													Clave anterior: '.$curso->clave.'
-													<br>
-													<br>
-													<div id="agregarCurso" class="row">
-														<div class="col-xs-12">'.
-															Form::label('Nueva clave del curso', 'clave_curso').'
+												echo '<div id="agregarCurso" class="row table">
+														<div class="col-xs-12 table-row">'.
+															Form::label('Nombre', 'nombre_curso_modificado').'
 														</div>
-														<div class="col-xs-12">'.
-															Form::input('clave_curso','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nueva clave')).'
+														<div class="col-xs-12 table-row">'.
+															Form::input('nombre_curso_modificado',$curso->nombre,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nuevo nombre')).'
+														</div>
+														<div class="col-xs-12 table-row">'.
+															Form::label('Clave', 'clave_curso_modificado').'
+														</div>
+														<div class="col-xs-12 table-row">'.
+															Form::input('clave_curso_modificado',$curso->clave,array('class'=>'form-control','type' => 'text', 'placeholder'=>'Nueva clave')).'
+														</div>
+														<div class="col-xs-12 table-row">'.
+															Form::label('Inicio de curso', 'inicio_curso_modificado').'
+														</div>
+														<div class="col-xs-12 table-row">'.
+															Form::input('inicio_curso_modificado',substr($curso->fecha_inicio, 0, 10),array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
+														</div>
+														<div class="col-xs-12 table-row">'.
+															Form::label('Fin de curso', 'fin_curso_modificado').'
+														</div>
+														<div class="col-xs-12 table-row">'.
+															Form::input('fin_curso_modificado',substr($curso->fecha_fin, 0, 10),array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
 														</div>
 													</div>';
-												echo $texto_modal;
 											?>
 										</div>
 										<div class="modal-footer">
@@ -164,7 +174,7 @@
 												</div>
 												<div class="col-xs-6">
 													<?php
-														echo Form::button('boton_agregar_curso', 'Agregar nueva clave', array('class' => 'btn btn-primary btn-block'));
+														echo Form::button('boton_agregar_curso', 'Guardar cambios', array('class' => 'btn btn-primary btn-block'));
 													?>
 												</div>
 											</div>
