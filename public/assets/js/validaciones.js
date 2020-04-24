@@ -1,9 +1,17 @@
 function agregarMensaje(elemento, mensaje){
-	let div = document.createElement("div");
-	let parrafo = document.createElement("p");
-	div.innerHTML = mensaje;
-	div.classList.add("error-text");
-	elemento.parentNode.appendChild(div);
+	const id_elemento = elemento.getAttribute("id");
+	const id_div_error = "error-"+id_elemento;
+	const div_error = document.getElementById(id_div_error);
+	if(div_error){
+		div_error.innerHTML = mensaje;
+	}else{
+		let div = document.createElement("div");
+		div.setAttribute("id", id_div_error);
+		let parrafo = document.createElement("p");
+		div.innerHTML = mensaje;
+		div.classList.add("error-text");
+		elemento.parentNode.appendChild(div);
+	}
 }
 
 function esCampoVacio(passwordElement){
