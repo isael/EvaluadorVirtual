@@ -23,9 +23,8 @@ function limpiarMensaje(elemento, mensaje){
 	}
 }
 
-function esCampoVacio(element){
+function esCampoVacio(element, mensaje = "El campo no puede ser vacío"){
 	let esCampoVacio = false;
-	let mensaje = "El campo no puede ser vacío";
 	if(!element.value || element.value.trim() === ''){
 		esCampoVacio = true;
 	}
@@ -66,6 +65,23 @@ function esValidoCorreo(correoElement){
 	esValido = !esCampoVacio(correoElement) && esValido;
 	if(esValido){
 		limpiarMensaje(correoElement);
+	}
+	return esValido;
+}
+
+function esValidaClaveNumerica(claveElement){	
+	let esValido = true;
+	let mensaje = "Error de formato";
+	const regex = new RegExp("^[0-9]+$",'i');
+	if(claveElement.value && !regex.test(claveElement.value)){
+		esValido = false;
+	}
+	if(!esValido){
+		agregarMensaje(claveElement,mensaje);
+	}
+	esValido = !esCampoVacio(claveElement,"Falta Clave") && esValido;
+	if(esValido){
+		limpiarMensaje(claveElement);
 	}
 	return esValido;
 }
@@ -172,5 +188,36 @@ function es_valido_formulario_registro_alumno(){
 	}else{
 		respuesta = false;
 	}
+	return respuesta;
+}
+
+function es_valido_formulario_inicio_sesion(){
+	let respuesta = true;
+
+	let correoElement = document.getElementById("correo");
+	let pwdElement = document.getElementById("pwd");
+
+	respuesta = esValidoCorreo(correoElement) && respuesta;
+	validaPassword1 = esValidoPassword(pwdElement) && respuesta;
+	return respuesta;
+}
+
+function es_valido_formulario_agregar_curso(){
+	let respuesta = true;
+
+	let claveElement = document.getElementById("form_clave_curso");
+	let nombreElement = document.getElementById("form_nombre_curso");
+
+	respuesta = esValidaClaveNumerica(claveElement) && respuesta;
+	validaPassword1 = !esCampoVacio(nombreElement) && respuesta;
+	return respuesta;
+}
+
+function es_valido_formulario_solicitar_curso(){
+	let respuesta = true;
+
+	let claveElement = document.getElementById("form_clave_curso");
+
+	respuesta = esValidaClaveNumerica(claveElement) && respuesta;
 	return respuesta;
 }

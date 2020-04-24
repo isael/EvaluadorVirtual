@@ -30,6 +30,13 @@ footer{
     position: fixed;
     height: 75px;
 }
+input{
+  min-height: 42px;
+}
+label{
+  min-height: 42px;
+  padding-top: 10px;
+}
 p {
   font-size: 20px;
 }
@@ -381,7 +388,6 @@ footer .footer-col {
 .btn-primary:active,
 .btn-primary.active,
 .open .dropdown-toggle.btn-primary {
-  color: var(--secondary-color);
   background-color: #1a242f;
   border-color: #161f29;
 }

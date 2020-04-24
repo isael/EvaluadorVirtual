@@ -14,7 +14,7 @@
             </div>
         </div>
         <br/>
-        <?php echo Form::open('sesion/inicio');?>
+        <?php echo Form::open(array('action' => 'sesion/inicio', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_inicio_sesion()}'));?>
         	<div class="row">
         		<div class="form-group col-md-6 col-md-offset-3">
 				    <label for="correo">Correo electrónico:</label>

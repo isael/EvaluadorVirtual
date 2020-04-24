@@ -75,15 +75,15 @@
 				</div>
 				<br>
 				<div id="agregarCurso" class="row" style="display: none;">
-					<?php echo Form::open('sesion/solicitar_curso');?>
+					<?php echo Form::open(array('action' => 'sesion/solicitar_curso', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_solicitar_curso()}'));?>
 					<div class="form-group">
 						<div class="col-xs-12 col-sm-1">
 							<?php echo Form::label('Curso', 'clave_curso');?>
 						</div>
 						<div class="col-xs-12 col-sm-9">
 							<?php echo Form::input('clave_curso','',array('class'=>'form-control','type' => 'text', 'placeholder'=>'Clave del curso'));?>
-							<br>
 						</div>
+						<br>
 						<div class="col-xs-12 col-sm-2">
 							<?php echo Form::button('boton_agregar_curso', '+ Solicitar', array('class' => 'btn btn-primary btn-block'));?>
 						</div>
