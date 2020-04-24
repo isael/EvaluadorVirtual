@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <?php echo Form::open('principal/registro_profesor');?>
+        <?php echo Form::open(array('action' => 'principal/registro_profesor', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_registro_profesor()}'));?>
         	<div class="row">
                 <div class="col-md-6 col-md-offset-3">
                     <label for="apellidos">Apellidos:</label>
@@ -50,8 +50,9 @@
         <br>
         <div style="text-align: center">
             <h4><u>
-                <?php echo Html::anchor('principal/registro','Volver');?>            
-            </u></h4>            
+                <?php echo Html::anchor('principal/registro','<i class="fa fa-arrow-left"></i>'.' Volver');?>
+            </u></h4>
         </div>
+        <br>
     </div>
 </section>

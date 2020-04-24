@@ -5,6 +5,7 @@
 				<!-- Contenido -->
 				
 				<div class="materia">Lista de Cursos</div>
+				<br>
 				<div class="row">
 					<div class="col-xs-2"><h4>Clave</h4></div>
 					<div class="col-xs-7"><h4>Curso</h4></div>
@@ -17,7 +18,7 @@
 					if(isset($cursos)){
 						foreach ($cursos as $curso) {
 							if($curso->estado=='a'){
-								echo "<div class='renglon'>";
+								echo "<div class='renglon casilla'>";
 								echo "<div class='row'>";
 								echo "<div class='col-xs-2'><u>";
 								echo Html::anchor('curso?id='.$curso->id_curso, $curso->clave);
@@ -31,7 +32,7 @@
 								echo "</div>";
 								echo "</div>";
 							}elseif ($curso->estado=='e') {
-								echo "<div class='renglon esperando'>";
+								echo "<div class='renglon casilla esperando'>";
 								echo "<div class='row'>";
 								echo "<div class='col-xs-2'>";
 								echo $curso->clave;
@@ -45,7 +46,7 @@
 								echo "</div>";
 								echo "</div>";
 							}else{
-								echo "<div class='renglon rechazado'>";
+								echo "<div class='renglon casilla rechazado'>";
 								echo "<div class='row'>";
 								echo "<div class='col-xs-2'>";
 								echo $curso->clave;

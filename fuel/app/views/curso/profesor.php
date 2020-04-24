@@ -12,12 +12,51 @@
 						</div>
 						<div class="col-xs-4 materia">
 								<!-- <?php echo $curso->nombre;?> -->
-							<?php echo Form::button('modificar_curso', $curso->nombre, array('class' => 'btn btn-primary btn-block btn-lg', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalModificarCurso'));?>
+							<?php echo Form::button('modificar_curso', '<i class="fa fa-pencil"></i>'.' '.$curso->nombre, array('class' => 'btn btn-primary btn-block btn-lg btn-materia', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalModificarCurso'));?>
 						</div>
 				</div>
 				<!-- /Barra -->
 
 				<hr>
+				<div class="row table">
+					<div class="col-xs-12 col-md-6 table-row">
+						<div class="col-xs-6 table-row">
+							<div class="col-md-12">
+								<h4>Inicio</h4>
+							</div>
+							<div class="col-md-12">
+								<?php echo Form::input('curso_inicio',substr($curso->fecha_inicio, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'DD/MM/AAAA')); ?>
+							</div>
+						</div>
+
+						<div class="col-xs-6 table-row">
+							<div class="col-md-12">
+								<h4>Fin</h4>
+							</div>
+							<div class="col-md-12">
+								<?php echo Form::input('curso_final',substr($curso->fecha_fin, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'DD/MM/AAAA')); ?>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-6 table-row">
+						<div class="col-md-12">
+							<h4>
+							<?php
+								$texto_activo = $curso->activo === '1' ? 'Curso Vigente' : 'Curso dado de Baja';
+								echo $texto_activo;
+							?>
+							</h4>
+						</div>
+						<div class="col-md-12">
+							<?php
+								$texto = $curso->activo === '1' ? '<i class="fa fa-times-circle"></i>'.' Dar de baja' : '<i class="fa fa-check-circle"></i>'.' Dar de alta';
+								$tipo = $curso->activo === '1' ? 'btn-danger' : 'btn-info';
+								echo Form::button('alta_baja', $texto, array('class' => 'btn '.$tipo.' btn-block btn-lg', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalDarDeAltaBaja'));
+							?>
+						</div>
+					</div>
+				</div>
+				<br>
 				<div class="row">
 					<div class="col-xs-4">
 						<?php echo Html::anchor('curso/examenes','<i class="fa fa-file-text-o"></i> <br> Exámenes',array('class'=>'btn btn-primary btn-block btn-lg')) ;?>
@@ -29,43 +68,7 @@
 						<?php echo Html::anchor('curso/alumnos','<i class="fa fa-users"></i> <br> Alumnos',array('class'=>'btn btn-primary btn-block btn-lg')) ;?>
 					</div>
 				</div>
-				<hr>
-				<div class="row table">
-					<div class="col-xs-12 col-md-4 table-row">
-						<div class="col-xs-6 col-md-12">
-							<h4>
-							<?php
-								$texto_activo = $curso->activo === '1' ? 'Curso Vigente' : 'Curso dado de Baja';
-								echo $texto_activo;
-							?>
-							</h4>
-						</div>
-						<div class="col-xs-6 col-md-12">
-							<?php								
-								$texto = $curso->activo === '1' ? 'Dar de baja' : 'Dar de alta';
-								$tipo = $curso->activo === '1' ? 'btn-warning' : 'btn-info';
-								echo Form::button('alta_baja', $texto, array('class' => 'btn '.$tipo.' btn-block btn-lg', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalDarDeAltaBaja'));
-							?>
-						</div>
-					</div>
-					<div class="col-xs-6 col-md-4 table-row">
-						<div class="col-xs-12 col-sm-12">
-							<h4>Inicio</h4>
-						</div>
-						<div class="col-xs-12 col-sm-12">
-							<?php echo Form::input('curso_inicio',substr($curso->fecha_inicio, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'DD/MM/AAAA')); ?>
-						</div>
-					</div>
-					<div class="col-xs-6 col-md-4 table-row">
-						<div class="col-xs-12 col-sm-12">
-							<h4>Fin</h4>
-						</div>
-						<div class="col-xs-12 col-sm-12">
-							<?php echo Form::input('curso_final',substr($curso->fecha_fin, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'DD/MM/AAAA')); ?>
-						</div>
-					</div>
-				</div>
-				<hr>
+				<br>
 				<?php
 					if($curso->activo === '1'){
 						echo "<h4>Solicitudes al curso</h4>";

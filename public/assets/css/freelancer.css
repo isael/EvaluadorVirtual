@@ -3,6 +3,12 @@
  * Copyright 2013-2016 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
  */
+:root {
+  --main-color: #F0F0F0;
+  --secondary-color: #2c3e73;
+  --dark-font-color: #17b59a;
+  --light-font-color: white;
+}
 html{
     position: relative; 
     min-height: 100%;
@@ -10,13 +16,13 @@ html{
 body {
   font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   overflow-x: hidden;
-  background-color: #17b59a;
+  background-color: var(--main-color);
   font-size: 1.7em;
   height: 100%;
   margin: 0 0 75px;
 }
 body.azul{
-  background-color: #2c3e73;
+  background-color: var(--secondary-color);
 }
 footer{
     width: 100%;
@@ -31,11 +37,10 @@ p.small {
   font-size: 16px;
 }
 a,
-a:hover,
 a:focus,
 a:active,
 a.active {
-  color: #ffffff;
+  color: var(--dark-font-color);
   outline: none;
 }
 h1,
@@ -75,22 +80,22 @@ hr.star-light {
   border-color: white;
 }
 hr.star-light:after {
-  background-color: #17b59a;
+  background-color: var(--main-color);
   color: white;
 }
 hr.star-primary {
-  border-color: #2c3e73;
+  border-color: var(--secondary-color);
 }
 hr.star-primary:after {
   background-color: white;
-  color: #2c3e73;
+  color: var(--secondary-color);
 }
 .img-centered {
   margin: 0 auto;
 }
 header {
   text-align: center;
-  background: #2c3e73;
+  background: var(--secondary-color);
   color: white;
 }
 header img {
@@ -121,7 +126,7 @@ header .intro-text .skills {
   }
 }
 .navbar-custom {
-  background: #2c3e73;
+  background: var(--secondary-color);
   font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-transform: uppercase;
   font-weight: 700;
@@ -147,7 +152,7 @@ header .intro-text .skills {
   color: white;
 }
 .navbar-custom .navbar-nav li a:hover {
-  color: #17b59a;
+  color: var(--main-color);
   outline: none;
 }
 .navbar-custom .navbar-nav li a:focus,
@@ -156,13 +161,13 @@ header .intro-text .skills {
 }
 .navbar-custom .navbar-nav li.active a {
   color: white;
-  background: #17b59a;
+  background: var(--main-color);
 }
 .navbar-custom .navbar-nav li.active a:hover,
 .navbar-custom .navbar-nav li.active a:focus,
 .navbar-custom .navbar-nav li.active a:active {
   color: white;
-  background: #17b59a;
+  background: var(--main-color);
 }
 .navbar-custom .navbar-toggle {
   color: white;
@@ -172,9 +177,9 @@ header .intro-text .skills {
 }
 .navbar-custom .navbar-toggle:hover,
 .navbar-custom .navbar-toggle:focus {
-  background-color: #17b59a;
+  background-color: var(--main-color);
   color: white;
-  border-color: #17b59a;
+  border-color: var(--main-color);
 }
 .navbar-avatar{
   position: relative;
@@ -216,12 +221,14 @@ section h2 {
   font-size: 3em;
 }
 section.success {
-  background: #17b59a;
-  color: white;
+  background: var(--main-color);
+  color: var(--dark-font-color);
+  -webkit-text-stroke: 0.2px grey;
 }
 section.session {
-  background: #17b59a;
-  color: white;
+  background: var(--main-color);
+  color: var(--dark-font-color);
+  -webkit-text-stroke: 0.2px grey;
 }
 @media (max-width: 767px) {
   section {
@@ -320,7 +327,7 @@ section.session {
   opacity: 1;
 }
 .floating-label-form-group-with-focus label {
-  color: #17b59a;
+  color: var(--main-color);
 }
 form .row:first-child .floating-label-form-group {
   border-top: 1px solid #eeeeee;
@@ -333,7 +340,7 @@ footer h3 {
 }
 footer .footer-above {
   padding-top: 0px;
-  background-color: #2c3e73;
+  background-color: var(--secondary-color);
 }
 footer .footer-col {
   margin-bottom: 0px;
@@ -341,6 +348,11 @@ footer .footer-col {
 .btn{
   font-size: 85%;
   padding: 10px 0px;
+  -webkit-text-stroke: 0px;
+  font-weight: 700;
+}
+.btn-info{
+  background-color: var(--dark-font-color);
 }
 .btn-outline {
   color: white;
@@ -354,14 +366,14 @@ footer .footer-col {
 .btn-outline:focus,
 .btn-outline:active,
 .btn-outline.active {
-  color: #17b59a;
+  color: var(--main-color);
   background: white;
   border: solid 2px white;
 }
 .btn-primary {
   color: white;
-  background-color: #2c3e73;
-  border-color: #2c3e73;
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
   font-weight: 700;
 }
 .btn-primary:hover,
@@ -393,17 +405,17 @@ fieldset[disabled] .btn-primary:active,
 .btn-primary.disabled.active,
 .btn-primary[disabled].active,
 fieldset[disabled] .btn-primary.active {
-  background-color: #2c3e73;
-  border-color: #2c3e73;
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
 }
 .btn-primary .badge {
-  color: #2c3e73;
+  color: var(--secondary-color);
   background-color: white;
 }
 .btn-success {
   color: white;
-  background-color: #17b59a;
-  border-color: #17b59a;
+  background-color: var(--main-color);
+  border-color: var(--main-color);
   font-weight: 700;
 }
 .btn-success:hover,
@@ -435,11 +447,11 @@ fieldset[disabled] .btn-success:active,
 .btn-success.disabled.active,
 .btn-success[disabled].active,
 fieldset[disabled] .btn-success.active {
-  background-color: #17b59a;
-  border-color: #17b59a;
+  background-color: var(--main-color);
+  border-color: var(--main-color);
 }
 .btn-success .badge {
-  color: #17b59a;
+  color: var(--main-color);
   background-color: white;
 }
 .btn-social {
@@ -511,7 +523,7 @@ fieldset[disabled] .btn-success.active {
   height: 75px;
   width: 1px;
   margin-left: 35px;
-  background-color: #2c3e73;
+  background-color: var(--secondary-color);
   transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   /* IE 9 */
@@ -522,7 +534,7 @@ fieldset[disabled] .btn-success.active {
 .portfolio-modal .close-modal .lr .rl {
   height: 75px;
   width: 1px;
-  background-color: #2c3e73;
+  background-color: var(--secondary-color);
   transform: rotate(90deg);
   -ms-transform: rotate(90deg);
   /* IE 9 */
@@ -547,8 +559,11 @@ fieldset[disabled] .btn-success.active {
     width: 100%;
     height: 100%;
 }
+.modal-title{
+  color: white;
+}
 .modal-header {
-  background-color: #17b59a;
+  background-color: var(--secondary-color);
 }
 .modal-body {
   color: #000000;
@@ -594,8 +609,10 @@ div.solicitud{
     background-size: 150% auto;
 }
 div.renglon {
+    font-size: 20px;
     padding-top: 10px;
     padding-bottom: 10px;
+    border-bottom: 1px solid var(--dark-font-color);
 }
 div.rechazado {
   background-color: #800000;
@@ -610,16 +627,13 @@ div.padding {
   margin: 5px 5px;
 }
 div.materia{
-  font-size: 20px;
+  font-size: 22px;
   font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-transform: uppercase;
   font-weight: bold;
 }
-@media (max-width: 767px) {
-  div.materia.materia_peque{
-    font-size: 15px;
-  }
-}
+div.materia.materia_peque{
+    margin-top: 10px;
+    font-size: 20px;}
 
 
 i.fav_icon {
@@ -629,10 +643,21 @@ i.fav_icon {
   position: relative;
   display: block;
   padding: 1px 1px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-bottom: -1px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-color: var(--secondary-color) var(--secondary-color) var(--secondary-color);
+  color: var(--secondary-color);
+}
+#pestanias {
+  border-bottom: 1px solid var(--secondary-color);
+  margin-bottom: 10px;
 }
 .nav-tabs > li > a:hover,
 .nav-tabs > li > a:focus {
-  background-color: #2c3e73;
+  background-color: var(--secondary-color);
   color: #ffffff;
   border-color: #ffffff #ffffff #ffffff;
   border-bottom-color: transparent;
@@ -642,7 +667,7 @@ i.fav_icon {
 .nav-tabs > li.active > a:focus {
   color: #ffffff;
   cursor: default;
-  background-color: #2c3e73;
+  background-color: var(--secondary-color);
   border: 1px solid #ffffff;
   border-bottom-color: transparent;
 }
@@ -652,16 +677,15 @@ i.fav_icon {
 .expuesto{
   display: block;
 }
-.examen{
-  background-color: #00997a;
+.casilla{
   border: 1px solid #ffffff;
   margin-top: 2px;
   border-radius: 4%;
 }
-.examen.seleccionada{
+.casilla.seleccionada{
     background-color: #00555a;
 }
-.examen:focus{
+.casilla:focus{
   background-color: #00777a;
 }
 .table{
@@ -679,4 +703,8 @@ i.fav_icon {
 .update-alert-input{
   color: #2154a9;
   text-align: left;
+}
+.error-text{
+  color: red;
+  text-align: right;
 }

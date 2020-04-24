@@ -98,6 +98,9 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
     <?php echo Asset::js('printThis.js'); ?>
 
 <!-- Extra-functionality -->
+    <?php echo Asset::js('validaciones.js'); ?>
+
+<!-- Extra-functionality -->
     <?php echo Asset::js('specialSelect.js'); ?>
 
 <!-- Connected -->

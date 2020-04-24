@@ -98,7 +98,7 @@
 							if(isset($examenes)){
 								echo '<div class="row">';
 								foreach ($examenes as $examen) {
-									echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
+									echo '<div class="col-xs-12 col-md-6 col-lg-4 casilla">';
 										echo Html::anchor('curso/examen/mostrar_examen/'.$examen->id_examen,
 												'<div class="row">'.
 													'<div class="col-xs-3">'.
