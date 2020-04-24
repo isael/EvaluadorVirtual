@@ -39,8 +39,8 @@
 				?>
 				<!-- Barra -->
 				<div class="row">
-					<div class="col-xs-2">
-						<?php echo Html::anchor('curso/profesor','<i class="fa fa-chevron-circle-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg')); ?>	
+					<div class="col-xs-2 materia">
+						<?php echo Html::anchor('curso/profesor','<i class="fa fa-arrow-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg')); ?>	
 
 					</div>
 					<div class="col-xs-8 materia materia_peque">

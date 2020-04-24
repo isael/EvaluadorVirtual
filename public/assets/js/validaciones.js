@@ -14,14 +14,23 @@ function agregarMensaje(elemento, mensaje){
 	}
 }
 
-function esCampoVacio(passwordElement){
+function limpiarMensaje(elemento, mensaje){
+	const id_elemento = elemento.getAttribute("id");
+	const id_div_error = "error-"+id_elemento;
+	const div_error = document.getElementById(id_div_error);
+	if(div_error){
+		elemento.nextElementSibling.remove();
+	}
+}
+
+function esCampoVacio(element){
 	let esCampoVacio = false;
 	let mensaje = "El campo no puede ser vacío";
-	if(!passwordElement.value || passwordElement.value.trim() === ''){
+	if(!element.value || element.value.trim() === ''){
 		esCampoVacio = true;
 	}
 	if(esCampoVacio){
-		agregarMensaje(passwordElement,mensaje);
+		agregarMensaje(element,mensaje);
 	}
 	return esCampoVacio;
 }
@@ -29,58 +38,78 @@ function esCampoVacio(passwordElement){
 function esValidoNombreApellido(nombreApellidoElement){
 	console.log(nombreApellidoElement);
 	let esValido = true;
-	let mensaje = "Error de formato";
-	if(false){
+	const mensaje = "Error de formato";
+	const regex = new RegExp("[A-Za-zÁÉÍÓÚñáéíóúÑ\'\s]+",'i');
+	if(nombreApellidoElement.value && !regex.test(nombreApellidoElement.value)){
 		esValido = false;
 	}
 	if(!esValido){
-		//Agrega mensaje en rojo en nombreApellidoElement2
+		agregarMensaje(nombreApellidoElement,mensaje);
 	}
-	return !esCampoVacio(nombreApellidoElement) && esValido;
+	esValido = !esCampoVacio(nombreApellidoElement) && esValido;
+	if(esValido){
+		limpiarMensaje(nombreApellidoElement);
+	}
+	return esValido;
 }
 
 function esValidoCorreo(correoElement){
 	let esValido = true;
-	let mensajeMalFormato = "Correo mal formado";
-	let mensajeExistente = "Correo existente";
-	if(false){
+	let mensaje = "Correo mal formado";
+	const regex = new RegExp("^[a-z0-9_.+-]+@[a-z]+\.[a-z.]+$",'i');
+	if(correoElement.value && !regex.test(correoElement.value)){
 		esValido = false;
 	}
 	if(!esValido){
-		//Agrega mensaje en rojo en correoElement2
+		agregarMensaje(correoElement,mensaje);
 	}
-	return !esCampoVacio(correoElement) && esValido;
+	esValido = !esCampoVacio(correoElement) && esValido;
+	if(esValido){
+		limpiarMensaje(correoElement);
+	}
+	return esValido;
 }
 
-function esValidoNumeroTrabajador(NumTrabElement){
+function esValidoNumeroTrabajador(numTrabElement){
 	let esValido = true;
-	let mensajeMalFormato = "Error de formato";
-	let mensajeExistente = "Número ya existente";
-	if(false){
+	let mensaje = "Error de formato";
+	const regex = new RegExp("^[0-9]+$",'i');
+	if(numTrabElement.value && !regex.test(numTrabElement.value)){
 		esValido = false;
 	}
 	if(!esValido){
-		//Agrega mensaje en rojo en NumTrabElement2
+		agregarMensaje(numTrabElement,mensaje);
 	}
-	return !esCampoVacio(NumTrabElement) && esValido;
+	esValido = !esCampoVacio(numTrabElement) && esValido;
+	if(esValido){
+		limpiarMensaje(numTrabElement);
+	}
+	return esValido;
 }
 
 function esValidoNumeroCuenta(numCtaElement){
 	let esValido = true;
-	let mensajeMalFormato = "Error de formato";
-	let mensajeExistente = "Número ya existente";
-	if(false){
+	let mensaje = "Error de formato";
+	const regex = new RegExp("^[0-9]+$",'i');
+	if(correoElement.value && !regex.test(numCtaElement.value)){
 		esValido = false;
 	}
 	if(!esValido){
-		//Agrega mensaje en rojo en numCtaElement2
+		agregarMensaje(numCtaElement,mensaje);
 	}
-	return !esCampoVacio(numCtaElement) && esValido;
+	esValido = !esCampoVacio(numCtaElement) && esValido;
+	if(esValido){
+		limpiarMensaje(numCtaElement);
+	}
+	return esValido;
 }
 
 function esValidoPassword(passwordElement){
 	let esValido = true;
 	esValido = !esCampoVacio(passwordElement);
+	if(esValido){
+		limpiarMensaje(passwordElement);
+	}
 	return esValido;
 }
 
@@ -91,7 +120,9 @@ function esValidoPasswordRepetido(passwordElement1,passwordElement2){
 		esValido = false;
 	}
 	if(!esValido){
-		//Agrega mensaje en rojo en passwordElement2
+		agregarMensaje(passwordElement2,mensaje);
+	}else{
+		limpiarMensaje(passwordElement2);
 	}
 	return esValido;
 }
@@ -133,7 +164,7 @@ function es_valido_formulario_registro_alumno(){
 	respuesta = esValidoNombreApellido(apellidosElement) && respuesta;
 	respuesta = esValidoNombreApellido(nombresElement) && respuesta;
 	respuesta = esValidoCorreo(correoElement) && respuesta;
-	respuesta = esValidoNumeroTrabajador(ncuentaElement) && respuesta;
+	respuesta = esValidoNumeroCuenta(ncuentaElement) && respuesta;
 	validaPassword1 = esValidoPassword(pwd1Element);
 	validaPassword2 = esValidoPassword(pwd2Element);
 	if(validaPassword1 && validaPassword2){

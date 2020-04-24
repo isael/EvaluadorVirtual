@@ -54,7 +54,7 @@ class Controller_Principal extends Controller_Template
 	 */
 	public function action_inicio()
 	{
-		Response::redirect('sesion/inicio');	
+		Response::redirect('sesion/inicio');
 	}
 
 	/**
@@ -131,39 +131,39 @@ class Controller_Principal extends Controller_Template
 				
 				if($nombres==null||$nombres==""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Nombres está vacío.<br>";
+					$mensaje=$mensaje."El campo de Nombres está vacío.|";
 				}
 					
 				if($apellidos==null||$apellidos===""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Apellidos está vacío.<br>";
+					$mensaje=$mensaje."El campo de Apellidos está vacío.|";
 				}
 				if($correo==null||$correo===""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Correo está vacío.<br>";
+					$mensaje=$mensaje."El campo de Correo está vacío.|";
 				}else if(!preg_match("/^[a-z0-9_\-.+]+@[a-z]+\.[a-z.]+$/i",$correo)){
 					$error=True;
-					$mensaje=$mensaje."El campo de Correo no contiene el formato de un correo válido (i.e. correo@servido.com).<br>";
+					$mensaje=$mensaje."El campo de Correo no contiene el formato de un correo válido (i.e. correo@servido.com).|";
 				}
 
 				if($ncuenta==null||$ncuenta===""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Número de cuenta está vacío.<br>";
+					$mensaje=$mensaje."El campo de Número de cuenta está vacío.|";
 				}elseif(!preg_match("/^[0-9]+$/",$ncuenta)){
 					$error=True;
-					$mensaje=$mensaje."El campo de Número de cuenta contiene más que números.<br>";
+					$mensaje=$mensaje."El campo de Número de cuenta contiene más que números.|";
 				}
 				if($contrasenia==null||$contrasenia===""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Contraseña está vacío.<br>";
+					$mensaje=$mensaje."El campo de Contraseña está vacío.|";
 				}
 				if($contrasenia2==null||$contrasenia2===""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Repetir Contraseña está vacío.<br>";
+					$mensaje=$mensaje."El campo de Repetir Contraseña está vacío.|";
 				}
 				if($contrasenia2!=$contrasenia){
 					$error=True;
-					$mensaje=$mensaje."Las contraseñas son diferentes.<br>";
+					$mensaje=$mensaje."Las contraseñas son diferentes.|";
 				}
 				if(!$error){
 					$alumno = new Model_Alumno();
@@ -193,7 +193,7 @@ class Controller_Principal extends Controller_Template
 				$this->template->content = View::forge('principal/registro_alumno', $data);
 			}else{
 				$data = array('mensaje' => $mensaje);
-				$this->template->content = View::forge('principal/mensaje', $data);
+				$this->template->content = View::forge('sesion/inicio', $data);
 			}
 		}
 	}
@@ -228,39 +228,39 @@ class Controller_Principal extends Controller_Template
 				
 				if($nombres==null||$nombres==""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Nombres está vacío.<br>";
+					$mensaje=$mensaje."El campo de Nombres está vacío.|";
 				}
 					
 				if($apellidos==null||$apellidos==""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Apellidos está vacío.<br>";
+					$mensaje=$mensaje."El campo de Apellidos está vacío.|";
 				}
 				if($correo==null||$correo==""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Correo está vacío.<br>";
+					$mensaje=$mensaje."El campo de Correo está vacío.|";
 				}elseif(!preg_match("/^[a-z0-9_\-.+]+@[a-z]+\.[a-z.]+$/i",$correo)){
 					$error=True;
-					$mensaje=$mensaje."El campo de Correo no contiene el formato de un correo válido (i.e. correo@servido.com).<br>";
+					$mensaje=$mensaje."El campo de Correo no contiene el formato de un correo válido (i.e. correo@servido.com).|";
 				}
 
 				if($ntrabajador==null||$ntrabajador==""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Número de trabajador está vacío.<br>";
+					$mensaje=$mensaje."El campo de Número de trabajador está vacío.|";
 				}elseif(!preg_match("/^[0-9]+$/",$ntrabajador)){
 					$error=True;
-					$mensaje=$mensaje."El campo de Número de trabajador contiene más que números.<br>";
+					$mensaje=$mensaje."El campo de Número de trabajador contiene más que números.|";
 				}
 				if($contrasenia==null||$contrasenia==""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Contraseña está vacío.<br>";
+					$mensaje=$mensaje."El campo de Contraseña está vacío.|";
 				}
 				if($contrasenia2==null||$contrasenia2==""){
 					$error=True;
-					$mensaje=$mensaje."El campo de Repetir Contraseña está vacío.<br>";
+					$mensaje=$mensaje."El campo de Repetir Contraseña está vacío.|";
 				}
 				if($contrasenia2!=$contrasenia){
 					$error=True;
-					$mensaje=$mensaje."Las contraseñas son diferentes.<br>";
+					$mensaje=$mensaje."Las contraseñas son diferentes.|";
 				}
 				if(!$error){
 					$profesor = new Model_Profesor();
@@ -290,7 +290,7 @@ class Controller_Principal extends Controller_Template
 				$this->template->content = View::forge('principal/registro_profesor', $data);
 			}else{
 				$data = array('mensaje' => $mensaje);
-				$this->template->content = View::forge('principal/mensaje', $data);
+				$this->template->content = View::forge('sesion/inicio', $data);
 			}
 		}
 		

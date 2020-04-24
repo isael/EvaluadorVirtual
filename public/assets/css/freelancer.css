@@ -178,7 +178,7 @@ header .intro-text .skills {
 .navbar-custom .navbar-toggle:hover,
 .navbar-custom .navbar-toggle:focus {
   background-color: var(--main-color);
-  color: white;
+  color: var(--secondary-color);
   border-color: var(--main-color);
 }
 .navbar-avatar{
@@ -366,7 +366,7 @@ footer .footer-col {
 .btn-outline:focus,
 .btn-outline:active,
 .btn-outline.active {
-  color: var(--main-color);
+  color: var(--secondary-color);
   background: white;
   border: solid 2px white;
 }
@@ -381,7 +381,7 @@ footer .footer-col {
 .btn-primary:active,
 .btn-primary.active,
 .open .dropdown-toggle.btn-primary {
-  color: white;
+  color: var(--secondary-color);
   background-color: #1a242f;
   border-color: #161f29;
 }

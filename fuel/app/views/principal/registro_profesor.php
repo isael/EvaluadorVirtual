@@ -2,11 +2,18 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12 text-center">
-                <h1>
-                    <?php if(isset($mensaje))
-                        echo $mensaje;
+                <h4>
+                    <?php if(isset($mensaje)){
+                        $mensajeArray = explode("|", $mensaje);
+                        foreach ($mensajeArray as $mensaje) {
+                            echo $mensaje;
+                            ?>
+                                <br>
+                            <?
+                        }
+                    }
                     ?>
-                </h1>
+                </h4>
                 <h3>Registro como profesor</h3>
                 
             </div>

@@ -43,12 +43,12 @@
 				<!-- /Informacion -->
 				<!-- Barra -->
 				<div class="row">
-					<div class="col-xs-2">
+					<div class="col-xs-2 materia">
 						<?php
 							if($es_profesor){
-								echo Html::anchor('curso/examenes/volver','<i class="fa fa-chevron-circle-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg'));
+								echo Html::anchor('curso/examenes/volver','<i class="fa fa-arrow-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg'));
 							}else{
-								echo Html::anchor('curso/alumno/volver','<i class="fa fa-chevron-circle-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg'));
+								echo Html::anchor('curso/alumno/volver','<i class="fa fa-arrow-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg'));
 							}
 
 						?>
