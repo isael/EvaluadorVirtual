@@ -7,7 +7,8 @@
     //die();
     if (!$existe) {
         $foto = Uri::base(false)."assets/img/usuarios/default.png";
-    } 
+    }
+    $foto = $foto."?t".time();
 ?>
 <!-- Navigation -->
     <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
@@ -110,17 +111,23 @@
                         </button>
                         <h4 class="modal-title" id="myModalLabel">Cambiar Nombre</h4>
                       </div>
-                      <?php echo Form::open(array('action' => 'sesion/cambiar_nombre', 'method' => 'post'));?>
+                      <?php echo Form::open(array('action' => 'sesion/cambiar_nombre', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_cambiar_nombre()}'));?>
                       <div class="form-group">
                         <div class="modal-body">
                           <label>Antiguo nombre</label>
                           <p><?php echo ($usuario->nombres)." ".($usuario->apellidos);?></p>
-                          <label for="nuevo_nombres">Nuevo(s) nombre(s)</label>
-                          <input type="text" class="form-control" id="nuevo_nombres" name="nuevo_nombres" placeholder="Introduce tu(s) nombre(s)">
-                          <label for="nuevo_apellidos">Nuevo(s) apellido(s)</label>
-                          <input type="text" class="form-control" id="nuevo_apellidos" name="nuevo_apellidos" placeholder="Introduce tu(s) apellido(s)">
-                          <label for="pass_nuevo_nombre">Contraseña de confirmación</label>
-                          <input type="password" class="form-control" id="pass_nuevo_nombre" name="pass_nuevo_nombre" placeholder="Introduce tu contraseña">
+                          <div>
+                            <label for="nuevo_nombres">Nuevo(s) nombre(s)</label>
+                            <input type="text" class="form-control" id="nuevo_nombres" name="nuevo_nombres" placeholder="Introduce tu(s) nombre(s)">
+                          </div>
+                          <div>
+                            <label for="nuevo_apellidos">Nuevo(s) apellido(s)</label>
+                            <input type="text" class="form-control" id="nuevo_apellidos" name="nuevo_apellidos" placeholder="Introduce tu(s) apellido(s)">
+                          </div>
+                          <div>
+                            <label for="pass_nuevo_nombre">Contraseña de confirmación</label>
+                            <input type="password" class="form-control" id="pass_nuevo_nombre" name="pass_nuevo_nombre" placeholder="Introduce tu contraseña">
+                          </div>
                         </div>
                         <div class="modal-footer">
                             <div class="row text-center">
@@ -147,15 +154,21 @@
                         </button>
                         <h4 class="modal-title" id="myModalLabel">Cambiar Contraseña</h4>
                       </div>
-                      <?php echo Form::open(array('action' => 'sesion/cambiar_contrasenia', 'method' => 'post'));?>
+                      <?php echo Form::open(array('action' => 'sesion/cambiar_contrasenia', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_cambiar_password()}'));?>
                       <div class="form-group">
-                        <div class="modal-body">                            
-                          <label for="anterior_pass">Escribe la contraseña actual</label>
-                          <input type="password" class="form-control" id="anterior_pass" name="anterior_pass" placeholder="Introduce tu contraseña">
-                          <label for="nuevo_pass">Escribe la nueva contraseña</label>
-                          <input type="password" class="form-control" id="nuevo_pass" name="nuevo_pass" placeholder="Introduce contraseña">
-                          <label for="nuevo_pass_rep">Repetir nueva contraseña</label>
-                          <input type="password" class="form-control" id="nuevo_pass_rep" name="nuevo_pass_rep" placeholder="Repite contraseña">
+                        <div class="modal-body">
+                          <div>
+                            <label for="anterior_pass">Escribe la contraseña actual</label>
+                            <input type="password" class="form-control" id="anterior_pass" name="anterior_pass" placeholder="Introduce tu contraseña">
+                          </div>
+                          <div>
+                            <label for="nuevo_pass">Escribe la nueva contraseña</label>
+                            <input type="password" class="form-control" id="nuevo_pass" name="nuevo_pass" placeholder="Introduce contraseña">
+                          </div>
+                          <div>
+                            <label for="nuevo_pass_rep">Repetir nueva contraseña</label>
+                            <input type="password" class="form-control" id="nuevo_pass_rep" name="nuevo_pass_rep" placeholder="Repite contraseña">
+                          </div>
                         </div>
                         <div class="modal-footer">
                             <div class="row text-center">
@@ -182,15 +195,21 @@
                         </button>
                         <h4 class="modal-title" id="myModalLabel">Cambiar Correo</h4>
                       </div>
-                      <?php echo Form::open(array('action' => 'sesion/cambiar_correo', 'method' => 'post'));?>
+                      <?php echo Form::open(array('action' => 'sesion/cambiar_correo', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_cambiar_correo()}'));?>
                       <div class="form-group">
                         <div class="modal-body">
-                          <label>Antiguo correo</label>
-                          <p><?php echo $usuario->correo;?></p>
-                          <label for="nuevo_correo">Nuevo correo</label>
-                          <input type="email" class="form-control" id="nuevo_correo" name="nuevo_correo" placeholder="Introduce nuevo correo">
-                          <label for="pass_nuevo_correo">Contraseña de confirmación</label>
-                          <input type="password" class="form-control" id="pass_nuevo_correo" name="pass_nuevo_correo" placeholder="Introduce tu contraseña">
+                          <div>
+                            <label>Antiguo correo</label>
+                            <p><?php echo $usuario->correo;?></p>
+                          </div>
+                          <div>
+                            <label for="nuevo_correo">Nuevo correo</label>
+                            <input type="email" class="form-control" id="nuevo_correo" name="nuevo_correo" placeholder="Introduce nuevo correo">
+                          </div>
+                          <div>
+                            <label for="pass_nuevo_correo">Contraseña de confirmación</label>
+                            <input type="password" class="form-control" id="pass_nuevo_correo" name="pass_nuevo_correo" placeholder="Introduce tu contraseña">
+                          </div>
                         </div>
                         <div class="modal-footer">
                             <div class="row text-center">

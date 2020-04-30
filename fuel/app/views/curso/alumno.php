@@ -43,7 +43,7 @@
 									<?php echo Form::label('Inicio', 'curso_inicio'); ?>
 								</div>
 								<div class="col-xs-12 col-sm-12">
-									<?php echo Form::input('curso_inicio',$curso_inicio,array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA', 'disabled' => 'true')); ?>
+									<?php echo Form::input('curso_inicio',$curso_inicio,array('class'=>'form-control','type' => 'date', 'placeholder'=>'AAAA-MM-DD', 'disabled' => 'true')); ?>
 								</div>
 							</div>
 							<div class="col-xs-12 col-sm-12">
@@ -51,7 +51,7 @@
 									<?php echo Form::label('Final', 'curso_final'); ?>
 								</div>
 								<div class="col-xs-12 col-sm-12">
-									<?php echo Form::input('curso_final',$curso_final,array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA', 'disabled' => 'true')); ?>
+									<?php echo Form::input('curso_final',$curso_final,array('class'=>'form-control','type' => 'date', 'placeholder'=>'AAAA-MM-DD', 'disabled' => 'true')); ?>
 								</div>
 							</div>
 						</div>

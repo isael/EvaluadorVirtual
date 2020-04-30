@@ -6,7 +6,7 @@
 :root {
   --main-color: #F0F0F0;
   --secondary-color: #2c3e73;
-  --dark-font-color: #17b59a;
+  --dark-font-color: #1ba48d;
   --light-font-color: white;
 }
 html{
@@ -63,6 +63,7 @@ h6 {
 hr{
   padding: 0;
   margin: 5px 5px;
+  border-top: 1px solid var(--secondary-color);
 }
 hr.star-light,
 hr.star-primary {
@@ -420,8 +421,8 @@ fieldset[disabled] .btn-primary.active {
 }
 .btn-success {
   color: white;
-  background-color: var(--main-color);
-  border-color: var(--main-color);
+  background-color: var(--dark-font-color);
+  border-color: var(--dark-font-color);
   font-weight: 700;
 }
 .btn-success:hover,
@@ -621,9 +622,11 @@ div.renglon {
     border-bottom: 1px solid var(--dark-font-color);
 }
 div.rechazado {
+  color: var(--main-color);
   background-color: #800000;
 }
 div.esperando {
+  color: var(--main-color);
   background-color: #00997a;
 }
 div.mega {
@@ -689,13 +692,16 @@ i.fav_icon {
   border-radius: 4%;
 }
 .casilla.seleccionada{
-    background-color: #00555a;
+  background-color: #00555a;
 }
 .casilla:focus{
   background-color: #00777a;
 }
 .table{
   display: table;
+}
+.table .table{
+  background-color: var(--main-color);
 }
 .table-row{
   display: table-row;
@@ -713,4 +719,23 @@ i.fav_icon {
 .error-text{
   color: red;
   text-align: right;
+}
+.secondary{
+  color: var(--secondary-color);
+}
+.input-group-btn{
+  vertical-align: baseline;
+}
+.solicitud_alumno{
+  border: 1px solid var(--main-color);
+  color: var(--secondary-color);
+}
+.respuesta{
+  border: 1px solid var(--main-color);
+  color: var(--secondary-color);
+}
+.respuesta.seleccionada{
+  color: var(--dark-font-color);
+  border: 1px solid var(--dark-font-color);
+  font-weight: bold;
 }

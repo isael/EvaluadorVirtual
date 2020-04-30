@@ -180,7 +180,7 @@ class Controller_Principal extends Controller_Template
 			}
 			else{
 				if($alumno1!=null)
-					$mensaje = "Ya existe un alumno con este número de trabajador.";
+					$mensaje = "Ya existe un alumno con este número de cuenta.";
 				else if($alumno2!=null)
 					$mensaje = "Ya existe un alumno con este correo electrónico.";
 				else
@@ -192,6 +192,7 @@ class Controller_Principal extends Controller_Template
 				$data = array('mensaje' => $mensaje, 'nombres'=> $nombres, 'apellidos' => $apellidos, 'correo' => $correo, 'ncuenta' => $ncuenta);
 				$this->template->content = View::forge('principal/registro_alumno', $data);
 			}else{
+				$this->enviar_correo($correo);
 				$data = array('mensaje' => $mensaje);
 				$this->template->content = View::forge('sesion/inicio', $data);
 			}
@@ -215,85 +216,114 @@ class Controller_Principal extends Controller_Template
 		$contrasenia2=trim(Input::post('pwd2'));
 
 
-		if ($ntrabajador==null)
+		if (False && $ntrabajador==null){//if ($ntrabajador==null){
 			$this->template->content = View::forge('principal/registro_profesor', $data);
-		else{
+		}else{
 			$mensaje="";
 			$error = False;
 
-			$profesor1 = Model_Profesor::find_by('n_trabajador', $ntrabajador);
-			$profesor2 = Model_Profesor::find_by('correo', $correo);
-			$alumno = Model_Alumno::find_by('correo',$correo);
-			if ($profesor1==null && $profesor2==null && $alumno==null){
+			// $profesor1 = Model_Profesor::find_by('n_trabajador', $ntrabajador);
+			// $profesor2 = Model_Profesor::find_by('correo', $correo);
+			// $alumno = Model_Alumno::find_by('correo',$correo);
+			// if ($profesor1==null && $profesor2==null && $alumno==null){
 				
-				if($nombres==null||$nombres==""){
-					$error=True;
-					$mensaje=$mensaje."El campo de Nombres está vacío.|";
-				}
+			// 	if($nombres==null||$nombres==""){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Nombres está vacío.|";
+			// 	}
 					
-				if($apellidos==null||$apellidos==""){
-					$error=True;
-					$mensaje=$mensaje."El campo de Apellidos está vacío.|";
-				}
-				if($correo==null||$correo==""){
-					$error=True;
-					$mensaje=$mensaje."El campo de Correo está vacío.|";
-				}elseif(!preg_match("/^[a-z0-9_\-.+]+@[a-z]+\.[a-z.]+$/i",$correo)){
-					$error=True;
-					$mensaje=$mensaje."El campo de Correo no contiene el formato de un correo válido (i.e. correo@servido.com).|";
-				}
+			// 	if($apellidos==null||$apellidos==""){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Apellidos está vacío.|";
+			// 	}
+			// 	if($correo==null||$correo==""){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Correo está vacío.|";
+			// 	}elseif(!preg_match("/^[a-z0-9_\-.+]+@[a-z]+\.[a-z.]+$/i",$correo)){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Correo no contiene el formato de un correo válido (i.e. correo@servido.com).|";
+			// 	}
 
-				if($ntrabajador==null||$ntrabajador==""){
-					$error=True;
-					$mensaje=$mensaje."El campo de Número de trabajador está vacío.|";
-				}elseif(!preg_match("/^[0-9]+$/",$ntrabajador)){
-					$error=True;
-					$mensaje=$mensaje."El campo de Número de trabajador contiene más que números.|";
-				}
-				if($contrasenia==null||$contrasenia==""){
-					$error=True;
-					$mensaje=$mensaje."El campo de Contraseña está vacío.|";
-				}
-				if($contrasenia2==null||$contrasenia2==""){
-					$error=True;
-					$mensaje=$mensaje."El campo de Repetir Contraseña está vacío.|";
-				}
-				if($contrasenia2!=$contrasenia){
-					$error=True;
-					$mensaje=$mensaje."Las contraseñas son diferentes.|";
-				}
-				if(!$error){
-					$profesor = new Model_Profesor();
-					$profesor->nombres = $nombres;
-					$profesor->apellidos = $apellidos;
-					$profesor->correo = $correo;
-					$profesor->contrasenia = sha1($contrasenia);
-					$profesor->n_trabajador = (int)$ntrabajador;
-					$profesor->save();
-					$mensaje = "El profesor ".$profesor->nombres." ha sido registrado con éxito.";
-				}
+			// 	if($ntrabajador==null||$ntrabajador==""){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Número de trabajador está vacío.|";
+			// 	}elseif(!preg_match("/^[0-9]+$/",$ntrabajador)){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Número de trabajador contiene más que números.|";
+			// 	}
+			// 	if($contrasenia==null||$contrasenia==""){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Contraseña está vacío.|";
+			// 	}
+			// 	if($contrasenia2==null||$contrasenia2==""){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."El campo de Repetir Contraseña está vacío.|";
+			// 	}
+			// 	if($contrasenia2!=$contrasenia){
+			// 		$error=True;
+			// 		$mensaje=$mensaje."Las contraseñas son diferentes.|";
+			// 	}
+			// 	if(!$error){
+			// 		$profesor = new Model_Profesor();
+			// 		$profesor->nombres = $nombres;
+			// 		$profesor->apellidos = $apellidos;
+			// 		$profesor->correo = $correo;
+			// 		$profesor->contrasenia = sha1($contrasenia);
+			// 		$profesor->n_trabajador = (int)$ntrabajador;
+			// 		$profesor->save();
+			// 		$mensaje = "El profesor ".$profesor->nombres." ha sido registrado con éxito.";
+			// 	}
 				
 				
-			}
-			else{
-				if($profesor1!=null)
-					$mensaje = "Ya existe un profesor con este número de trabajador.";
-				elseif($profesor2!=null)
-					$mensaje = "Ya existe un profesor con este correo electrónico.";
-				else
-					$mensaje = "Ya existe un alumno con este correo electrónico. Si se requiere cuenta de profesor necesita registrar su cuenta con otro correo electrónico.";
-				$error = True;
-			}
+			// }
+			// else{
+			// 	if($profesor1!=null)
+			// 		$mensaje = "Ya existe un profesor con este número de trabajador.";
+			// 	elseif($profesor2!=null)
+			// 		$mensaje = "Ya existe un profesor con este correo electrónico.";
+			// 	else
+			// 		$mensaje = "Ya existe un alumno con este correo electrónico. Si se requiere cuenta de profesor necesita registrar su cuenta con otro correo electrónico.";
+			// 	$error = True;
+			// }
 			
 			if($error){
 				$data = array('mensaje' => $mensaje, 'nombres'=> $nombres, 'apellidos' => $apellidos, 'correo' => $correo, 'ntrabajador' => $ntrabajador);
 				$this->template->content = View::forge('principal/registro_profesor', $data);
 			}else{
+				$this->enviar_correo($correo);
 				$data = array('mensaje' => $mensaje);
 				$this->template->content = View::forge('sesion/inicio', $data);
 			}
 		}
 		
+	}
+
+	private function enviar_correo($correo){
+		//Pendiente de probar en servidor
+		$to = $correo;
+		$subject = "Registro Exitoso en Evaluador Virtual";
+		$headers = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+		 
+		$message = "
+		<html>
+		<head>
+		<title>HTML</title>
+		</head>
+		<body>
+		<h1>¡Bienvenid@!</h1>
+		<h2>Te registraste con éxito</h2>
+		<p>Ahora podrás ingresar a la aplicación con esta cuenta de correo y la contraseña que guardaste.</p>
+		<p>Solo pulsa el siguiente enlace que te activará tu usuario.</p>
+		<br>
+		<a href=\""."www.google.com.mx"."\">
+		</body>
+		</html>";
+		 
+		$success = mail($to, $subject, $message, $headers);
+		if (!$success) {
+		    $errorMessage = error_get_last()['message'];
+		}
 	}
 
 	/**

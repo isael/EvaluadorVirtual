@@ -22,11 +22,11 @@
         <?php echo Form::open(array('action' => 'principal/registro_profesor', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_registro_profesor()}'));?>
         	<div class="row">
                 <div class="col-md-6 col-md-offset-3">
-                    <label for="apellidos">Apellidos:</label>
+                    <label for="apellidos">Apellido(s):</label>
                     <input type="text" class="form-control" id="apellidos" name="apellidos" value="<?php if (isset($apellidos)){echo $apellidos;}?>">
                 </div>
                 <div class="col-md-6 col-md-offset-3">
-                    <label for="nombres">Nombres:</label>
+                    <label for="nombres">Nombre(s):</label>
                     <input type="text" class="form-control" id="nombres" name="nombres" value="<?php if (isset($nombres)){echo $nombres;}?>">
                 </div>
                 <div class="col-md-6 col-md-offset-3">

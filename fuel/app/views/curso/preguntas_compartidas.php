@@ -27,7 +27,7 @@
 			   
 				<!-- Area de trabajo -->
 				
-					<div class="col-xs-12">
+					<div class="col-xs-12 table">
 						<?php
 							if(isset($preguntas)){
 								$tema_actual = '';
@@ -36,7 +36,7 @@
 										$tema_actual = $pregunta->nombre;
 										echo '<h4>'.$tema_actual.'</h4>';
 									}
-									echo '<div class="col-xs-12">';
+									echo '<div class="col-xs-12 table-row">';
 										echo '<div class="col-xs-1">';
 											echo '<input type="checkbox" name="'.$pregunta->id_pregunta.'" value="'.$pregunta->id_pregunta.'" '.(isset($preguntas_compartidas_agregadas) && in_array($pregunta->id_pregunta, $preguntas_compartidas_agregadas)? 'checked ' :  '').'disabled>';
 										echo '</div>';

@@ -22,7 +22,7 @@
 							}
 						?>
 					</div>
-					<div class="col-xs-4 materia materia_peque">
+					<div class="col-xs-4 materia materia_peque secondary">
 						<?php echo $examen->nombre; ?>
 					</div>
 					<div class="col-xs-4">
@@ -52,6 +52,7 @@
 				<!-- /Barra -->
 
 				<!-- Informacion -->
+				<div class="secondary">
 					<div class="col-xs-12">
 						<div class="col-xs-12">
 							<h4>
@@ -76,6 +77,7 @@
 				    		<span id="tiempo"> 15</span>
 				    	</div>
 					</div>
+				</div>
 				<!-- /Informacion -->
 
 			    <!-- Modal -->
@@ -93,7 +95,7 @@
 		<div class="row">
 			<?php echo Form::open('curso/examen/presentando'); ?>
 			<div class="col-xs-6">
-				<?php echo Form::button('abandonar', 'Abandonar', array('class' => 'btn btn-primary btn-block', 'value' => 'abandonar', 'type' => 'button')); ?>
+				<?php echo Form::button('abandonar', 'Abandonar', array('class' => 'btn btn-primary btn-block', 'value' => 'abandonar', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalAbandonar')); ?>
 			</div>
 			<div class="col-xs-6">
 				<?php echo Form::button('evaluar', 'Siguiente Pregunta', array('class' => 'btn btn-danger btn-block', 'value' => 'evaluar', 'id' => 'boton_evaluar')); ?>

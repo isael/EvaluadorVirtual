@@ -55,10 +55,6 @@ class Controller_Curso extends Controller_Template
 				$curso->save();
 			}
 			SESSION::set('id_curso',$id_curso);
-			// echo var_dump($curso->fecha_fin < $delete_data_date);
-			// echo var_dump($curso->fecha_fin);
-			// echo var_dump($delete_data_date);
-			// die();
 			if($curso && !$curso->activo && $curso->fecha_fin < $delete_data_date){
 				$this->borrar_informacion();
 			}
@@ -472,20 +468,6 @@ class Controller_Curso extends Controller_Template
 			}
 
 			$promedios = array('examenes' => $promedios_arreglo_examenes, 'promedios' => $promedios_arreglo_promedios);
-
-			// $temas = Model_Tema::find(function ($query) use ($id_curso,$n_cuenta){
-			//	 return $query->select('Tema.nombre',array('Examen.nombre','nombre_ex'))
-			//				  ->join('CometeErroresEn')
-			//				  ->on('CometeErroresEn.id_tema', '=', 'Tema.id_tema')
-			//				  ->join('Examen')
-			//				  ->on('Examen.id_examen', '=', 'CometeErroresEn.id_examen')
-			//				  ->join('Evalua')
-			//				  ->on('Evalua.id_examen', '=', 'Examen.id_examen')
-			//				  ->where('Evalua.id_curso', $id_curso)
-			//				  ->where('CometeErroresEn.n_cuenta', $n_cuenta)
-			//				  ->order_by('nombre_ex')
-			//				  ->order_by('Tema.nombre');
-			// });
 
 			$sql = "SELECT `Tema`.`nombre`, `Examen`.`nombre` AS `nombre_ex`, COUNT(*) AS `suma` FROM `Tema` JOIN `CometeErroresEn` ON (`CometeErroresEn`.`id_tema` = `Tema`.`id_tema`) JOIN `Examen` ON (`Examen`.`id_examen` = `CometeErroresEn`.`id_examen`) JOIN `Evalua` ON (`Evalua`.`id_examen` = `Examen`.`id_examen`) WHERE `Evalua`.`id_curso` = '".$id_curso."' AND `CometeErroresEn`.`n_cuenta` = '".$n_cuenta."' GROUP BY `Tema`.`nombre`, `nombre_ex`";
 			$temas = DB::query($sql)->execute();

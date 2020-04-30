@@ -25,7 +25,7 @@
 								<h4>Inicio</h4>
 							</div>
 							<div class="col-md-12">
-								<?php echo Form::input('curso_inicio',substr($curso->fecha_inicio, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'DD/MM/AAAA')); ?>
+								<?php echo Form::input('curso_inicio',substr($curso->fecha_inicio, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'AAAA-MM-DD')); ?>
 							</div>
 						</div>
 
@@ -34,7 +34,7 @@
 								<h4>Fin</h4>
 							</div>
 							<div class="col-md-12">
-								<?php echo Form::input('curso_final',substr($curso->fecha_fin, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'DD/MM/AAAA')); ?>
+								<?php echo Form::input('curso_final',substr($curso->fecha_fin, 0, 10),array('class'=>'form-control', 'disabled' => 'true','type' => 'date', 'placeholder'=>'AAAA-MM-DD')); ?>
 							</div>
 						</div>
 					</div>
@@ -100,9 +100,9 @@
 									echo Form::close();
 									echo "<br>";
 									$contador = $contador+1;
-									echo "<div>";
+									echo "</div>";
 								}
-								echo "<div>";
+								echo "</div>";
 							}
 						}
 						if ($contador==0) {
@@ -137,7 +137,7 @@
 								<h4 class="modal-title" id="myModalLabel">Modificar curso</h4>
 								</div>
 								<?php
-									echo Form::open('curso/modificar_curso');
+									echo Form::open(array('action' => 'curso/modificar_curso', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_modificar_curso()}'));
 								?>
 									<div class="form-group">
 										<div class="modal-body">
@@ -159,13 +159,13 @@
 															Form::label('Inicio de curso', 'inicio_curso_modificado').'
 														</div>
 														<div class="col-xs-12 table-row">'.
-															Form::input('inicio_curso_modificado',substr($curso->fecha_inicio, 0, 10),array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
+															Form::input('inicio_curso_modificado',substr($curso->fecha_inicio, 0, 10),array('class'=>'form-control','type' => 'date', 'placeholder'=>'AAAA-MM-DD')).'
 														</div>
 														<div class="col-xs-12 table-row">'.
 															Form::label('Fin de curso', 'fin_curso_modificado').'
 														</div>
 														<div class="col-xs-12 table-row">'.
-															Form::input('fin_curso_modificado',substr($curso->fecha_fin, 0, 10),array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
+															Form::input('fin_curso_modificado',substr($curso->fecha_fin, 0, 10),array('class'=>'form-control','type' => 'date', 'placeholder'=>'AAAA-MM-DD')).'
 														</div>
 													</div>';
 											?>
@@ -204,7 +204,7 @@
 							</div>
 							<?php
 								if(!$curso->activo && !$hay_informacion_por_borrar){
-									echo Form::open('curso/reestablecer_curso');
+									echo Form::open(array('action' => 'curso/reestablecer_curso', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_solicitar_curso()}'));
 								}
 							?>
 							<div class="form-group">

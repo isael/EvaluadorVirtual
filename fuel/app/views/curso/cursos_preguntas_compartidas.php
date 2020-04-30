@@ -33,7 +33,7 @@
 									echo '<div class="col-xs-12" table>';
 										echo '<div class="col-xs-3 table-row">';
 											echo isset($materia) ?
-												Html::anchor('curso/examen/preguntas_compartidas/'.$materia.'/'.$curso->id_curso,'Ver lista de preguntas', array('class' => 'btn btn-primary btn-block btn-lg'))
+												Html::anchor('curso/examen/preguntas_compartidas/'.$materia.'/'.$curso->id_curso,'Ver lista', array('class' => 'btn btn-primary btn-block btn-lg'))
 												: 'Hubo un error en los datos';
 										echo '</div>';
 										echo '<div class="col-xs-9 table-row">';

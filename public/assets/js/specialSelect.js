@@ -22,6 +22,23 @@ function handleFocus(results, focusIn){
     },150);
 }
 
+function avoidTyping(e) {
+    e.stopPropagation();
+    e.preventDefault();
+}
+
+function addNewListener(id_name) {
+    console.log("addNewListener");
+    const element = document.getElementById(id_name);
+    element.addEventListener("keydown", avoidTyping);
+}
+
+function removeNewListener(id_name) {
+    console.log("removeNewListener");
+    const element = document.getElementById(id_name);
+    element.removeEventListener("keydown", avoidTyping);
+}
+
 function updateResponse(idSelected, results, textElement, text){
     let element = document.getElementById(textElement.id);
     element.value = text;
@@ -116,8 +133,11 @@ function actualizaRespuestas(cantidad){
 
 
 function submitPregunta(){
-    let formulario = document.getElementById("pregunta_formulario_modal");
-    formulario.submit();
+    const sufijoModal = "_modal";
+    let formulario = document.getElementById("pregunta_formulario"+sufijoModal);
+    if(es_valido_formulario_crear_pregunta(sufijoModal)){
+        formulario.submit();
+    }
 }
 
 function muestraModalActualizarPreguntaCompartida($estaSiendoCompartida = false){
@@ -138,10 +158,13 @@ function muestraModalActualizarPreguntaCompartida($estaSiendoCompartida = false)
 }
 
 function duplicaPregunta(){
-    let formulario = document.getElementById("pregunta_formulario_modal");
+    const sufijoModal = "_modal";    
+    let formulario = document.getElementById("pregunta_formulario"+sufijoModal);
     let elementoDuplicado = document.getElementById("form_pregunta_duplicada");
     elementoDuplicado.value = "duplicada";
-    formulario.submit();
+    if(es_valido_formulario_crear_pregunta(sufijoModal)){
+        formulario.submit();
+    }
 }
 
 function imprimirEstadisticas(seccionesImpresion) {

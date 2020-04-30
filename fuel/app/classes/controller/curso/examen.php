@@ -167,7 +167,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
 					$new_examen->preguntas_por_mezclar = $preguntas_agregadas;
 					// $new_examen->save();
-					if (!$new_examen->save()){
+					if ($new_examen->save() < 0){
 				        throw new \Exception('Falla creación de examen en Examen');
 				    }
 
@@ -179,7 +179,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$new_basado_en->desde_dificultad = $tema_niveles_array[1];
 						$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
 						// $new_basado_en->save();
-						if (!$new_basado_en->save()){
+						if ($new_basado_en->save() < 0){
 					        throw new \Exception('Falla creación de examen en BasadoEn');
 					    }
 					}
@@ -194,7 +194,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
 					$new_examen->preguntas_por_mezclar = $preguntas_agregadas;
 					// $new_examen->save();
-					if (!$new_examen->save()){
+					if ($new_examen->save() < 0){
 				        throw new \Exception('Falla creación de examen en Examen');
 				    }
 					$id_examen = $new_examen->id_examen;
@@ -203,7 +203,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_evalua->id_curso = $id_curso;
 					$new_evalua->id_examen = $id_examen;
 					// $new_evalua->save();
-					if (!$new_evalua->save()){
+					if ($new_evalua->save() < 0){
 				        throw new \Exception('Falla creación de examen en Evalua');
 				    }
 
@@ -216,7 +216,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$new_basado_en->desde_dificultad = $tema_niveles_array[1];
 						$new_basado_en->hasta_dificultad = $tema_niveles_array[2];
 						// $new_basado_en->save();
-						if (!$new_basado_en->save()){
+						if ($new_basado_en->save() < 0){
 					        throw new \Exception('Falla creación de examen en BasadoEn');
 					    }
 					}
@@ -317,7 +317,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$fuente->nombre = $nombre;
 						$fuente->autores = $autores;
 						// $fuente->save();
-						if (!$fuente->save()){
+						if ($fuente->save() < 0){
 					        throw new \Exception('Falla creación de bibliografía en Fuente');
 					    }
 
@@ -327,7 +327,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$edicion->anio = $anio;
 							$edicion->liga = $liga;
 							// $edicion->save();
-							if (!$edicion->save()){
+							if ($edicion->save() < 0){
 						        throw new \Exception('Falla creación de bibliografía en Edición');
 						    }
 						}else{
@@ -342,7 +342,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$nueva_edicion->anio = $anio;
 							$nueva_edicion->liga = $liga;
 							// $nueva_edicion->save();
-							if (!$nueva_edicion->save()){
+							if ($nueva_edicion->save() < 0){
 						        throw new \Exception('Falla creación de bibliografía en Edición');
 						    }
 						}
@@ -354,7 +354,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$fuente->nombre = $nombre;
 							$fuente->autores = $autores;
 							// $fuente->save();
-							if (!$fuente->save()){
+							if ($fuente->save() < 0){
 						        throw new \Exception('Falla creación de bibliografía en Fuente');
 						    }
 						}
@@ -364,7 +364,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$nueva_edicion->anio = $anio;
 						$nueva_edicion->liga = $liga;
 						// $nueva_edicion->save();
-						if (!$nueva_edicion->save()){
+						if ($nueva_edicion->save() < 0){
 					        throw new \Exception('Falla creación de bibliografía en Edición');
 					    }
 
@@ -372,7 +372,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$curso_fuente->id_curso = $id_curso;
 						$curso_fuente->id_fuente = $fuente->id_fuente;
 						// $curso_fuente->save();
-						if (!$curso_fuente->save()){
+						if ($curso_fuente->save() < 0){
 					        throw new \Exception('Falla creación de bibliografía en CursoFuente');
 					    }
 
@@ -424,7 +424,7 @@ class Controller_Curso_Examen extends Controller_Template
 			$pregunta->tiene_subpreguntas = $old_pregunta->tiene_subpreguntas;
 			$pregunta->tiempo = $old_pregunta->tiempo;
 			// $pregunta->save();
-			if (!$pregunta->save()){
+			if ($pregunta->save() < 0){
 		        throw new \Exception('Falla en copia de pregunta en Pregunta');
 		    }
 			$new_id_pregunta = $pregunta->id_pregunta;
@@ -439,7 +439,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$fundamentado_en->id_pregunta = $new_id_pregunta;
 				$fundamentado_en->id_referencia = $old_fundamentado_en->id_referencia;
 				// $fundamentado_en->save();
-				if (!$fundamentado_en->save()){
+				if ($fundamentado_en->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en FundamentadoEn');
 			    }
 			}
@@ -452,7 +452,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$de_tipo->id_tipo = $old_de_tipo->id_tipo;
 				$de_tipo->id_pregunta = $new_id_pregunta;
 				// $de_tipo->save();
-				if (!$de_tipo->save()){
+				if ($de_tipo->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en DeTipo');
 			    }
 			}
@@ -476,7 +476,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_tema = new Model_Tema();
 					$new_tema->nombre = $old_tema->nombre;
 					// $new_tema->save();
-					if (!$new_tema->save()){
+					if ($new_tema->save() < 0){
 				        throw new \Exception('Falla en copia de pregunta Tema');
 				    }
 					$id_tema = $new_tema->id_tema;
@@ -487,7 +487,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$genera->id_pregunta = $new_id_pregunta;
 				$genera->id_tema = $id_tema;
 				// $genera->save();
-				if (!$genera->save()){
+				if ($genera->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en Genera');
 			    }
 
@@ -500,7 +500,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$genera->id_pregunta = $new_id_pregunta;
 					$genera->id_tema = $old_genera->id_tema;
 					// $genera->save();
-					if (!$genera->save()){
+					if ($genera->save() < 0){
 				        throw new \Exception('Falla en copia de pregunta en Genera');
 				    }
 				}
@@ -518,14 +518,14 @@ class Controller_Curso_Examen extends Controller_Template
 				$new_respuesta->contenido = $old_respuesta->contenido;
 				$new_respuesta->porcentaje = $old_respuesta->porcentaje;
 				// $new_respuesta->save();
-				if (!$new_respuesta->save()){
+				if ($new_respuesta->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en Respuesta');
 			    }
 				$contiene = new Model_Contiene();
 				$contiene->id_pregunta = $new_id_pregunta;
 				$contiene->id_respuesta = $new_respuesta->id_respuesta;
 				// $contiene->save();
-				if (!$contiene->save()){
+				if ($contiene->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en Contiene');
 			    }
 			}
@@ -537,7 +537,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
 				$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
 				// $tema_fuente->save();
-				if (!$tema_fuente->save()){
+				if ($tema_fuente->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en TemaFuente');
 			    }
 			}else{
@@ -546,7 +546,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$tema_fuente->id_fuente = $id_fuente;
 				$tema_fuente->cantidad_preguntas = 1;
 				// $tema_fuente->save();
-				if (!$tema_fuente->save()){
+				if ($tema_fuente->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en TemaFuente');
 			    }
 			}
@@ -557,7 +557,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
 				$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
 				// $curso_tema->save();
-				if (!$curso_tema->save()){
+				if ($curso_tema->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en CursoTema');
 			    }
 			}else{
@@ -566,7 +566,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$curso_tema->id_tema = $id_tema;
 				$curso_tema->cantidad_preguntas = 1;
 				// $curso_tema->save();
-				if (!$curso_tema->save()){
+				if ($curso_tema->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en CursoTema');
 			    }
 			}
@@ -577,7 +577,7 @@ class Controller_Curso_Examen extends Controller_Template
 				$curso_fuente->id_curso = $id_curso;
 				$curso_fuente->id_fuente = $id_fuente;
 				// $curso_fuente->save();
-				if (!$curso_fuente->save()){
+				if ($curso_fuente->save() < 0){
 			        throw new \Exception('Falla en copia de pregunta en CursoFuente');
 			    }
 			}
@@ -632,7 +632,7 @@ class Controller_Curso_Examen extends Controller_Template
 				if($cantidad_curso_tema > 1){
 					$curso_tema->cantidad_preguntas =  $cantidad_curso_tema - 1;
 					// $curso_tema->save();
-					if (!$curso_tema->save()){
+					if ($curso_tema->save() < 0){
 				        throw new \Exception('Falla en disminuir cantidad preguntas en CursoFuente');
 				    }
 				}else{
@@ -650,7 +650,7 @@ class Controller_Curso_Examen extends Controller_Template
 				if($cantidad_tema_fuente > 1){
 					$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente - 1;
 					// $tema_fuente->save();
-					if (!$tema_fuente->save()){
+					if ($tema_fuente->save() < 0){
 				        throw new \Exception('Falla en disminuir cantidad preguntas en TemaFuente');
 				    }
 				}else{
@@ -968,7 +968,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$respaldo->id_pregunta = $id_pregunta;
 							$respaldo->id_pregunta_respaldo = $new_id_pregunta;
 							// $respaldo->save();
-							if (!$respaldo->save()){
+							if ($respaldo->save() < 0){
 						        throw new \Exception('Falla en crear pregunta en RespaldoDe');
 						    }
 						}
@@ -1010,7 +1010,7 @@ class Controller_Curso_Examen extends Controller_Template
 								if(isset($similar_referencia)){
 									$fundamentado_en->id_referencia = $similar_referencia->id_referencia;
 									// $fundamentado_en->save();
-									if (!$fundamentado_en->save()){
+									if ($fundamentado_en->save() < 0){
 								        throw new \Exception('Falla en crear pregunta en FundamentadoEn');
 								    }
 
@@ -1047,7 +1047,7 @@ class Controller_Curso_Examen extends Controller_Template
 
 								}else{
 									// $current_referencia->save();
-									if (!$current_referencia->save()){
+									if ($current_referencia->save() < 0){
 								        throw new \Exception('Falla en crear pregunta en Referencia');
 								    }
 								}
@@ -1072,7 +1072,7 @@ class Controller_Curso_Examen extends Controller_Template
 								}
 								if($update_referencia_fuente){
 									// $current_referencia_fuente->save();
-									if (!$current_referencia_fuente->save()){
+									if ($current_referencia_fuente->save() < 0){
 								        throw new \Exception('Falla en crear pregunta en ReferenciaFuente');
 								    }
 								}
@@ -1104,7 +1104,7 @@ class Controller_Curso_Examen extends Controller_Template
 							}
 							if($update_pregunta){
 								// $new_pregunta->save();
-								if (!$new_pregunta->save()){
+								if ($new_pregunta->save() < 0){
 							        throw new \Exception('Falla en crear pregunta en RespaldoDe');
 							    }
 							}
@@ -1130,7 +1130,7 @@ class Controller_Curso_Examen extends Controller_Template
 								}
 								if($update_respuesta){
 									// $resp->save();
-									if (!$resp->save()){
+									if ($resp->save() < 0){
 								        throw new \Exception('Falla en crear pregunta en Respuesta');
 								    }
 								}
@@ -1154,7 +1154,7 @@ class Controller_Curso_Examen extends Controller_Template
 								$genera->id_pregunta = $id_pregunta;
 								$genera->id_tema = $id_tema_actual;
 								// $genera->save();
-								if (!$genera->save()){
+								if ($genera->save() < 0){
 							        throw new \Exception('Falla en crear pregunta en Genera');
 							    }
 
@@ -1167,7 +1167,7 @@ class Controller_Curso_Examen extends Controller_Template
 									if($cantidad_tema_fuente > 1){
 										$tema_fuente->cantidad_preguntas =  $cantidad_tema_fuente -1;
 										// $tema_fuente->save();
-										if (!$tema_fuente->save()){
+										if ($tema_fuente->save() < 0){
 									        throw new \Exception('Falla en crear pregunta en TemaFuente');
 									    }
 									}else{
@@ -1181,7 +1181,7 @@ class Controller_Curso_Examen extends Controller_Template
 										$cantidad = intval($tema_fuente_nuevo->cantidad_preguntas);
 										$tema_fuente_nuevo->cantidad_preguntas = $cantidad + 1;
 										// $tema_fuente_nuevo->save();
-										if (!$tema_fuente_nuevo->save()){
+										if ($tema_fuente_nuevo->save() < 0){
 									        throw new \Exception('Falla en crear pregunta en TemaFuente');
 									    }
 									}else{
@@ -1190,7 +1190,7 @@ class Controller_Curso_Examen extends Controller_Template
 										$tema_fuente_nuevo->id_tema = $id_tema_actual;
 										$tema_fuente_nuevo->cantidad_preguntas = 1;
 										// $tema_fuente_nuevo->save();
-										if (!$tema_fuente_nuevo->save()){
+										if ($tema_fuente_nuevo->save() < 0){
 									        throw new \Exception('Falla en crear pregunta en TemaFuente');
 									    }
 									}
@@ -1203,7 +1203,7 @@ class Controller_Curso_Examen extends Controller_Template
 									if($cantidad_curso_tema > 1){
 										$curso_tema->cantidad_preguntas =  $cantidad_curso_tema -1;
 										// $curso_tema->save();
-										if (!$tema_fuente->save()){
+										if ($tema_fuente->save() < 0){
 									        throw new \Exception('Falla en crear pregunta en CursoTema');
 									    }
 									}else{
@@ -1217,7 +1217,7 @@ class Controller_Curso_Examen extends Controller_Template
 										$cantidad = intval($curso_tema_nuevo->cantidad_preguntas);
 										$curso_tema_nuevo->cantidad_preguntas = $cantidad + 1;
 										// $curso_tema_nuevo->save();
-										if (!$curso_tema_nuevo->save()){
+										if ($curso_tema_nuevo->save() < 0){
 									        throw new \Exception('Falla en crear pregunta en CursoTema');
 									    }
 									}else{
@@ -1226,7 +1226,7 @@ class Controller_Curso_Examen extends Controller_Template
 										$curso_tema_nuevo->id_tema = $id_tema_actual;
 										$curso_tema_nuevo->cantidad_preguntas = 1;
 										// $curso_tema_nuevo->save();
-										if (!$curso_tema_nuevo->save()){
+										if ($curso_tema_nuevo->save() < 0){
 									        throw new \Exception('Falla en crear pregunta en CursoTema');
 									    }
 									}
@@ -1245,7 +1245,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$pregunta->tiene_subpreguntas = $tipo->tiene_subpreguntas; //Pendiente
 					$pregunta->tiempo = $pregunta_tiempo;
 					// $pregunta->save();
-					if (!$pregunta->save()){
+					if ($pregunta->save() < 0){
 				        throw new \Exception('Falla en crear pregunta en Pregunta');
 				    }
 					$id_pregunta = $pregunta->id_pregunta;
@@ -1254,7 +1254,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$de_tipo->id_tipo = $tipo->id_tipo;
 					$de_tipo->id_pregunta = $id_pregunta;
 					// $de_tipo->save();
-					if (!$de_tipo->save()){
+					if ($de_tipo->save() < 0){
 				        throw new \Exception('Falla en crear pregunta en DeTipo');
 				    }
 
@@ -1276,7 +1276,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$referencia->capitulo = $pregunta_bibliografia_capitulo;
 						$referencia->pagina = $pregunta_bibliografia_pagina;
 						// $referencia->save();
-						if (!$referencia->save()){
+						if ($referencia->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en Referencia');
 					    }
 						$id_referencia=$referencia->id_referencia;
@@ -1286,7 +1286,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$referencia_fuente->id_fuente = $fuente->id_fuente;
 						$referencia_fuente->numero_edicion = $fuente->numero;
 						// $referencia_fuente->save();
-						if (!$referencia_fuente->save()){
+						if ($referencia_fuente->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en ReferenciaFuente');
 					    }
 					}
@@ -1296,7 +1296,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$fundamentado_en->id_pregunta = $id_pregunta;
 					$fundamentado_en->id_referencia = $id_referencia;
 					// $fundamentado_en->save();
-					if (!$fundamentado_en->save()){
+					if ($fundamentado_en->save() < 0){
 				        throw new \Exception('Falla en crear pregunta en FundamentadoEn');
 				    }
 
@@ -1307,7 +1307,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$resp->contenido = $texto_actual;
 						$resp->porcentaje = $porcentaje_actual;
 						// $resp->save();
-						if (!$resp->save()){
+						if ($resp->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en Respuesta');
 					    }
 
@@ -1315,7 +1315,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$contiene->id_pregunta = $id_pregunta;
 						$contiene->id_respuesta = $resp->id_respuesta;
 						// $contiene->save();
-						if (!$contiene->save()){
+						if ($contiene->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en Contiene');
 					    }
 					}
@@ -1324,7 +1324,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$tema = new Model_Tema();
 						$tema->nombre = $pregunta_tema;
 						// $tema->save();
-						if (!$tema->save()){
+						if ($tema->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en Tema');
 					    }
 					}
@@ -1333,7 +1333,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$genera->id_pregunta = $id_pregunta;
 					$genera->id_tema = $tema->id_tema;
 					// $genera->save();
-					if (!$genera->save()){
+					if ($genera->save() < 0){
 				        throw new \Exception('Falla en crear pregunta en Genera');
 				    }
 
@@ -1344,14 +1344,14 @@ class Controller_Curso_Examen extends Controller_Template
 						$tema_fuente->id_tema = $tema->id_tema;
 						$tema_fuente->cantidad_preguntas = 1;
 						// $tema_fuente->save();
-						if (!$tema_fuente->save()){
+						if ($tema_fuente->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en TemaFuente');
 					    }
 					}else{
 						$cantidad_tema_fuente_string = $tema_fuente->cantidad_preguntas;
 						$tema_fuente->cantidad_preguntas = intval($cantidad_tema_fuente_string) + 1;
 						// $tema_fuente->save();
-						if (!$tema_fuente->save()){
+						if ($tema_fuente->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en TemaFuente');
 					    }
 					}
@@ -1363,14 +1363,14 @@ class Controller_Curso_Examen extends Controller_Template
 						$curso_tema->id_tema = $tema->id_tema;
 						$curso_tema->cantidad_preguntas = 1;
 						// $curso_tema->save();
-						if (!$curso_tema->save()){
+						if ($curso_tema->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en CursoTema');
 					    }
 					}else{
 						$cantidad_curso_tema_string = $curso_tema->cantidad_preguntas;
 						$curso_tema->cantidad_preguntas = intval($cantidad_curso_tema_string) + 1;
 						// $curso_tema->save();
-						if (!$curso_tema->save()){
+						if ($curso_tema->save() < 0){
 					        throw new \Exception('Falla en crear pregunta en CursoTema');
 					    }
 					}
@@ -1582,7 +1582,7 @@ class Controller_Curso_Examen extends Controller_Template
 						}else{
 							$presenta->oportunidades = 0;
 							// $presenta->save();
-							if (!$presenta->save()){
+							if ($presenta->save() < 0){
 						        throw new \Exception('Falla en presenta en Presenta');
 						    }
 						}
@@ -1595,7 +1595,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$presenta->calificacion = 0;
 						$presenta->terminado = 0;
 						// $presenta->save();
-						if (!$presenta->save()){
+						if ($presenta->save() < 0){
 					        throw new \Exception('Falla en presenta en Presenta');
 					    }
 					}
@@ -1769,6 +1769,7 @@ class Controller_Curso_Examen extends Controller_Template
 		SESSION::set('respuestas_ids',$respuestas_ids);
 
 		$mensaje = "";
+		$this->template->nav_bar = null;
 		$this->template->content = View::forge('curso/examen/presentando', $data);
 		
 	}
@@ -1851,7 +1852,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$oportunidades_usadas = $presenta->oportunidades;
 							$presenta->oportunidades = $oportunidades_usadas + 1;
 							// $presenta->save();
-							if (!$presenta->save()){
+							if ($presenta->save() < 0){
 						        throw new \Exception('Falla evalua en Presenta');
 							}
 						}
@@ -1890,7 +1891,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$comete_error->n_cuenta = $n_cuenta;
 						$comete_error->id_examen = $id_examen;
 						// $comete_error->save();
-						if (!$comete_error->save()){
+						if ($comete_error->save() < 0){
 					        throw new \Exception('Falla evalua en CometeErroresEn');
 						}
 					}
@@ -1909,6 +1910,7 @@ class Controller_Curso_Examen extends Controller_Template
 		$data = array('examen' => $examen, 'presenta' => $presenta, 'evaluacion' => $evaluacion, 'hizo_trampa' => $hizo_trampa);
 		SESSION::set('evaluado',True);
 		$mensaje = "";
+		$this->template->nav_bar = null;
 		$this->template->content = View::forge('curso/examen/evalua', $data);
 		// }
 	}
@@ -1975,7 +1977,7 @@ class Controller_Curso_Examen extends Controller_Template
 							if(isset($presenta)){
 								$presenta->terminado = 1;
 								// $presenta->save();
-								if (!$presenta->save()){
+								if ($presenta->save() < 0){
 							        throw new \Exception('Falla final en Presenta');
 								}
 							}
@@ -1990,7 +1992,7 @@ class Controller_Curso_Examen extends Controller_Template
 								if(!($examen->vidas > $presenta->vidas)){
 									$presenta->terminado = 1;
 									// $presenta->save();	
-									if (!$presenta->save()){
+									if ($presenta->save() < 0){
 								        throw new \Exception('Falla final en Presenta');
 									}							
 								}
@@ -2079,7 +2081,7 @@ class Controller_Curso_Examen extends Controller_Template
 						if(isset($presenta) && !($presenta->vidas < $examen->vidas)){
 							$presenta->terminado = 1;
 							// $presenta->save();
-							if (!$presenta->save()){
+							if ($presenta->save() < 0){
 						        throw new \Exception('Falla final en Presenta');
 							}
 							$fue_ultima_vida = True;
@@ -2095,7 +2097,7 @@ class Controller_Curso_Examen extends Controller_Template
 							$presenta->terminado = 1;
 							$presenta->calificacion = $calificacion;
 							// $presenta->save();
-							if (!$presenta->save()){
+							if ($presenta->save() < 0){
 						        throw new \Exception('Falla final en Presenta');
 							}
 						}
@@ -2130,6 +2132,7 @@ class Controller_Curso_Examen extends Controller_Template
 					}
 				}
 				$pregunta->save();
+				SESSION::set('mensaje','Pregunta actualizada con éxito.');
 			}
 		}
 		SESSION::set('pestania','preguntas');

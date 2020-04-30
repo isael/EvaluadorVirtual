@@ -56,12 +56,18 @@ class Special_Selector
 		$result = 	'<div class="col-xs-12 col-sm-12">
 						<ul class="col-xs-12 selector">
 								<li class="response">
-									<input type="hidden" name="'.$responseTextId.'_option_selected" id="'.$responseTextId.'_option_selected" value="'.$defaultOptionValue.'">
-									<input class="form-control" type="text" placeholder="'.$placeholder.'" name="'.$responseTextId.'" id="'.$responseTextId.'" onfocus="javascript:handleFocus('.$resultsId.',true)" onfocusout="javascript:handleFocus('.$resultsId.',false)"'.$atributos.'>
-									<ul id="'.$resultsId.'">'.
-										$options
-										.$extraButtonElement.'
-						            </ul>
+									<div>
+										<input type="hidden" name="'.$responseTextId.'_option_selected" id="'.$responseTextId.'_option_selected" value="'.$defaultOptionValue.'">
+									</div>
+									<div>
+										<input class="form-control" type="text" placeholder="'.$placeholder.'" name="'.$responseTextId.'" id="'.$responseTextId.'" onfocus="javascript:handleFocus('.$resultsId.',true); addNewListener(\''.$responseTextId.'\');" onfocusout="javascript:handleFocus('.$resultsId.',false); removeNewListener(\''.$responseTextId.'\');"'.$atributos.'>
+									</div>
+									<div>
+										<ul id="'.$resultsId.'">'.
+											$options
+											.$extraButtonElement.'
+							            </ul>
+							        </div>
 						        </li>
 						        <li class="button">
 									<a href="javascript:toogleSelector('.$responseTextId.', '.$resultsId.')">v</a>

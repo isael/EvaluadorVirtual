@@ -106,16 +106,27 @@ function cambiarPestania(pestanias,pestania) {
 }
 
 function mostrarFormulario(boton_id,formulario_id,mensaje1,mensaje0){
-    formulario = document.getElementById(formulario_id);
-    boton = document.getElementById(boton_id);
+    const formulario = document.getElementById(formulario_id);
+    let boton = document.getElementById(boton_id);
     if($(formulario).is(":visible")){
         $(formulario).hide(300);
         $(boton).html(mensaje1);
     }else{
         $(formulario).show(300);
         $(boton).html(mensaje0);
+        let otros_formularios = document.getElementsByName("visibleToogle");
+        let formulario_aux = null;
+        otros_formularios.forEach(element => {
+            if(element.id !== boton.id){
+                formulario_aux = document.getElementById(element.getAttribute("relatedForm"));
+                if($(formulario_aux).is(":visible")){
+                    $(element).click();
+                }
+            }
+        });
     }
 }
+
 function cambia_preguntas_faltantes(esModal){
     let sufijo_modal = esModal ? "_modal" : "";
     let examen_cantidad_preguntas_elemento = document.getElementById("examen_cantidad_preguntas"+sufijo_modal) || document.getElementById("form_examen_cantidad_preguntas"+sufijo_modal);

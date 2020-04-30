@@ -9,7 +9,7 @@
 				<div class="row">
 					<div class="col-xs-1"><h4>Clave</h4></div>
 					<div class="col-xs-8"><h4>Curso</h4></div>
-					<div class="col-xs-3"><h4>Avisos</h4></div>
+					<div class="col-xs-3"><h4>Alumnos</h4></div>
 				</div>
 				<br>
 				<!-- Lista de Cursos -->
@@ -17,17 +17,27 @@
 				<?php
 					if(isset($cursos)){
 						foreach ($cursos as $curso) {
-							echo Html::anchor('curso?id='.$curso->id_curso, "<div class='renglon casilla'>".
+							if($curso['esperando'] === '0'){
+								$alumnos="<span>".
+									$curso['aceptados'].
+									"<span>";
+							}else{
+								$alumnos="<span class='text-danger'>".
+									$curso['aceptados'].
+									"+".$curso['esperando'].
+									"</span>";
+							}
+							echo Html::anchor('curso?id='.$curso['id_curso'], "<div class='renglon casilla'>".
 								"<div class='row'>".
 									"<div class='col-xs-1'><span>".
-									$curso->clave.
+									$curso['clave'].
 									"</span></div>".
 									"<div class='col-xs-8'><span>".
-									$curso->nombre.
+									$curso['nombre'].
 									"</span></div>".
-									"<div class='col-xs-3'><span>".
-									$curso->id_curso.
-									"</span></div>".
+									"<div class='col-xs-3'>".
+									$alumnos.
+									"</div>".
 								"</div>".
 							"</div>");
 						}

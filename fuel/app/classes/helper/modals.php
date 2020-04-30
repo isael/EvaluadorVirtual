@@ -182,7 +182,7 @@ class Modals
 								// 	</div>
 								// </div>';
 		}
-		$result = $result.Form::open('curso/examen/crear_examen');
+		$result = $result.Form::open(array('action' => 'curso/examen/crear_examen', 'accept-charset' => 'utf-8', 'method' => 'post', 'autocomplete' => 'off', 'onsubmit' => 'javascript:{return es_valido_formulario_crear_examen(\''.$sufijo_modal.'\')}'));
 		$result = $result.'<div class="form-group">
 								<div class="col-xs-12 col-sm-12 table">
 									<div class="col-xs-12 col-sm-12">'.
@@ -222,7 +222,7 @@ class Modals
 											Form::label('Inicio', 'examen_inicio'.$sufijo_modal).'
 										</div>
 										<div class="col-xs-12 col-sm-12">'.
-											Form::input('examen_inicio'.$sufijo_modal,$examen_inicio,array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
+											Form::input('examen_inicio'.$sufijo_modal,$examen_inicio,array('class'=>'form-control','type' => 'date', 'placeholder'=>'AAAA-MM-DD')).'
 										</div>
 									</div>
 									<div class="col-xs-6 col-sm-6 table-row">
@@ -230,7 +230,7 @@ class Modals
 											Form::label('Final', 'examen_final'.$sufijo_modal).'
 										</div>
 										<div class="col-xs-12 col-sm-12">'.
-											Form::input('examen_final'.$sufijo_modal,$examen_final,array('class'=>'form-control','type' => 'date', 'placeholder'=>'DD/MM/AAAA')).'
+											Form::input('examen_final'.$sufijo_modal,$examen_final,array('class'=>'form-control','type' => 'date', 'placeholder'=>'AAAA-MM-DD')).'
 										</div>
 									</div>
 								</div>
@@ -251,9 +251,13 @@ class Modals
 											Form::label('Preguntas por añadir', 'examen_faltante').'
 										</div>
 										<div class="col-xs-12 col-sm-12">'.
-											'<div id="preguntas_faltantes'.$sufijo_modal.'">'.intval($examen_cantidad_preguntas)*$multiplo_total_preguntas.'</div>'.
+											'<div id="preguntas_faltantes'.$sufijo_modal.'">'.intval($examen_cantidad_preguntas)*$multiplo_total_preguntas.'</div>
+											<div>'.
 											Form::input("preguntas_agregadas".$sufijo_modal,'0', array('type' => 'hidden')).''.
+											'</div>
+											<div>'.
 											Form::input("preguntas_multiplo".$sufijo_modal,$multiplo_total_preguntas, array('type' => 'hidden')).'
+											</div>
 										</div>
 									</div>
 								</div>'.
@@ -363,7 +367,7 @@ class Modals
 					</div>
 					<div class="modal-body">';
 		}
-		$result = $result.Form::open('curso/examen/crear_bibliografia');
+		$result = $result.Form::open(array('action' => 'curso/examen/crear_bibliografia', 'accept-charset' => 'utf-8', 'method' => 'post', 'onsubmit' => 'javascript:{return es_valido_formulario_crear_bibliografia(\''.$sufijo_modal.'\')}'));
 		$result = $result.'<div class="form-group">
 								<div class="col-xs-12 col-sm-12">'.
 									Form::label('Nombre', 'nombre_bibliografia').'
@@ -580,7 +584,7 @@ class Modals
 					</div>
 					<div class="modal-body">';
 		}
-		$result = $result.Form::open(array('action' => 'curso/examen/crear_pregunta', 'id' => 'pregunta_formulario'.$sufijo_modal));
+		$result = $result.Form::open(array('action' => 'curso/examen/crear_pregunta', 'accept-charset' => 'utf-8', 'method' => 'post',  'id' => 'pregunta_formulario'.$sufijo_modal, 'autocomplete' => 'off', 'onsubmit' => 'javascript:{return es_valido_formulario_crear_pregunta(\''.$sufijo_modal.'\')}'));
 
 		$result = $result.'
 							<div class="form-group">
@@ -1256,7 +1260,7 @@ class Modals
 							<div class="table">
 								<br>
 								<div class="col-xs-12 col-sm-12 table-row">'.
-									Form::label('Nombre del curso', 'pregunta_compartida_materia').'
+									Form::label('Nombre del curso del cual quieres obtener preguntas compartidas.', 'pregunta_compartida_materia').'
 								</div>
 								<div class="col-xs-12 col-sm-12 table-row">'.
 									Form::input('pregunta_compartida_materia','', array('class'=>'form-control','type' => 'text', 'placeholder'=>'Escribe el nombre del curso lo más parecido a como está en la tira de materias')).'

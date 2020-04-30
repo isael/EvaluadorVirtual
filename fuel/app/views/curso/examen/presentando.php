@@ -32,7 +32,7 @@
 							}
 						?>
 					</div>
-					<div class="col-xs-4 materia materia_peque">
+					<div class="col-xs-4 materia materia_peque secondary">
 						<?php echo $examen->nombre; ?>
 					</div>
 					<div class="col-xs-4">
@@ -63,6 +63,7 @@
 				<!-- /Barra -->
 
 				<!-- Informacion -->
+				<div class="secondary">
 					<div class="col-xs-12">
 						<div class="col-xs-6">
 							<span>Tiempo restante: </span>
@@ -129,6 +130,7 @@
 				<!-- /Modal -->
 
 				<!-- /Contenido -->
+				</div>
 			</div>
 		</div>
 	</div>

@@ -176,11 +176,14 @@ class Controller_Sesion extends Controller_Template
 		if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
 			SESSION::delete('id_curso');
 			$id = substr($id,1);
-			$cursos = Model_Curso::find(function ($query) use ($id){
-			    return $query->join('Imparte')
-			                 ->on('Imparte.id_curso', '=', 'Curso.id_curso')
-			                 ->where('Imparte.n_trabajador', $id);
-			});
+			//SELECT `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`, COUNT(IF(`Cursa`.`estado` = 'a', `Cursa`.`estado`,null)) AS aceptados, COUNT(IF(`Cursa`.`estado` = 'e', `Cursa`.`estado`,null)) AS esperando FROM `Curso` JOIN `Imparte` ON (`Imparte`.`id_curso` = `Curso`.`id_curso`) LEFT JOIN `Cursa` ON (`Cursa`.`id_curso` = `Curso`.`id_curso`) WHERE `Imparte`.`n_trabajador` = '1' GROUP BY `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`
+			$sql = "SELECT `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`, COUNT(IF(`Cursa`.`estado` = 'a', `Cursa`.`estado`,null)) AS aceptados, COUNT(IF(`Cursa`.`estado` = 'e', `Cursa`.`estado`,null)) AS esperando FROM `Curso` JOIN `Imparte` ON (`Imparte`.`id_curso` = `Curso`.`id_curso`) LEFT JOIN `Cursa` ON (`Cursa`.`id_curso` = `Curso`.`id_curso`) WHERE `Imparte`.`n_trabajador` = '1' GROUP BY `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`";
+			$cursos = DB::query($sql)->execute();
+			// $cursos = Model_Curso::find(function ($query) use ($id){
+			//     return $query->join('Imparte')
+			//                  ->on('Imparte.id_curso', '=', 'Curso.id_curso')
+			//                  ->where('Imparte.n_trabajador', $id);
+			// });
 			$data = array('cursos' => $cursos);
 			$this->template->content = View::forge('sesion/sesion_profesor', $data);
 		}else{

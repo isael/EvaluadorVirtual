@@ -231,63 +231,84 @@
 								case "preguntas":
 								default:
 								?>
-									<div class="row">
-										<button id="mostrarCrearPregunta" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPregunta','agregarPregunta','+ Agrega nueva pregunta','- Cancelar nueva pregunta')">+ Agrega nueva pregunta</button>
+								<div class="row table">
+									<div class="col-xs-12 table-row">
+										<div class="col-xs-6">
+											<button id="mostrarCrearPregunta" name="visibleToogle" relatedForm="agregarPregunta" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPregunta','agregarPregunta','+ Nueva pregunta','- Cancelar pregunta')">+ Nueva pregunta</button>
+										</div>
+										<div class="col-xs-6">
+											<button id="mostrarCrearPreguntaCompartida" name="visibleToogle" relatedForm="agregarPreguntaCompartida" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPreguntaCompartida','agregarPreguntaCompartida','+ Preguntas compartidas','- Cancelar busqueda')">+ Preguntas compartidas</button>
+										</div>
 									</div>
-									<br>
-									<div id="agregarPregunta" class="row" style="display: none;">
-										<?php
-											echo Modals::getModalPregunta($temas, $bibliografias, $tipos);
-										?>
+									<div class="col-xs-12 table-row">
+										<br>
+										<div id="agregarPregunta" style="display: none;">
+											<?php
+												echo Modals::getModalPregunta($temas, $bibliografias, $tipos);
+											?>
+										</div>
+										<div id="agregarPreguntaCompartida" style="display: none;">
+											<?php
+												echo Modals::getModalPreguntaCompartidaFormulario($profesores);
+											?>
+										</div>
 									</div>
-									<div class="row">
-										<button id="mostrarCrearPreguntaCompartida" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPreguntaCompartida','agregarPreguntaCompartida','+ Agrega preguntas compartidas','- Cancelar preguntas compartidas')">+ Agrega preguntas compartidas</button>
-									</div>
-									<div id="agregarPreguntaCompartida" class="row" style="display: none;">
-										<?php
-											echo Modals::getModalPreguntaCompartidaFormulario($profesores);
-										?>
-									</div>
-
+								</div>
 								<?php
 							}
 							?>
 						<!-- /Seccion agregar pregunta -->
-						<br>
 						<!-- Lista Preguntas -->
 						<?php
 							$cual_boton = "preguntas";
 							if(isset($preguntas)){
 								echo '<div class="row">';
-								echo "<h4>Preguntas propias</h4>";
+								echo "<h3 class='secondary'>Lista de preguntas</h3>";
+								echo "<hr>";
+								echo "<h4 class='secondary'>Preguntas por tema</h4>";
 								$tema_actual = "";
+								$indice = 0;
 								foreach ($preguntas as $pregunta) {
 									if($tema_actual !== $pregunta->nombre){
-										if($tema_actual !== "")
+										if($tema_actual !== ""){
+												echo "</div>";
 											echo "</div>";
+										}
 										$tema_actual = $pregunta->nombre;
 										echo '<div class="col-xs-12 table">';
-										echo "<h5>".$tema_actual."</h5>";
+											echo '<div class="col-xs-12 table-row">';
+												echo '<div class="col-xs-8">';
+													echo "<span>".$tema_actual."</span>";
+												echo '</div>';
+												echo '<div class="col-xs-4">';
+													echo "<button id=\"mostrarPreguntasTema".$indice."\" name=\"visibleToogle\" relatedForm=\"preguntasTema".$indice."\" class=\"btn btn-primary btn-block btn-lg\" onclick=\"mostrarFormulario('mostrarPreguntasTema".$indice."','preguntasTema".$indice."','Mostrar','Ocultar')\"> Mostrar </button>";
+												echo '</div>';
+											echo '</div>';
+											echo '<div id="preguntasTema'.$indice.'" style="display: none;" class="table">';
 									}
-									echo '<div class="col-xs-12 col-md-6 col-lg-4">';
+									echo '<div class="col-xs-12 col-md-6 col-lg-4 table-row">';
 										echo '<div class="col-xs-9">';
 											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta->id_pregunta,'<b>Nivel '.$pregunta->dificultad.':</b> <i><span>'.$pregunta->texto.'</span></i>', array('class' => ''));
 											echo "<br>";
 										echo '</div>';
 										echo '<div class="col-xs-3" style="padding: 5px;">';
-											$texto = $pregunta->compartida === '1' ? 'Dejar de compartir' : 'Compartir';
-											echo Html::anchor('curso/examen/compartir_pregunta/'.$pregunta->id_pregunta,$texto, array('class' => 'btn btn-primary btn-block'));
+											$texto = $pregunta->compartida === '1' ? 'No compartir' : 'Compartir';
+											$estilo = $pregunta->compartida === '1' ? 'btn-danger' : 'btn-primary';
+											echo Html::anchor('curso/examen/compartir_pregunta/'.$pregunta->id_pregunta,$texto, array('class' => 'btn '.$estilo.' btn-block'));
 										echo '</div>';
 										echo "</br>";
 									echo '</div>';
+									$indice++;
 								}
-								if($tema_actual !== "")
+								if($tema_actual !== ""){
+										echo "</div>";
 									echo "</div>";
+								}
 								echo '</div>';
 							}
 							if(isset($preguntas_externas)){
 								echo '<div class="row">';
-								echo "<h4>Preguntas externas</h4>";
+								echo "<h4 class='secondary'>Preguntas externas</h4>";
 								$tema_actual = "";
 								foreach ($preguntas_externas as $pregunta_externa) {
 									if($tema_actual !== $pregunta_externa->nombre){

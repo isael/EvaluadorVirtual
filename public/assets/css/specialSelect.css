@@ -24,6 +24,7 @@
 }
  
 .selector li a {
+    height: 42px;
     padding:8px 0px;
     color:#616161;
     text-shadow:1px 1px 0px #fff;
