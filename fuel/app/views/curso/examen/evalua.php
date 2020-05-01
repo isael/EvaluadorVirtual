@@ -9,9 +9,14 @@
 						<?php echo "Vidas: "; ?>
 						<?php
 							$vidas_posibles = intval($examen->vidas);
+							$n_cuenta = SESSION::get('n_cuenta');
+							$es_test = False;
 							$vidas_usadas = 0;
 							if(isset($presenta)){
 								$vidas_usadas = intval($presenta->vidas)-1;
+							}
+							if(!isset($n_cuenta)){
+								$es_test = True;
 							}
 							$vidas_totales = $vidas_posibles - $vidas_usadas;
 							for ($i=0; $i < $vidas_totales; $i++) {
@@ -64,6 +69,10 @@
 					</div>
 					<hr style="border:2px dotted" />
 					<div class="col-xs-12">
+
+						<?php
+							if($es_test){
+						?>
 						<div class="col-xs-12">
 							<h4>Valor de la respuesta:</h4>
 						</div>
@@ -72,6 +81,9 @@
 								echo $evaluacion;
 							?>
 						</div>						
+						<?php
+							}
+						?>			
 						<div class="col-xs-12">
 				    		<span>Tiempo restante para comenzar la siguiente pregunta: </span>
 				    		<span id="tiempo"> 15</span>

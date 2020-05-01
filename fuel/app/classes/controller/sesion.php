@@ -151,12 +151,20 @@ class Controller_Sesion extends Controller_Template
 		if(isset($id) && substr($id,0,1)=='a'){
 			SESSION::delete('id_curso');
 			$id = substr($id,1);
-			$cursos = Model_Curso::find(function ($query) use ($id){
-			    return $query->join('Cursa')
-			                 ->on('Cursa.id_curso', '=', 'Curso.id_curso')
-			                 ->where('Cursa.n_cuenta', $id)
-			                 ->order_by('Cursa.estado');
-			});
+			// $cursos = Model_Curso::find(function ($query) use ($id){
+			//     return $query->join('Cursa')
+			//                  ->on('Cursa.id_curso', '=', 'Curso.id_curso')
+			//                  ->where('Cursa.n_cuenta', $id)
+			//                  ->order_by('Cursa.estado');
+			// });
+			$sql = "SELECT
+					`Curso`.`id_curso` as curso_id,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`, `Cursa`.`estado`,  
+					(SELECT COUNT(*) FROM `Curso` JOIN `Evalua` ON `Evalua`.`id_curso` = `Curso`.`id_curso` JOIN `Examen` ON `Examen`.`id_examen` = `Evalua`.`id_examen` JOIN `Presenta` ON `Presenta`.`id_examen` = `Examen`.`id_examen` WHERE `Presenta`.`terminado` = 1 AND `Examen`.`fecha_inicio` <= NOW() AND NOW() <= `Examen`.`fecha_fin` AND `Curso`.`id_curso` = curso_id AND `Presenta`.`n_cuenta` = ".$id.") as examenes_terminados,
+					(SELECT COUNT(*) FROM `Examen` JOIN `Evalua` ON `Examen`.`id_examen` = `Evalua`.`id_examen` JOIN `Cursa` ON `Cursa`.`id_curso` = `Evalua`.`id_curso` WHERE `Cursa`.`id_curso` = curso_id AND `Cursa`.`n_cuenta` = ".$id." AND (`Examen`.`fecha_inicio` > NOW() OR NOW() > `Examen`.`fecha_fin`)) as examenes_pasados, 
+					(SELECT COUNT(*) FROM `Examen` JOIN `Evalua` ON `Examen`.`id_examen` = `Evalua`.`id_examen` JOIN `Cursa` ON `Cursa`.`id_curso` = `Evalua`.`id_curso` WHERE `Cursa`.`id_curso` = curso_id AND `Cursa`.`n_cuenta` = ".$id.") as examenes_totales
+					FROM `Cursa` JOIN `Curso` ON `Cursa`.`id_curso` = `Curso`.`id_curso`
+					WHERE `Cursa`.`n_cuenta` = ".$id." GROUP BY curso_id, `Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`, `Cursa`.`estado`";
+			$cursos = DB::query($sql)->execute();
 			$data = array('cursos' => $cursos);
 			$this->template->content = View::forge('sesion/sesion_alumno', $data);
 		}else{
@@ -177,13 +185,8 @@ class Controller_Sesion extends Controller_Template
 			SESSION::delete('id_curso');
 			$id = substr($id,1);
 			//SELECT `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`, COUNT(IF(`Cursa`.`estado` = 'a', `Cursa`.`estado`,null)) AS aceptados, COUNT(IF(`Cursa`.`estado` = 'e', `Cursa`.`estado`,null)) AS esperando FROM `Curso` JOIN `Imparte` ON (`Imparte`.`id_curso` = `Curso`.`id_curso`) LEFT JOIN `Cursa` ON (`Cursa`.`id_curso` = `Curso`.`id_curso`) WHERE `Imparte`.`n_trabajador` = '1' GROUP BY `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`
-			$sql = "SELECT `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`, COUNT(IF(`Cursa`.`estado` = 'a', `Cursa`.`estado`,null)) AS aceptados, COUNT(IF(`Cursa`.`estado` = 'e', `Cursa`.`estado`,null)) AS esperando FROM `Curso` JOIN `Imparte` ON (`Imparte`.`id_curso` = `Curso`.`id_curso`) LEFT JOIN `Cursa` ON (`Cursa`.`id_curso` = `Curso`.`id_curso`) WHERE `Imparte`.`n_trabajador` = '1' GROUP BY `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`";
+			$sql = "SELECT `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`, COUNT(IF(`Cursa`.`estado` = 'a', `Cursa`.`estado`,null)) AS aceptados, COUNT(IF(`Cursa`.`estado` = 'e', `Cursa`.`estado`,null)) AS esperando FROM `Curso` JOIN `Imparte` ON (`Imparte`.`id_curso` = `Curso`.`id_curso`) LEFT JOIN `Cursa` ON (`Cursa`.`id_curso` = `Curso`.`id_curso`) WHERE `Imparte`.`n_trabajador` = ".$id." GROUP BY `Curso`.`id_curso`,`Curso`.`clave`,`Curso`.`nombre`,`Curso`.`activo`,`Curso`.`fecha_inicio`,`Curso`.`fecha_fin`";
 			$cursos = DB::query($sql)->execute();
-			// $cursos = Model_Curso::find(function ($query) use ($id){
-			//     return $query->join('Imparte')
-			//                  ->on('Imparte.id_curso', '=', 'Curso.id_curso')
-			//                  ->where('Imparte.n_trabajador', $id);
-			// });
 			$data = array('cursos' => $cursos);
 			$this->template->content = View::forge('sesion/sesion_profesor', $data);
 		}else{

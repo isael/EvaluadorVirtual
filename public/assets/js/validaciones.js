@@ -238,24 +238,24 @@ function es_valido_cantidad_preguntas(cantidadPreguntasElement){
 function es_valido_formulario_registro_profesor(){
 	let respuesta = true;
 
-	// let apellidosElement = document.getElementById("apellidos");
-	// let nombresElement = document.getElementById("nombres");
-	// let correoElement = document.getElementById("correo");
-	// let ntrabajadorElement = document.getElementById("ntrabajador");
-	// let pwd1Element = document.getElementById("pwd1");
-	// let pwd2Element = document.getElementById("pwd2");
+	let apellidosElement = document.getElementById("apellidos");
+	let nombresElement = document.getElementById("nombres");
+	let correoElement = document.getElementById("correo");
+	let ntrabajadorElement = document.getElementById("ntrabajador");
+	let pwd1Element = document.getElementById("pwd1");
+	let pwd2Element = document.getElementById("pwd2");
 
-	// respuesta = es_valido_nombre_apellido(apellidosElement) && respuesta;
-	// respuesta = es_valido_nombre_apellido(nombresElement) && respuesta;
-	// respuesta = es_valido_correo(correoElement) && respuesta;
-	// respuesta = es_valido_numero_trabajador(ntrabajadorElement) && respuesta;
-	// validaPassword1 = es_valido_password(pwd1Element);
-	// validaPassword2 = es_valido_password(pwd2Element);
-	// if(validaPassword1 && validaPassword2){
-	// 	respuesta = es_valido_passwordRepetido(pwd1Element,pwd2Element) && respuesta;
-	// }else{
-	// 	respuesta = false;
-	// }
+	respuesta = es_valido_nombre_apellido(apellidosElement) && respuesta;
+	respuesta = es_valido_nombre_apellido(nombresElement) && respuesta;
+	respuesta = es_valido_correo(correoElement) && respuesta;
+	respuesta = es_valido_numero_trabajador(ntrabajadorElement) && respuesta;
+	validaPassword1 = es_valido_password(pwd1Element);
+	validaPassword2 = es_valido_password(pwd2Element);
+	if(validaPassword1 && validaPassword2){
+		respuesta = es_valido_passwordRepetido(pwd1Element,pwd2Element) && respuesta;
+	}else{
+		respuesta = false;
+	}
 	return respuesta;
 }
 

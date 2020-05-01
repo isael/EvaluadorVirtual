@@ -36,7 +36,7 @@
 								$tiempo = $tiempo + intval($pregunta->tiempo);
 							}
 						}
-						$minutos = $tiempo / 60;
+						$minutos = intval($tiempo / 60);
 						$segundos = ($tiempo % 60) < 10 ? '0'.($tiempo % 60) : ($tiempo % 60) ;
 
 					?>

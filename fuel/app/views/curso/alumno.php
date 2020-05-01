@@ -78,8 +78,8 @@
 
 				<?php
 					echo "<h3>Exámenes disponibles</h3>";
+					$contador = 0;
 					if (isset($examenes)) {
-						$contador = 0;
 						foreach ($examenes as $examen) {
 							$vigente = False;
 							$hecho = False;
@@ -90,10 +90,14 @@
 							if(isset($examenes_disponibles) && in_array($examen->id_examen, $examenes_disponibles)){
 								$vigente = True;
 							}
+							$clase_vigente = !$hecho ? ( $vigente ? ' secondary' : ' text-danger') : '';
+							$icono_pendiente = $vigente && !$hecho ? '<i i="" class="fa fa-exclamation-circle fav_icon"></i>' : '';
+							$fecha_vigencia = $vigente ? $fecha_limite["day"].'/'.$fecha_limite["month"].'/'.$fecha_limite["year"] : '';
 							echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
 								echo Html::anchor(($vigente || $hecho ? 'curso/examen/presentar/'.$examen->id_examen : 'javascript:void()'),
-										'<div class="row">'.
+										'<div class="row'.$clase_vigente.'">'.
 											'<div class="col-xs-3">'.
+												$icono_pendiente.
 												'<i i="" class="fa fa-file-text-o fav_icon"></i>'.
 											'</div>'.
 											'<div class="col-xs-6">'.
@@ -101,17 +105,16 @@
 												' <h5>'.$examen->preguntas_por_mostrar.' preguntas</h5>'.
 											'</div>'.
 											'<div class="col-xs-3">'.
-												'<h4>'.($hecho ? 'Hecho' : ( $vigente ? 'Vigente' : 'No vigente') ).'</h4>'.
-												($vigente ? 'Fecha límite '.$fecha_limite["day"].'/'.$fecha_limite["month"].'/'.$fecha_limite["year"] : '').
+												'<h4>'.($hecho ? 'Hecho' : ( $vigente ? 'Vigente '.$fecha_vigencia : 'No vigente') ).'</h4>'.
 											'</div>'.
 										'</div>'
 									, array('class' => ''));
 							echo '</div>';
 							$contador = $contador+1;
 						}
-						if ($contador==0) {
-							echo "<p>-*- No hay exámenes disponibles -*-</p>";
-						}
+					}					
+					if ($contador==0) {
+						echo "<p>-*- No hay exámenes disponibles -*-</p>";
 					}
 
 				?>

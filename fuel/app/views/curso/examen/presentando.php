@@ -10,12 +10,16 @@
 						<?php
 							$siguiente_posicion_pregunta = SESSION::get('siguiente_posicion_pregunta');
 							$preguntas = SESSION::get('preguntas_ids');
-
+							$n_cuenta = SESSION::get('n_cuenta');
+							$es_test = False;
 							if(!isset($siguiente_posicion_pregunta)){
 								$siguiente_posicion_pregunta = 0;
 							}
 							if(!isset($preguntas)){
 								$preguntas = [];
+							}
+							if(!isset($n_cuenta)){
+								$es_test = True;
 							}
 
 							$vidas_posibles = intval($examen->vidas);
@@ -102,6 +106,9 @@
 							?>
 						</div>
 					</div>
+					<?php
+						if($es_test){
+					?>
 					<hr style="border:2px dotted" />
 					<div class="col-xs-12">
 						<div class="col-xs-12">
@@ -123,6 +130,9 @@
 							?>
 						</div>
 					</div>
+					<?php
+						}
+					?>
 				<!-- /Informacion -->
 
 				<!-- Modal -->
