@@ -44,6 +44,7 @@
 				// 	}
 					if(isset($cursos)){
 						$notificacion = "";
+						$fila="";
 						$tiene_examenes = False;
 						foreach ($cursos as $curso) {
 							if($curso['estado']=='a'){
@@ -53,48 +54,49 @@
 								}else{
 									$notificacion = "<i class='fa fa-check'></i>";
 								}
-								echo "<div class='renglon casilla'>";
-								echo "<div class='row'>";
-								echo "<div class='col-xs-2'><u>";
-								echo Html::anchor('curso?id='.$curso['curso_id'], $curso['clave']);
-								echo "</u></div>";
-								echo "<div class='col-xs-7'><u>";
-								echo Html::anchor('curso?id='.$curso['curso_id'], $curso['nombre']);
-								echo "</u></div>";
-								echo "<div class='col-xs-3'><u>";
-								echo Html::anchor('curso?id='.$curso['curso_id'], $notificacion);
-								echo "</u></div>";
-								echo "</div>";
-								echo "</div>";
+								$fila = "<div class='renglon casilla'>".
+									"<div class='row'>".
+									"<div class='col-xs-2'><u>".
+									$curso['clave'].
+									"</u></div>".
+									"<div class='col-xs-7'><u>".
+									$curso['nombre'].
+									"</u></div>".
+									"<div class='col-xs-3'><u>".
+									$notificacion.
+									"</u></div>".
+									"</div>".
+									"</div>";
 							}elseif ($curso['estado']=='e') {
-								echo "<div class='renglon casilla esperando'>";
-								echo "<div class='row'>";
-								echo "<div class='col-xs-2'>";
-								echo $curso['clave'];
-								echo "</div>";
-								echo "<div class='col-xs-7'>";
-								echo $curso['nombre'];
-								echo "</div>";
-								echo "<div class='col-xs-3'>";
-								echo "En espera.";
-								echo "</div>";
-								echo "</div>";
-								echo "</div>";
+								$fila = "<div class='renglon casilla esperando'>".
+									"<div class='row'>".
+									"<div class='col-xs-2'>".
+									$curso['clave'].
+									"</div>".
+									"<div class='col-xs-7'>".
+									$curso['nombre'].
+									"</div>".
+									"<div class='col-xs-3'>".
+									"En espera.".
+									"</div>".
+									"</div>".
+									"</div>";
 							}else{
-								echo "<div class='renglon casilla rechazado'>";
-								echo "<div class='row'>";
-								echo "<div class='col-xs-2'>";
-								echo $curso['clave'];
-								echo "</div>";
-								echo "<div class='col-xs-7'>";
-								echo $curso['nombre'];
-								echo "</div>";
-								echo "<div class='col-xs-3'>";
-								echo "Rechazado.";
-								echo "</div>";
-								echo "</div>";
-								echo "</div>";
+								$fila = "<div class='renglon casilla rechazado'>".
+									"<div class='row'>".
+									"<div class='col-xs-2'>".
+									$curso['clave'].
+									"</div>".
+									"<div class='col-xs-7'>".
+									$curso['nombre'].
+									"</div>".
+									"<div class='col-xs-3'>".
+									"Rechazado.".
+									"</div>".
+									"</div>".
+									"</div>";
 							}
+							echo Html::anchor('curso?id='.$curso['curso_id'], $fila);
 							
 						}
 					}
