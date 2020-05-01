@@ -104,7 +104,11 @@ class Controller_Sesion extends Controller_Template
 						$this->template->content = View::forge('sesion/inicio', $data);
 					}else{
 						//Es alumno
-						if($alumno->contrasenia==sha1($contrasenia)){
+						if($this->esta_pendiente($alumno->n_cuenta)){
+							$mensaje = "Activa tu cuenta con el correo que se te ha enviado para poder iniciar sesión";
+							$data = array('mensaje' => $mensaje );
+							$this->template->content = View::forge('sesion/inicio', $data);
+						}elseif($alumno->contrasenia==sha1($contrasenia)){
 							$id = $alumno->n_cuenta;
 							SESSION::set('id_sesion','a'.$id);
 							SESSION::set('usuario',$alumno);
@@ -112,14 +116,18 @@ class Controller_Sesion extends Controller_Template
 							//$this->template->content = View::forge('sesion/sesion_alumno', $data);//cambiar***********
 						}else{
 							$mensaje = "El correo y/o la contraseña son incorrectos.";
-							$data = array('mensaje' => $mensaje );				
+							$data = array('mensaje' => $mensaje );
 							$this->template->content = View::forge('sesion/inicio', $data);
 						}
 					}
 				}else{
 					//Es profesor. Si existiera una cuenta como profesor y otra como alumno para el mismo 
 					//alumno, que en principio no debera pasar, seleccionaria por defecto la de profesor.
-					if(($profesor->contrasenia)==sha1($contrasenia)){
+					if($this->esta_pendiente($profesor->n_trabajador)){
+							$mensaje = "Activa tu cuenta con el correo que se te ha enviado para poder iniciar sesión";
+							$data = array('mensaje' => $mensaje );
+							$this->template->content = View::forge('sesion/inicio', $data);
+					}elseif(($profesor->contrasenia)==sha1($contrasenia)){
 						$id = $profesor->n_trabajador;
 						SESSION::set('id_sesion','p'.$id);
 						SESSION::set('usuario',$profesor);
@@ -137,6 +145,37 @@ class Controller_Sesion extends Controller_Template
 		}
 
 		
+	}
+
+	private function esta_pendiente($id){
+		$respuesta = False;
+		$pendiente = Model_Pendiente::find_one_by('id',$id);
+		if(isset($pendiente)){
+			$respuesta = True;
+		}
+		return $respuesta;
+	}
+
+	/**
+	 * Controlador para activar las cuentas de usuarios
+	 *
+	 * @access  public
+	 * @return  Response
+	 */
+	public function action_activar($clave = "")
+	{
+		$this->template->nav_bar = View::forge('nav_bar');
+		$pendiente = Model_Pendiente::find_one_by('clave',$clave);
+		if(isset($pendiente)){
+			$pendiente->delete();
+			$mensaje = "Cuenta activada con éxito. Ingresa tu correo y contraseña para acceder al sitio.";
+			$data = array('mensaje' => $mensaje, 'className' => ' secondary' );
+			$this->template->content = View::forge('sesion/inicio', $data);
+		}else{
+			$mensaje = "Hay un error en la liga a la que intentas acceder.";
+			$data = array('mensaje' => $mensaje );
+			$this->template->content = View::forge('sesion/inicio', $data);
+		}
 	}
 
 	/**

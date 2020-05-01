@@ -4,7 +4,15 @@
             <div class="col-lg-12 text-center">
                 <h3>
                     <?php if(isset($mensaje)){
-                            echo $mensaje;?>
+                            if(isset($className)){
+                                echo '<div class="'.$className.'">';
+                            }
+                            echo $mensaje;
+                            if(isset($className)){
+                                echo '</div>';
+                            }
+                            ?>
+
                             <hr>
                             <?php
                         }
