@@ -367,6 +367,10 @@ class Controller_Principal extends Controller_Template
 	 */
 	public function action_404()
 	{
-		return Response::forge(Presenter::forge('principal/404'), 404);
+		// return Response::forge(Presenter::forge('principal/404'), 404);
+		$mensaje = "La página o recurso que buscas no existe. Verifica bien la dirección.";
+		$error = "404 página no encontrada";
+		$data = array('mensaje' => $mensaje,'error' => $error);
+		$this->template->content = View::forge('principal/mensaje', $data);
 	}
 }

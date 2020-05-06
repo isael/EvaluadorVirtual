@@ -6,10 +6,12 @@
 <?php 
 
 if (isset($error) && $error)
-	echo "<h1>Error<h1>";
+	echo "<h1>Error: ".$error."<h1>";
 
-	//Session::destroy();	
-
+	//Session::destroy();
+	echo '<br>';
+	echo '<hr>';
+	echo '<br>';
 if (isset($mensaje))
 	echo "<h3>".$mensaje."</h3>";
 
@@ -17,5 +19,4 @@ if (isset($mensaje))
 			</div>
 		</div>
 	</div>
-</section>	
-	
+</section>
