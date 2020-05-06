@@ -2118,6 +2118,7 @@ class Controller_Curso_Examen extends Controller_Template
 	 * @return  Response
 	 */
 	public function action_compartir_pregunta($id_pregunta){
+		$mensaje = null;
 		if(isset($id_pregunta)){
 			$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
 			if(isset($pregunta)){
@@ -2126,14 +2127,19 @@ class Controller_Curso_Examen extends Controller_Template
 				}else{
 					$pregunta_compartida = Model_CursoPreguntasCompartidas::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
 					if(isset($pregunta_compartida)){
-						SESSION::set('mensaje','Esta pregunta solo puede ser actualizada, ya que alguna profesora o profesor la está utilizando.');
+						$mensaje = 'Esta pregunta solo puede ser actualizada, ya que alguna profesora o profesor la está utilizando.';
 					}else{
 						$pregunta->compartida = '0';
 					}
 				}
 				$pregunta->save();
-				SESSION::set('mensaje','Pregunta actualizada con éxito.');
+				if(!isset($mensaje)){
+					$mensaje = 'Pregunta actualizada con éxito.';
+				}
 			}
+		}
+		if(isset($mensaje)){
+			SESSION::set('mensaje',$mensaje);
 		}
 		SESSION::set('pestania','preguntas');
 		Response::redirect('curso/examenes');
@@ -2215,13 +2221,16 @@ class Controller_Curso_Examen extends Controller_Template
 	 */
 	public function action_actualizar_pregunta_compartida($pregunta_id = null){
 		$id_curso = SESSION::get('id_curso');
+		$mensaje = SESSION::get('mensaje');
 		$id_pregunta = Input::post('pregunta_id');
 		$id_pregunta = isset($id_pregunta) ? trim($id_pregunta) : $pregunta_id;
 		$pregunta_compartida = Model_CursoPreguntasCompartidas::find(array('id_curso' => $id_curso, 'id_pregunta' => $id_pregunta ));
 		if(isset($pregunta_compartida)){
 			$pregunta_compartida->por_cambiar = '0';
 			$pregunta_compartida->save();
-
+			if(!isset($mensaje)){
+				SESSION::set('mensaje','Pregunta actualizada');
+			}
 			$primera_pregunta_compartida = Model_CursoPreguntasCompartidas::find('first',array('where' => array(array('id_pregunta', $id_pregunta),array('por_cambiar', '1'))));
 
 			if(!isset($primera_pregunta_compartida)){
@@ -2262,6 +2271,7 @@ class Controller_Curso_Examen extends Controller_Template
 			if(isset($pregunta_respaldo) && isset($id_fuente) && isset($id_fuente)){
 				$completa = True;
 				$pregunta = $this->copiar_pregunta($pregunta_respaldo, $id_tema, $id_fuente, $completa);
+				SESSION::set('mensaje','Pregunta guardada y actualizada');
 			}
 
 		}

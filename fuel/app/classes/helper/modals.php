@@ -876,7 +876,6 @@ class Modals
 								<div id="respuestas'.$sufijo_modal.'"">
 									<!-- Aquí van las respuestas -->'.
 									$respuestas.'
-									*-* Selecciona un tipo de pregunta primero *-*
 								</div>'.
 									Form::input('pregunta_cantidad_respuestas'.$sufijo_modal,$cantidad_respuestas, array('type' => 'hidden')).'
 								<div class="col-xs-12 col-sm-12">'.

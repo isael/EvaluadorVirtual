@@ -27,7 +27,6 @@ class Controller_Principal extends Controller_Template
     {
         parent::before(); 
         $this->template->nav_bar = View::forge('nav_bar');
-        //$this->template->portfolio_modals = View::forge('portfolio_modals');
         $this->template->footer = View::forge('footer');
         $this->template->title = "Evaluador Virtual";
      
@@ -345,10 +344,7 @@ class Controller_Principal extends Controller_Template
 		"</body>
 		</html>";
 		 
-		$success = mail($to, $subject, $message, $headers);
-		if (!$success) {
-		    $errorMessage = error_get_last()['message'];
-		}
+		mail($to, $subject, $message, $headers);
 	}
 
 	/**

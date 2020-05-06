@@ -237,7 +237,7 @@
 											<button id="mostrarCrearPregunta" name="visibleToogle" relatedForm="agregarPregunta" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPregunta','agregarPregunta','+ Nueva pregunta','- Cancelar pregunta')">+ Nueva pregunta</button>
 										</div>
 										<div class="col-xs-6">
-											<button id="mostrarCrearPreguntaCompartida" name="visibleToogle" relatedForm="agregarPreguntaCompartida" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPreguntaCompartida','agregarPreguntaCompartida','+ Preguntas compartidas','- Cancelar busqueda')">+ Preguntas compartidas</button>
+											<button id="mostrarCrearPreguntaCompartida" name="visibleToogle" relatedForm="agregarPreguntaCompartida" class="btn btn-primary btn-block btn-lg" onclick="mostrarFormulario('mostrarCrearPreguntaCompartida','agregarPreguntaCompartida','+ Preguntas compartidas','- Cancelar búsqueda')">+ Preguntas compartidas</button>
 										</div>
 									</div>
 									<div class="col-xs-12 table-row">

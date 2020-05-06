@@ -87,7 +87,17 @@
 							<h4>Pregunta:</h4>
 						</div>
 						<div class="col-xs-12">
-							<?php echo $pregunta->texto ?>
+							<?php
+								$texto_pregunta = $pregunta->texto;
+								if(preg_match("/^http[s]*:\/\/[a-z0-9._-].*$/",$texto_pregunta)) {
+										$texto_pregunta = str_replace('youtube.com/watch?v=', 'youtube.com/embed/', $texto_pregunta);
+										$texto_pregunta = str_replace('dailymotion.com/video/', 'dailymotion.com/embed/video/', $texto_pregunta);
+										echo '<iframe src="'.$texto_pregunta.'" width="400" height="300" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> Embed Not Supported
+										</iframe>';
+								}else{
+									echo $texto_pregunta;
+								}
+							?>
 						</div>
 					</div>
 					<div class="col-xs-12 table">
@@ -98,8 +108,17 @@
 							<?php
 								$i = 0;
 								foreach ($respuestas as $respuesta) {
-									echo '<a id="respuesta_'.$i.'" class="col-xs-6 col-md-6 col-lg-4 examen respuesta" href="javascript:agregaEstiloSelected(respuesta_'.$i.',respuestas)">';
-									echo $respuesta->contenido;
+									echo '<a id="respuesta_'.$i.'" class="col-xs-6 col-md-6 examen respuesta" href="javascript:agregaEstiloSelected(respuesta_'.$i.',respuestas)">';
+									$texto_respuesta = $respuesta->contenido;
+									if(preg_match("/^http[s]*:\/\/[a-z0-9._-].*$/",$texto_respuesta)) {
+										$texto_respuesta = str_replace('youtube.com/watch?v=', 'youtube.com/embed/', $texto_respuesta);
+										$texto_respuesta = str_replace('dailymotion.com/video/', 'dailymotion.com/embed/video/', $texto_respuesta);
+										echo '<iframe src="'.$texto_respuesta.'" width="400" height="300" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> Embed Not Supported
+										</iframe>';
+									echo "Selecciona esta respuesta";
+									}else{
+										echo $texto_respuesta;
+									}
 									echo '</a>';
 									$i++;
 								}

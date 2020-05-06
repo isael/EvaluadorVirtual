@@ -15,33 +15,6 @@
 				<!-- Lista de Cursos -->
 				<div class="row">
 				<?php
-				// 	if(isset($cursos)){
-				// 		foreach ($cursos as $curso) {
-				// 			if($curso['esperando'] === '0'){
-				// 				$alumnos="<span>".
-				// 					$curso['aceptados'].
-				// 					"<span>";
-				// 			}else{
-				// 				$alumnos="<span class='text-danger'>".
-				// 					$curso['aceptados'].
-				// 					"+".$curso['esperando'].
-				// 					"</span>";
-				// 			}
-				// 			echo Html::anchor('curso?id='.$curso['id_curso'], "<div class='renglon casilla'>".
-				// 				"<div class='row'>".
-				// 					"<div class='col-xs-1'><span>".
-				// 					$curso['clave'].
-				// 					"</span></div>".
-				// 					"<div class='col-xs-8'><span>".
-				// 					$curso['nombre'].
-				// 					"</span></div>".
-				// 					"<div class='col-xs-3'>".
-				// 					$alumnos.
-				// 					"</div>".
-				// 				"</div>".
-				// 			"</div>");
-				// 		}
-				// 	}
 					if(isset($cursos)){
 						$notificacion = "";
 						$fila="";

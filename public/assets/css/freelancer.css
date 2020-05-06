@@ -733,6 +733,8 @@ i.fav_icon {
 .respuesta{
   border: 1px solid var(--main-color);
   color: var(--secondary-color);
+  margin-bottom: 25px;
+  margin-top: 25px;
 }
 .respuesta.seleccionada{
   color: var(--dark-font-color);

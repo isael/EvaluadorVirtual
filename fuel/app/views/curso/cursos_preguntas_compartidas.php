@@ -25,7 +25,7 @@
 				
 					<div class="col-xs-12">
 						<?php
-							if(isset($cursos)){
+							if(isset($cursos) && sizeof($cursos)>0){
 								foreach ($cursos as $curso) {
 									echo '<div class="col-xs-12 table">';
 										echo '<h4>'.$curso->nombre.'</h4>';
@@ -56,6 +56,9 @@
 									echo '</div>';
 									echo '<br>';
 								}
+							}
+							else{
+								echo "No hay coincidencias con el curso que indicaste, inténtalo de nuevo.";
 							}
 						 ?>
 					</div>
