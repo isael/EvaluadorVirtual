@@ -324,9 +324,11 @@ class Controller_Principal extends Controller_Template
 		$pendiente->id = $id;
 		$pendiente->save();
 		//Pendiente de probar en servidor
+		$from = "noreply@evaluadorvirtual.com.mx";
 		$to = $correo;
 		$subject = "Registro Exitoso en Evaluador Virtual";
-		$headers = "MIME-Version: 1.0" . "\r\n";
+		$headers = "From:" . $from . "\r\n";
+		$headers .= "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
 		 
 		$message = "
