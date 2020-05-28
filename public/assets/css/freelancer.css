@@ -741,3 +741,17 @@ i.fav_icon {
   border: 1px solid var(--dark-font-color);
   font-weight: bold;
 }
+.toggle.btn{
+  width: 100% !important;
+}
+.toggle-on.btn{
+  padding: 0px;
+  padding-top: 5px;
+}
+.toggle-off.btn{
+  padding: 0px; 
+  padding-top: 5px;
+}
+.toggle-handle{
+  width: 50px;
+}

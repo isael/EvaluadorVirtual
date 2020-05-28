@@ -18,6 +18,7 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
     <!-- Bootstrap Core CSS -->
     <?php echo Asset::css('bootstrap.css'); ?>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 
     <!-- Theme CSS -->
     <?php echo Asset::css('freelancer.css'); ?>
@@ -90,6 +91,7 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 <!-- Bootstrap Core JavaScript -->
     <?php echo Asset::js('bootstrap.min.js'); ?>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
 <!-- Theme JavaScript -->
     <?php echo Asset::js('freelancer.js'); ?>

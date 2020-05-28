@@ -91,16 +91,29 @@
 																	</div>
 																</div>
 															</div>';
-														echo '<div class="form-group">
-																<div class="col-xs-12 col-sm-12 table">
-																	<div class="col-xs-12 col-sm-12">'.
-																		Form::label('Respuesta correcta', $error['id_respuesta_correcta']).'
+														if($error['muestra_respuestas'] === '1'){
+															echo '<div class="form-group">
+																	<div class="col-xs-12 col-sm-12 table">
+																		<div class="col-xs-12 col-sm-12">'.
+																			Form::label('Respuesta correcta', $error['id_respuesta_correcta']).'
+																		</div>
+																		<div class="col-xs-12 col-sm-12">'.
+																			Form::input($error['id_respuesta_correcta'],$error['texto_respuesta_correcta'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																		</div>
 																	</div>
-																	<div class="col-xs-12 col-sm-12">'.
-																		Form::input($error['id_respuesta_correcta'],$error['texto_respuesta_correcta'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																</div>';
+														}else{
+															echo '<div class="form-group">
+																	<div class="col-xs-12 col-sm-12 table">
+																		<div class="col-xs-12 col-sm-12">'.
+																			Form::label('Tema relacionado', $error['id_tema']).'
+																		</div>
+																		<div class="col-xs-12 col-sm-12">'.
+																			Form::input($error['id_tema'],$error['texto_tema'],array('class'=>'form-control','type' => 'text','readonly' => 'true')).'
+																		</div>
 																	</div>
-																</div>
-															</div>';
+																</div>';
+														}
 														echo '<div class="form-group">
 																<div class="col-xs-12 col-sm-12 table">
 																	<div class="col-xs-12 col-sm-12">'.

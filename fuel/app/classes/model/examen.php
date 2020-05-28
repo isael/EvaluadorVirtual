@@ -10,6 +10,7 @@ class Model_Examen extends \Model_Crud{
 		'vidas',
 		'preguntas_por_mostrar',
 		'preguntas_por_mezclar',
+		'muestra_respuestas',
 
 );
 

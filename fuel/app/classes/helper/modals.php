@@ -46,6 +46,7 @@ class Modals
 		$examen_lista_de_nombres_de_preguntas = '';
 		$examen_temas_modal = '';
 		$examen_temas_rangos = [];
+		$muestra_respuestas = 'checked';
 		if(isset($temas)){
 			foreach ($temas as $tema) {
 				$id_tema = $tema->id_tema;
@@ -150,7 +151,7 @@ class Modals
 			$examen_cantidad_preguntas = $examen->preguntas_por_mostrar;
 			$examen_vidas = $examen->vidas;
 			$examen_oportunidades = $examen->oportunidades;
-
+			$muestra_respuestas = $examen->muestra_respuestas === '1' ? 'checked' : '';
 			$sufijo_modal = "_modal";
 			$result =
 			'<div class="modal-dialog" role="document">
@@ -163,24 +164,6 @@ class Modals
 					</div>
 					<div class="modal-body">';
 			$temas_y_niveles =	'<input type="hidden" id="examen_temas_modal" name="examen_temas_modal" value="'.implode(',', $examen_temas_rangos).'" onclick="javascript:rellenar_modal_examen_con_temas(examen_temas_modal,lista_de_preguntas_por_tema,examen_tema,examen_tema_nivel_desde,examen_tema_nivel_hasta);">';
-								// <div class="col-xs-12 col-sm-12 table-row">
-								// 	<div class="col-xs-1 col-sm-1 table-row">
-								// 		<button type="button" class="btn btn-danger btn-block btn-lg">-</button>
-								// 	</div>
-								// 	<div class="col-xs-10 col-sm-10 table-row">
-								// 		<span>Mi primer tema. &nbsp;&nbsp;&nbsp;&nbsp;Cantidad de preguntas:</span>
-								// 		<span id="span_7">  N1: 3,   N2: 2,   N3: 1.</span>
-								// 	</div>
-								// </div>
-								// <div class="col-xs-12 col-sm-12 table-row">
-								// 	<div class="col-xs-1 col-sm-1 table-row">
-								// 		<button type="button" class="btn btn-danger btn-block btn-lg">-</button>
-								// 	</div>
-								// 	<div class="col-xs-10 col-sm-10 table-row">
-								// 		<span>Mi tercer tema. &nbsp;&nbsp;&nbsp;&nbsp;Cantidad de preguntas:</span>
-								// 		<span id="span_9">  N1: 2,   N2: 2,   N3: 0.</span>
-								// 	</div>
-								// </div>';
 		}
 		$result = $result.Form::open(array('action' => 'curso/examen/crear_examen', 'accept-charset' => 'utf-8', 'method' => 'post', 'autocomplete' => 'off', 'onsubmit' => 'javascript:{return es_valido_formulario_crear_examen(\''.$sufijo_modal.'\')}'));
 		$result = $result.'<div class="form-group">
@@ -305,6 +288,14 @@ class Modals
 									<br>'.
 									$temas_y_niveles.'
 								</div>
+							</div>							
+							<div class="col-xs-12">
+								<div class="col-xs-6">
+									En cada error se mostrará:
+								</div>
+								<div class="col-xs-6">
+									<input '.$muestra_respuestas.' name="muestra_respuestas'.$sufijo_modal.'" id="muestra_respuestas'.$sufijo_modal.'" type="checkbox" data-toggle="toggle" data-on="Respuesta correcta" data-off="Tema relacionado" data-onstyle="success" data-offstyle="primary">
+								</div>
 							</div>';
 		if($is_modal){
 			$result = $result.'
@@ -315,7 +306,7 @@ class Modals
 								Html::anchor('curso/examen/presentar/'.$id_examen,'Probar vista previa del examen',array('class'=>'btn btn-primary btn-block btn-lg')).
 								Form::input('pregunta_duplicada','', array('type' => 'hidden')).'
 							</div>
-							<br>	
+							<br>
 							<div class="col-xs-6">
 								<button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Cancelar</button>
 							</div>
@@ -328,6 +319,7 @@ class Modals
 			</div>';
 		}else{
 			$result = $result.'<br>
+								<br>
 								<div class="col-xs-12 col-sm-12">'.
 									Form::button('boton_agregar_examen', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
 								</div>

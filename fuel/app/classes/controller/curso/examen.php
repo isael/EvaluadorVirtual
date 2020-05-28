@@ -74,6 +74,7 @@ class Controller_Curso_Examen extends Controller_Template
 		$examen_cantidad_preguntas = trim(Input::post('examen_cantidad_preguntas'.$sufijo_modal));
 		$preguntas_agregadas = trim(Input::post('preguntas_agregadas'.$sufijo_modal));
 		$preguntas_multiplo = trim(Input::post('preguntas_multiplo'.$sufijo_modal));
+		$muestra_respuestas = trim(Input::post('muestra_respuestas'.$sufijo_modal));
 
 		$mensaje="";
 		$error = False;
@@ -166,6 +167,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_examen->vidas = $examen_vidas_value;
 					$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
 					$new_examen->preguntas_por_mezclar = $preguntas_agregadas;
+					$new_examen->muestra_respuestas = $muestra_respuestas === 'on' ? true : false;
 					// $new_examen->save();
 					if ($new_examen->save() < 0){
 				        throw new \Exception('Falla creación de examen en Examen');
@@ -193,6 +195,7 @@ class Controller_Curso_Examen extends Controller_Template
 					$new_examen->vidas = $examen_vidas_value;
 					$new_examen->preguntas_por_mostrar = $examen_cantidad_preguntas;
 					$new_examen->preguntas_por_mezclar = $preguntas_agregadas;
+					$new_examen->muestra_respuestas = $muestra_respuestas === 'on' ? true : false;
 					// $new_examen->save();
 					if ($new_examen->save() < 0){
 				        throw new \Exception('Falla creación de examen en Examen');
@@ -2015,6 +2018,12 @@ class Controller_Curso_Examen extends Controller_Template
 						$id_pregunta = $respuesta[1];
 						$id_respuesta = $respuesta[2];
 						$pregunta = Model_Pregunta::find_one_by('id_pregunta',$id_pregunta);
+						$genera = Model_Genera::find('first',array('where' => array(array('id_pregunta', $id_pregunta))));
+						$tema = null;
+						if(isset($genera)){
+							$id_tema = $genera->id_tema;
+							$tema = Model_Tema::find_one_by('id_tema',$id_tema);
+						}
 						$respuesta = ($id_respuesta >= 0) ? Model_Respuesta::find_one_by('id_respuesta',$id_respuesta) : null;
 						$_respuestas = Model_Respuesta::find(function ($query) use ($id_pregunta){
 							return $query->join('Contiene')
@@ -2051,7 +2060,7 @@ class Controller_Curso_Examen extends Controller_Template
 						$justificacion = $pregunta->justificacion;
 						$bibliografia = $referencia->nombre.', '.$referencia->numero.'ª edición: página '.$referencia->pagina.', capítulo '.$referencia->capitulo;
 
-						array_push($errores, array('n_cuenta' => $n_cuenta, 'titulo' => $titulo, 'id_pregunta' => $id_pregunta, 'texto_pregunta' => $texto_pregunta, 'id_respuesta' => $id_respuesta, 'texto_respuesta' => $texto_respuesta, 'id_respuesta_correcta' => $respuesta_correcta->id_respuesta, 'texto_respuesta_correcta' => $texto_respuesta_correcta, 'justificacion' => $justificacion, 'bibliografia' => $bibliografia ) );
+						array_push($errores, array('n_cuenta' => $n_cuenta, 'titulo' => $titulo, 'id_pregunta' => $id_pregunta, 'texto_pregunta' => $texto_pregunta, 'muestra_respuestas' => $examen->muestra_respuestas , 'id_tema' => $tema->id_tema, 'texto_tema' => $tema->nombre, 'id_respuesta' => $id_respuesta, 'texto_respuesta' => $texto_respuesta, 'id_respuesta_correcta' => $respuesta_correcta->id_respuesta, 'texto_respuesta_correcta' => $texto_respuesta_correcta, 'justificacion' => $justificacion, 'bibliografia' => $bibliografia ) );
 
 					}
 				}
