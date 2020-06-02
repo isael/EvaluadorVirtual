@@ -288,13 +288,13 @@
 									}
 									echo '<div class="col-xs-12 col-md-6 col-lg-4 table-row">';
 										echo '<div class="col-xs-9">';
-											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta->id_pregunta,'<b>Nivel '.$pregunta->dificultad.':</b> <i><span>'.$pregunta->texto.'</span></i>', array('class' => ''));
+											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta->id_pregunta.'?date='.time(),'<b>Nivel '.$pregunta->dificultad.':</b> <i><span>'.$pregunta->texto.'</span></i>', array('class' => ''));
 											echo "<br>";
 										echo '</div>';
 										echo '<div class="col-xs-3" style="padding: 5px;">';
 											$texto = $pregunta->compartida === '1' ? 'No compartir' : 'Compartir';
 											$estilo = $pregunta->compartida === '1' ? 'btn-danger' : 'btn-primary';
-											echo Html::anchor('curso/examen/compartir_pregunta/'.$pregunta->id_pregunta,$texto, array('class' => 'btn '.$estilo.' btn-block'));
+											echo Html::anchor('curso/examen/compartir_pregunta/'.$pregunta->id_pregunta.'?date='.time(),$texto, array('class' => 'btn '.$estilo.' btn-block'));
 										echo '</div>';
 										echo "</br>";
 									echo '</div>';
@@ -320,7 +320,7 @@
 									}
 									echo '<div class="col-xs-12 col-md-6 col-lg-4">';
 										echo '<div class="col-xs-9">';
-											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta_externa->id_pregunta.'/externa','<b>Nivel '.$pregunta_externa->dificultad.':</b> <i><span>'.$pregunta_externa->texto.'</span></i>', array('class' => ''));
+											echo Html::anchor('curso/examen/mostrar_pregunta/'.$pregunta_externa->id_pregunta.'/externa'.'?date='.time(),'<b>Nivel '.$pregunta_externa->dificultad.':</b> <i><span>'.$pregunta_externa->texto.'</span></i>', array('class' => ''));
 											echo "<br>";
 										echo '</div>';
 										echo '<div class="col-xs-3">';

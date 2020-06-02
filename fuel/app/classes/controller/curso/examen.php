@@ -1007,7 +1007,10 @@ class Controller_Curso_Examen extends Controller_Template
 												->where('Referencia.pagina', $pregunta_bibliografia_pagina)
 												->where('ReferenciaFuente.id_fuente', $fuente->id_fuente);
 								});
-								$similar_referencia = reset($similar_referencia_lista);
+								$similar_referencia = null;
+								if(isset($similar_referencia_lista)){
+									$similar_referencia = reset($similar_referencia_lista);
+								}
 
 								// Ya existe una referencia con esas propiedades, diferente a la actual
 								if(isset($similar_referencia)){

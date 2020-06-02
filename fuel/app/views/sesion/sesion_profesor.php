@@ -27,7 +27,7 @@
 									"+".$curso['esperando'].
 									"</span>";
 							}
-							echo Html::anchor('curso?id='.$curso['id_curso'], "<div class='renglon casilla'>".
+							echo Html::anchor('curso?id='.$curso['id_curso'].'&date='.time(), "<div class='renglon casilla'>".
 								"<div class='row'>".
 									"<div class='col-xs-1'><span>".
 									$curso['clave'].

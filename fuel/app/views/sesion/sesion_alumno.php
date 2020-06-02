@@ -69,7 +69,7 @@
 									"</div>".
 									"</div>";
 							}
-							echo Html::anchor('curso?id='.$curso['curso_id'], $fila);
+							echo Html::anchor('curso?id='.$curso['curso_id'].'&date='.time(), $fila);
 							
 						}
 					}
