@@ -94,7 +94,7 @@
 							$icono_pendiente = $vigente && !$hecho ? '<i i="" class="fa fa-exclamation-circle fav_icon"></i>' : '';
 							$fecha_vigencia = $vigente ? $fecha_limite["day"].'/'.$fecha_limite["month"].'/'.$fecha_limite["year"] : '';
 							echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';
-								echo Html::anchor(($vigente || $hecho ? 'curso/examen/presentar/'.$examen->id_examen : 'javascript:void()'),
+								echo Html::anchor(($vigente || $hecho ? 'curso/examen/presentar/'.$examen->id_examen.'?date='.time() : 'javascript:void()'),
 										'<div class="row'.$clase_vigente.'">'.
 											'<div class="col-xs-3">'.
 												$icono_pendiente.

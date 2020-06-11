@@ -99,7 +99,7 @@
 								echo '<div class="row">';
 								foreach ($examenes as $examen) {
 									echo '<div class="col-xs-12 col-md-6 col-lg-4 casilla">';
-										echo Html::anchor('curso/examen/mostrar_examen/'.$examen->id_examen,
+										echo Html::anchor('curso/examen/mostrar_examen/'.$examen->id_examen.'?date='.time(),
 												'<div class="row">'.
 													'<div class="col-xs-3">'.
 														'<i i="" class="fa fa-file-text-o fav_icon"></i>'.

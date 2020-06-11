@@ -1565,16 +1565,15 @@ class Controller_Curso_Examen extends Controller_Template
 		$id_examen = SESSION::get('id_examen');
 		$n_cuenta = SESSION::get('n_cuenta');
 		$es_test = True;
-
 		if(isset($n_cuenta)){
 			$es_test = False;
 		}
 
 		if(isset($id_examen)){
+			SESSION::delete('siguiente_posicion_pregunta');
 			DB::start_transaction(); 
 			try{
 				$examen = Model_Examen::find_one_by('id_examen',$id_examen);
-
 				$presenta = null;
 				if(!$es_test){
 					$presenta = Model_Presenta::find(array('n_cuenta' => $n_cuenta, 'id_examen' => $id_examen));
