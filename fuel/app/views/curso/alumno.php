@@ -77,7 +77,7 @@
 				<hr>
 
 				<?php
-					echo "<h3>Exámenes disponibles</h3>";
+					echo "<h3>Lista de exámenes</h3>";
 					$contador = 0;
 					if (isset($examenes)) {
 						foreach ($examenes as $examen) {
