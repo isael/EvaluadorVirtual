@@ -755,3 +755,11 @@ i.fav_icon {
 .toggle-handle{
   width: 50px;
 }
+.overflow{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.itemPregunta{
+  text-align: left;
+}

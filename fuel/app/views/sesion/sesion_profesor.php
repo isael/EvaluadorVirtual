@@ -7,8 +7,8 @@
 				<div class="materia">Lista de Cursos</div>
 				<br>
 				<div class="row">
-					<div class="col-xs-1"><h4>Clave</h4></div>
-					<div class="col-xs-8"><h4>Curso</h4></div>
+					<div class="col-xs-2"><h4>Clave</h4></div>
+					<div class="col-xs-7"><h4>Curso</h4></div>
 					<div class="col-xs-3"><h4>Alumnos</h4></div>
 				</div>
 				<br>
@@ -29,10 +29,10 @@
 							}
 							echo Html::anchor('curso?id='.$curso['id_curso'].'&date='.time(), "<div class='renglon casilla'>".
 								"<div class='row'>".
-									"<div class='col-xs-1'><span>".
+									"<div class='col-xs-2'><span>".
 									$curso['clave'].
 									"</span></div>".
-									"<div class='col-xs-8'><span>".
+									"<div class='col-xs-7 overflow'><span>".
 									$curso['nombre'].
 									"</span></div>".
 									"<div class='col-xs-3'>".

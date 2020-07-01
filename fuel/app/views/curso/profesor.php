@@ -8,11 +8,11 @@
 						<div class="col-xs-2 materia">
 							<?php echo Html::anchor('sesion/profesor','<i class="fa fa-arrow-left"></i>', array('class' => 'btn btn-primary btn-block btn-lg')); ?>
 						</div>
-						<div class="col-xs-2">
+						<div class="col-xs-0 col-md-1">
 						</div>
-						<div class="col-xs-4 materia">
+						<div class="col-xs-8 col-md-6 materia">
 								<!-- <?php echo $curso->nombre;?> -->
-							<?php echo Form::button('modificar_curso', '<i class="fa fa-pencil"></i>'.' '.$curso->nombre, array('class' => 'btn btn-primary btn-block btn-lg btn-materia', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalModificarCurso'));?>
+							<?php echo Form::button('modificar_curso', '<div class="overflow"><i class="fa fa-pencil"></i>'.' '.$curso->nombre.'</div>', array('class' => 'btn btn-primary btn-block btn-lg btn-materia', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalModificarCurso'));?>
 						</div>
 				</div>
 				<!-- /Barra -->
