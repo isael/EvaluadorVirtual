@@ -19,7 +19,7 @@
             <div class="navbar-header page-scroll">
                 <a class="navbar-brand" href="<?php echo Uri::base()."sesion/index";?>"><?php echo Asset::img('logo/ev_app_brand.png', array('width'=>'50%'));?> </a>
 
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menu_ajustes"> <i class="fa fa-cog"></i>  Ajustes
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menu_ajustes"> <i class="fa fa-bars"></i> &nbsp; Perfil
                 </button>
                 <button type="button" class="navbar-avatar usuario" style="background-image: url(<?php echo $foto;?>)" data-toggle="modal" data-target="#modalInfo">
                 </button>              
