@@ -321,7 +321,7 @@ class Modals
 			$result = $result.'<br>
 								<br>
 								<div class="col-xs-12 col-sm-12">'.
-									Form::button('boton_agregar_examen', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
+									Form::button('boton_agregar_examen', '+ Guardar nuevo examen', array('class' => 'btn btn-primary btn-block')).'
 								</div>
 								<br>';
 		}
@@ -428,7 +428,7 @@ class Modals
 		}else{
 			$result = $result.'<br>
 								<div class="col-xs-12 col-sm-12">'.
-									Form::button('boton_agregar_bibliografia', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
+									Form::button('boton_agregar_bibliografia', '+ Guardar nueva bibliografía', array('class' => 'btn btn-primary btn-block')).'
 								</div>
 								<br>';
 		}
@@ -684,7 +684,7 @@ class Modals
 		}else{
 			$result = $result.'<br>
 								<div class="col-xs-12 col-sm-12">'.
-									Form::button('boton_agregar_pregunta', '+ Agregar', array('class' => 'btn btn-primary btn-block')).'
+									Form::button('boton_agregar_pregunta', '+ Guardar nueva pregunta', array('class' => 'btn btn-primary btn-block')).'
 								</div>
 								<br>';
 		}
