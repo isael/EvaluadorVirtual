@@ -12,7 +12,7 @@
 						</div>
 						<div class="col-xs-8 col-md-6 materia">
 								<!-- <?php echo $curso->nombre;?> -->
-							<?php echo Form::button('modificar_curso', '<div class="overflow"><i class="fa fa-pencil"></i>'.' '.$curso->nombre.'</div>', array('class' => 'btn btn-primary btn-block btn-lg btn-materia', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalModificarCurso'));?>
+							<?php echo Form::button('modificar_curso', '<div class="overflow">&nbsp;&nbsp;<i class="fa fa-pencil"></i> | '.' '.$curso->nombre.'</div>', array('class' => 'btn btn-primary btn-block btn-lg btn-materia', 'type' => 'button', 'data-toggle' => 'modal', 'data-target' => '#modalModificarCurso'));?>
 						</div>
 				</div>
 				<!-- /Barra -->
