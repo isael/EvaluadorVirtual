@@ -398,7 +398,8 @@ function agregaEstiloSelected(respuesta,otras_respuestas) {
     let input_respuesta = document.getElementById('respuesta_elegida') || document.getElementById('form_respuesta_elegida');
     let string = "respuesta_";
     input_respuesta.value = respuesta.id.substring(string.length);
-    //habilitar el boton de pregunta.
+    const boton_evaluar = document.getElementById('boton_evaluar');
+    boton_evaluar.disabled = false;
 }
 
 function waiting() {
@@ -416,11 +417,13 @@ function waiting() {
             let input_respuesta = document.getElementById('respuesta_elegida') || document.getElementById('form_respuesta_elegida');
             input_respuesta.value = '-1';
             let sumbit = document.getElementById('boton_evaluar') || document.getElementById('form_boton_evaluar');
+            sumbit.disabled = false;
             sumbit.click();
         }else{
             span_elemento.innerHTML = tiempo;       
             if(tiempo == 0){
                 let sumbit = document.getElementById('boton_evaluar') || document.getElementById('form_boton_evaluar');
+                sumbit.disabled = false;
                 sumbit.click();
             }else{
                 setTimeout(function(){
