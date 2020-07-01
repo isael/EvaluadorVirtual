@@ -90,7 +90,7 @@
 							if(isset($examenes_disponibles) && in_array($examen->id_examen, $examenes_disponibles)){
 								$vigente = True;
 							}
-							$clase_vigente = !$hecho ? ( $vigente ? ' secondary' : ' text-danger') : '';
+							$clase_vigente = !$hecho ? ( $vigente ? '' : ' text-danger') : ' secondary';
 							$icono_pendiente = $vigente && !$hecho ? '<i i="" class="fa fa-exclamation-circle fav_icon"></i>' : '';
 							$fecha_vigencia = $vigente ? $fecha_limite["day"].'/'.$fecha_limite["month"].'/'.$fecha_limite["year"] : '';
 							echo '<div class="col-xs-12 col-md-6 col-lg-4 examen">';

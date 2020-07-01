@@ -8,7 +8,7 @@
 				<br>
 				<div class="row">
 					<div class="col-xs-2"><h4>Clave</h4></div>
-					<div class="col-xs-7"><h4>Curso</h4></div>
+					<div class="col-xs-7"><h4>Nombre</h4></div>
 					<div class="col-xs-3"><h4>Estado</h4></div>
 				</div>
 				<br>
@@ -23,7 +23,7 @@
 							if($curso['estado']=='a'){
 								$tiene_examenes = intval($curso['examenes_totales']) - intval($curso['examenes_pasados']) - intval($curso['examenes_terminados']) != 0;
 								if($tiene_examenes){
-									$notificacion = "<div class='secondary'><i class='fa fa-exclamation-circle'></i> <i class='fa fa-file-text-o'></i></div>";
+									$notificacion = "<div><i class='fa fa-exclamation-circle'></i> <i class='fa fa-file-text-o'></i></div>";
 								}else{
 									$notificacion = "<i class='fa fa-check'></i>";
 								}

@@ -4,11 +4,11 @@
 			<div class="col-lg-12 text-center">
 				<!-- Contenido -->
 
-				<div class="materia">Lista de Cursos</div>
+				<div class="materia secondary">Lista de Cursos</div>
 				<br>
 				<div class="row">
 					<div class="col-xs-2"><h4>Clave</h4></div>
-					<div class="col-xs-7"><h4>Curso</h4></div>
+					<div class="col-xs-7"><h4>Nombre</h4></div>
 					<div class="col-xs-3"><h4>Alumnos</h4></div>
 				</div>
 				<br>
