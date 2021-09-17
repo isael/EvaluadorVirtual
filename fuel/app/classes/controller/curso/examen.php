@@ -1539,17 +1539,22 @@ class Controller_Curso_Examen extends Controller_Template
 	{
 		$id_curso = SESSION::get('id_curso');
 		$curso = Model_Curso::find_one_by('id_curso',$id_curso);
+		$id = SESSION::get('id_sesion');
 		if(isset($curso) && $curso->activo){
 			SESSION::set('id_examen',$id_examen);
 			SESSION::delete('n_cuenta');
-			$id = SESSION::get('id_sesion');
 			if(isset($id) && substr($id,0,1)=='a'){
 				$n_cuenta = substr($id,1);
 				SESSION::set('n_cuenta',$n_cuenta);
 			}
 			Response::redirect('curso/examen/presentar_inicio');
 		}else{
-			Response::redirect('curso/alumno');
+			if(isset($id) && ($tipo_usuario = substr($id,0,1))=='p'){
+				SESSION::set('id_examen',$id_examen);
+				Response::redirect('curso/examen/presentar_inicio');
+			}else{
+				Response::redirect('curso/alumno');
+			}
 		}
 	}
 
